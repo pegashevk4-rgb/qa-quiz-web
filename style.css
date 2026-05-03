@@ -5,7 +5,17 @@ body {
   padding: 0;
 }
 
-#app-root, body {
+/* ОСТАВЛЯЕМ контейнер, как есть */
+.container {
+  max-width: 600px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 16px;
+  box-sizing: border-box;
+}
+
+/* Центруем только корень приложения, а не body */
+#app-root {
   display: flex;
   justify-content: center;
   align-items: center;
