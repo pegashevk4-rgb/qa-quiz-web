@@ -68,6 +68,24 @@ h1 {
   color: #000000;
 }
 
+#next-btn {
+  width: 100%;
+  max-width: 300px;
+  margin: 20px auto 0;
+  padding: 12px 16px;
+  border-radius: 999px;
+  border: none;
+  background: #1976d2;
+  color: #ffffff;
+  cursor: pointer;
+  font-size: 16px;
+  display: block;
+}
+
+#next-btn:hover {
+  background: #1565c0;
+}
+
 #options button:hover:not(:disabled) {
   background: #f0f0f0;
 }
