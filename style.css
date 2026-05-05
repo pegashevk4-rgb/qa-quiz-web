@@ -107,3 +107,74 @@ h1 {
   color: #fff;
   cursor: pointer;
 }
+
+/* Форма ввода данных */
+#user-form {
+  background: #ffffff;
+  padding: 32px 24px;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+  max-width: 600px;
+  width: 100%;
+  box-sizing: border-box;
+  text-align: center;
+}
+
+#user-form h2 {
+  margin-bottom: 24px;
+  color: #000;
+  font-size: 24px;
+  font-weight: 600;
+}
+
+#data-form {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+#data-form input {
+  width: 100%;
+  padding: 14px 16px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  font-size: 16px;
+  box-sizing: border-box;
+  background: #fafafa;
+  transition: border-color 0.2s, background 0.2s;
+}
+
+#data-form input:focus {
+  outline: none;
+  border-color: #1976d2;
+  background: #fff;
+  box-shadow: 0 0 0 3px rgba(25, 118, 210, 0.1);
+}
+
+#data-form input::placeholder {
+  color: #999;
+}
+
+#data-form button {
+  width: 100%;
+  max-width: 300px;
+  margin: 16px auto 0;
+  padding: 12px 16px;
+  border-radius: 999px; /* Овальная кнопка как в квизе */
+  border: none;
+  background: #1976d2; /* Голубой цвет как в квизе */
+  color: #ffffff;
+  font-size: 16px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.1s;
+}
+
+#data-form button:hover {
+  background: #1565c0;
+  transform: translateY(-1px);
+}
+
+#data-form button:active {
+  transform: translateY(0);
+}

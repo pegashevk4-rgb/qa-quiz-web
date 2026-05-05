@@ -26,6 +26,18 @@
           <button id="next-btn" style="display: none;">Далее</button>
         </div>
 
+        <!-- ДОБАВЬ ЭТО СЮДА ⬇️ -->
+        <div id="user-form" style="display: none;">
+          <h2>Введите ваши данные</h2>
+          <form id="data-form">
+            <input type="text" id="firstName" placeholder="Имя *" required>
+            <input type="text" id="lastName" placeholder="Фамилия *" required>
+            <input type="email" id="email" placeholder="Email (необязательно)">
+            <button type="submit">Сохранить результат</button>
+          </form>
+        </div>
+        <!-- ДО СЮДА ⬆️ -->
+
         <div id="result" style="display:none;">
           <h2>Результат</h2>
           <p id="result-text"></p>

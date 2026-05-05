@@ -1,69 +1,72 @@
-# QA Quiz
+# QA Quiz Web Application
 
-Веб‑тренажёр по теории тестирования для начинающих QA‑инженеров.
+Веб-приложение для тестирования знаний по QA с автоматическим сохранением результатов в Google Sheets.
 
-👉 Живая версия: https://pegashevk4-rgb.github.io/qa-quiz-web/
+## Особенности
 
-## Что это за проект
-
-- Тренажёр с вопросами по теории тестирования уровня junior.
-- За один проход задаётся 30 случайных вопросов из базы.
-- По каждому вопросу есть 4 варианта ответа и подсветка правильного/неправильного.
-- В конце показывается результат: количество правильных ответов и процент.
-
-## Темы вопросов
-
-Всего в базе 109 вопросов, охватываются:
-
-- Принципы тестирования (ISTQB).
-- Виды тестирования: функциональное, нагрузочное, security, usability, exploratory, A/B, локализация и др.
-- Уровни тестирования: unit, integration, system, UAT.
-- Документация: тест‑кейсы, чек‑листы, баг‑репорты, тест‑план, RTM, test report.
-- Severity / Priority и жизненный цикл дефекта.
-- Smoke / sanity / регрессия / ретест.
-- SDLC / STLC, Agile, Waterfall, спринты, CI/CD, code review.
-- API‑тестирование: REST, HTTP‑методы, статус‑коды, JSON, headers, Postman.
-- SQL для тестировщика: SELECT, WHERE, JOIN, COUNT, UPDATE, DISTINCT и др.
+- 30 вопросов по тестированию ПО
+- Автоматическое сохранение результатов в Google Таблицы
+- Локальная база данных SQLite
+- Поддержка кириллицы
+- Flask backend + Vanilla JS frontend
 
 ## Технологии
 
-- HTML, CSS, JavaScript (чистый JS без фреймворков).
-- Вопросы хранятся в `questions.json` в виде массива объектов:
-  - `id`, `category`, `question`, `options[]`, `correct_index`.
-- Режим случайных 30 вопросов за сессию.
-- Деплой через GitHub Pages.
+- **Backend:** Python, Flask, SQLite
+- **Frontend:** HTML, CSS, JavaScript
+- **Интеграция:** Google Sheets API, gspread
+- **Деплой:** GitHub Pages (frontend)
 
-## Как запустить локально
+## Установка
 
 1. Клонировать репозиторий:
-
 ```bash
-git clone https://github.com/pegashevk4-rgb/qa-quiz-web.git
+git clone https://github.com/ваш-username/qa-quiz-web.git
 cd qa-quiz-web
 ```
 
-2. Запустить простой локальный сервер (например, через Python):
+2. Создать виртуальное окружение:
+```bash
+python -m venv .venv
+.venv\Scripts\activate  # Windows
+```
+
+3. Установить зависимости:
+```bash
+pip install -r requirements.txt
+```
+
+4. Настроить Google Sheets API:
+   - Создать проект в Google Cloud Console
+   - Включить Google Sheets API
+   - Создать сервисный аккаунт и скачать JSON-ключ
+   - Поместить JSON-ключ в корень проекта
+   - Добавить email сервисного аккаунта в настройки доступа Google Таблицы
+
+5. Обновить `server.py`:
+   - Указать имя JSON-файла в `SERVICE_ACCOUNT_FILE`
+   - Указать ID вашей Google Таблицы в `SPREADSHEET_ID`
+
+## Запуск
 
 ```bash
-python -m http.server 8000
+python server.py
 ```
 
-3. Открыть в браузере:
+Открыть в браузере: `http://localhost:5000`
 
-```text
-http://localhost:8000/index.html
-```
+## Структура проекта
+qa-quiz-web/
+├── index.html # Главная страница
+├── script.js # Логика квиза
+├── styles.css # Стили
+├── server.py # Flask сервер
+├── requirements.txt # Зависимости Python
+├── .gitignore # Исключения для Git
+└── README.md # Документация
 
-Или просто использовать опубликованную версию по ссылке выше.
+text
 
-## Known issues
+## Автор
 
-- При открытии файла `index.html` напрямую через `file://` в браузере может не работать загрузка `questions.json` из-за ограничений на `fetch` локальных файлов.
-- Рекомендуемый способ запуска локально — через простой HTTP‑сервер, например:
-
-```bash
-cd qa-quiz-web
-python -m http.server 8000
-```
-
-После этого приложение доступно по адресу `http://localhost:8000/index.html` и ведёт себя так же, как на GitHub Pages.
+Кирилл Пегашев - Junior Python Developer / QA Engineer

@@ -12,6 +12,7 @@ const restartBtn = document.getElementById('restart-btn');
 const categoryTextEl = document.getElementById('category-text');
 const nextBtn = document.getElementById('next-btn');
 
+
 const QUESTIONS_PER_RUN = 30;
 
 async function loadQuestions() {
@@ -26,7 +27,6 @@ function shuffleAndSliceQuestions() {
   questions = questions.slice(0, QUESTIONS_PER_RUN);
 }
 
-// Функция для перемешивания массива (Фишер–Йетс)
 function shuffleArray(array) {
   const arr = array.slice();
   for (let i = arr.length - 1; i > 0; i--) {
@@ -41,6 +41,10 @@ function startQuiz() {
   correctCount = 0;
   quizEl.style.display = 'block';
   resultEl.style.display = 'none';
+  
+  const userFormEl = document.getElementById('user-form');
+  if (userFormEl) userFormEl.style.display = 'none';
+  
   nextBtn.style.display = 'none';
   showQuestion();
 }
@@ -52,18 +56,13 @@ function showQuestion() {
   categoryTextEl.textContent = `Категория: ${q.category}`;
   questionTextEl.textContent = q.question;
 
-  // исходные варианты и правильный текст
   const originalOptions = q.options;
   const originalCorrectIndex = q.correct_index;
   const correctText = originalOptions[originalCorrectIndex];
 
-  // перемешиваем копию вариантов
   const shuffledOptions = shuffleArray(originalOptions);
-
-  // находим новый индекс правильного ответа
   const newCorrectIndex = shuffledOptions.indexOf(correctText);
 
-  // сохраняем на время текущего прохода
   q._shuffledOptions = shuffledOptions;
   q._correctIndexShuffled = newCorrectIndex;
 
@@ -75,7 +74,6 @@ function showQuestion() {
     btn.onclick = () => handleAnswer(index);
   });
 
-  // кнопку «Далее» прячем до ответа
   nextBtn.style.display = 'none';
   nextBtn.onclick = null;
 }
@@ -86,15 +84,14 @@ function handleAnswer(selectedIndex) {
 
   if (selectedIndex === correctIndex) {
     correctCount++;
-    optionButtons[selectedIndex].style.backgroundColor = '#c8e6c9'; // зелёный
+    optionButtons[selectedIndex].style.backgroundColor = '#c8e6c9';
   } else {
-    optionButtons[selectedIndex].style.backgroundColor = '#ffcdd2'; // красный
+    optionButtons[selectedIndex].style.backgroundColor = '#ffcdd2';
     optionButtons[correctIndex].style.backgroundColor = '#c8e6c9';
   }
 
   optionButtons.forEach(btn => btn.disabled = true);
 
-  // показываем кнопку «Далее»
   nextBtn.style.display = 'block';
   nextBtn.onclick = () => {
     currentIndex++;
@@ -108,15 +105,54 @@ function handleAnswer(selectedIndex) {
 
 function showResult() {
   quizEl.style.display = 'none';
-  resultEl.style.display = 'block';
+  resultEl.style.display = 'none';
+  
+  const userFormEl = document.getElementById('user-form');
+  userFormEl.style.display = 'block';
 
   const total = questions.length;
   const percent = Math.round((correctCount / total) * 100);
 
-  resultTextEl.textContent = `Правильных ответов: ${correctCount} из ${total} (${percent}%).`;
+  const form = document.getElementById('data-form');
+  form.onsubmit = (e) => {
+    e.preventDefault();
+    
+    const firstName = document.getElementById('firstName').value;
+    const lastName = document.getElementById('lastName').value;
+    const email = document.getElementById('email').value;
+    
+    submitResults(firstName, lastName, email, correctCount, total);
+    
+    userFormEl.style.display = 'none';
+    resultEl.style.display = 'block';
+    resultTextEl.textContent = `Правильных ответов: ${correctCount} из ${total} (${percent}%).`;
+  };
+}
+
+function submitResults(firstName, lastName, email, score, total) {
+    fetch('http://localhost:5000/api/save-result', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            firstName: firstName,
+            lastName: lastName,
+            email: email,
+            score: score,
+            total: total
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        console.log('✅ Результат сохранён в БД:', data);
+    })
+    .catch(error => {
+        console.error('❌ Ошибка при сохранении:', error);
+        alert('Не удалось сохранить результат. Проверьте, запущен ли сервер.');
+    });
 }
 
 restartBtn.addEventListener('click', startQuiz);
 
-// стартуем при загрузке страницы
 loadQuestions();
