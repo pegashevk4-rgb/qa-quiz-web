@@ -2,6 +2,9 @@ let questions = [];
 let currentIndex = 0;
 let correctCount = 0;
 
+// базовый URL бэкенда на PythonAnywhere
+const API_BASE = 'https://kirilla5.pythonanywhere.com';
+
 // testId из URL (?test_id=qa_middle_web), по умолчанию middle
 const params = new URLSearchParams(window.location.search);
 const testId = params.get('test_id') || 'qa_middle_web';
@@ -22,10 +25,10 @@ const TEST_TITLES = {
   qa_senior_web: 'QA Senior (Web)',
 };
 
-// Загрузка вопросов теперь с бэка по test_id
+// Загрузка вопросов с бэка по test_id
 async function loadQuestions() {
   try {
-    const res = await fetch(`http://localhost:5000/api/test/${testId}`);
+    const res = await fetch(`${API_BASE}/api/test/${testId}`);
     if (!res.ok) {
       throw new Error('Ошибка загрузки теста');
     }
@@ -41,7 +44,7 @@ async function loadQuestions() {
       // берём title с бэка, если его нет — из TEST_TITLES, если и там нет — просто QA Quiz
       testTitleEl.textContent = data.title || TEST_TITLES[testId] || 'QA Quiz';
     }
-    
+
     startQuiz();
   } catch (e) {
     console.error(e);
@@ -152,7 +155,7 @@ function showResult() {
 }
 
 function submitResults(firstName, lastName, email, score, total) {
-  fetch('http://localhost:5000/api/save-result', {
+  fetch(`${API_BASE}/api/save-result`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
