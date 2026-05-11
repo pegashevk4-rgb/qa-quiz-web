@@ -1,37 +1,43 @@
 # QA Quiz Web Application
 
-Веб‑приложение для тестирования знаний по QA (Junior / Middle / Senior) с сохранением результатов и онлайн‑доступом через PythonAnywhere.
+Веб‑приложение для тестирования знаний по QA (Junior / Middle / Senior) с онлайн‑квизами и возможностью сохранения результатов.
 
-Локальный запуск:
-- Откройте `index.html` в браузере
-  или
+## Демо
+
+GitHub Pages (frontend, без VPN):
+
+- Junior: https://pegashevk4-rgb.github.io/qa-quiz-web/index.html?test_id=qa_junior_web  
+- Middle: https://pegashevk4-rgb.github.io/qa-quiz-web/index.html?test_id=qa_middle_web  
+- Senior: https://pegashevk4-rgb.github.io/qa-quiz-web/index.html?test_id=qa_senior_web
+
+## Локальный запуск (frontend)
+
+- Откройте `index.html` в браузере  
+  или  
 - Запустите локальный сервер в корне проекта:
-  ```bash
-  python -m http.server 8000
-  ```
-  и перейдите по адресу `http://localhost:8000/`
 
-После настройки GitHub Pages:
-- Демо будет доступно по ссылке:
-  https://pegashevk4-rgb.github.io/qa-quiz-web/index.html?test_id=qa_junior_web
+```bash
+python -m http.server 8000
+```
+
+и перейдите по адресу `http://localhost:8000/`.
 
 ## Особенности
 
 - Несколько квизов под разные уровни: **Junior / Middle / Senior**.
-- Вопросы отдаются с backend‑API по `test_id` (например, `qa_middle_web`).
+- Выбор квиза по `test_id` (например, `qa_junior_web`, `qa_middle_web`, `qa_senior_web`) через query‑параметр.
 - До 30 случайных вопросов за одну попытку (`QUESTIONS_PER_RUN`).
 - Подсчёт результата и отображение процента правильных ответов.
-- Форма ввода имени/фамилии/email перед показом результата.
-- Сохранение результатов через API (может быть привязано к БД и/или Google Sheets).
+- Форма ввода имени/фамилии/email перед показом результата (для сбора контактных данных).
 - Полностью на русском, поддержка кириллицы.
-- Стэк: **Flask backend + Vanilla JS frontend**, деплой на **PythonAnywhere**.
+- Возможность подключения backend‑API для сохранения результатов (SQLite / Google Sheets).
 
 ## Технологии
 
-- **Backend:** Python, Flask, SQLite (опционально), интеграция с Google Sheets (gspread).
-- **Frontend:** HTML, CSS, JavaScript (без фреймворков).
+- **Frontend:** HTML, CSS, JavaScript (Vanilla JS, без фреймворков).
+- **Backend (опционально):** Python, Flask, SQLite, интеграция с Google Sheets (gspread).
 - **Интеграция:** Google Sheets API (через сервисный аккаунт).
-- **Деплой:** PythonAnywhere (backend + статический frontend).
+- **Хостинг фронтенда:** GitHub Pages.
 
 ## Структура проекта
 
@@ -40,7 +46,7 @@ qa-quiz-web/
 ├── index.html          # Страница квиза (frontend)
 ├── app.js              # Логика квиза на стороне клиента
 ├── style.css           # Стили
-├── server.py           # Flask-сервер и API (загрузка тестов, сохранение результатов)
+├── server.py           # Flask-сервер и API (загрузка тестов, сохранение результатов) [опционально]
 ├── export_to_csv.py    # Скрипт экспорта результатов из БД в CSV
 ├── view_results.py     # Скрипт просмотра результатов и выгрузки в Google Sheets
 ├── quiz_results.db     # Локальная база данных SQLite (игнорируется в Git)
