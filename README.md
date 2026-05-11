@@ -2,18 +2,18 @@
 
 Веб‑приложение для тестирования знаний по QA (Junior / Middle / Senior) с сохранением результатов и онлайн‑доступом через PythonAnywhere.
 
-## Онлайн‑демо
+Локальный запуск:
+- Откройте `index.html` в браузере
+  или
+- Запустите локальный сервер в корне проекта:
+  ```bash
+  python -m http.server 8000
+  ```
+  и перейдите по адресу `http://localhost:8000/`
 
-Продакшен‑версии квизов уже доступны по ссылкам:
-
-- **QA Junior (Web):**  
-  https://kirilla5.pythonanywhere.com/quiz/index.html?test_id=qa_junior_web
-- **QA Middle (Web):**  
-  https://kirilla5.pythonanywhere.com/quiz/index.html?test_id=qa_middle_web
-- **QA Senior (Web):**  
-  https://kirilla5.pythonanywhere.com/quiz/index.html?test_id=qa_senior_web
-
-Каждая ссылка открывает тот же frontend, но с разным `test_id`, который подтягивает соответствующий набор вопросов с backend‑API.
+После настройки GitHub Pages:
+- Демо будет доступно по ссылке:
+  https://pegashevk4-rgb.github.io/qa-quiz-web/index.html?test_id=qa_junior_web
 
 ## Особенности
 
