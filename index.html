@@ -10,8 +10,14 @@
   <div class="container">
     <div id="app-root">
       <div>
-        <h1>QA Quiz</h1>
-        <h2 id="test-title"></h2> 
+
+        <!-- Шапка с таймером -->
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+          <h1 style="margin: 0;">QA Quiz</h1>
+          <div id="timer" style="font-weight: bold; color: #c0392b;">Осталось: 15:00</div>
+        </div>
+
+        <h2 id="test-title"></h2>
 
         <div id="quiz">
           <div id="progress"></div>
@@ -27,7 +33,6 @@
           <button id="next-btn" style="display: none;">Далее</button>
         </div>
 
-        
         <div id="user-form" style="display: none;">
           <h2>Введите ваши данные</h2>
           <form id="data-form">
@@ -37,7 +42,6 @@
             <button type="submit">Сохранить результат</button>
           </form>
         </div>
-        
 
         <div id="result" style="display:none;">
           <h2>Результат</h2>
@@ -48,6 +52,117 @@
     </div>
   </div>
 
+  <!-- Модальное окно "Время вышло" -->
+  <div id="timeup-modal" style="display:none;
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,0.5);
+    justify-content: center; align-items: center;
+    z-index: 9999;">
+    <div style="background: #fff; padding: 20px 24px; border-radius: 8px;
+      max-width: 400px; width: 90%; text-align: center; box-shadow: 0 4px 16px rgba(0,0,0,0.2);">
+      <h2 style="margin-top:0; margin-bottom: 10px;">Время вышло</h2>
+      <p style="margin-bottom: 16px;">
+        Время на прохождение теста закончилось. Мы сохраним ваши ответы и покажем результат после ввода данных.
+      </p>
+      <button id="timeup-ok-btn" style="padding: 8px 16px; border: none;
+        background: #1976d2; color: #fff; border-radius: 4px; cursor: pointer;">
+        Ок
+      </button>
+    </div>
+  </div>
+
   <script src="app.js"></script>
+
+  <!-- Скрипт таймера -->
+  <script>
+    // Определяем test_id из URL
+    const TEST_ID = new URLSearchParams(window.location.search).get('test_id') || 'default_test';
+
+    // Время для разных уровней (сейчас для теста по 1 минуте)
+    let QUIZ_MINUTES = 15;
+    if (TEST_ID === 'qa_junior_web') QUIZ_MINUTES = 20;
+    if (TEST_ID === 'qa_middle_web') QUIZ_MINUTES = 20;
+    if (TEST_ID === 'qa_senior_web') QUIZ_MINUTES = 25;
+
+    const STORAGE_KEY = 'quiz_end_time_' + TEST_ID;
+
+    let endTime = localStorage.getItem(STORAGE_KEY);
+
+    if (!endTime) {
+      const now = Date.now();
+      endTime = now + QUIZ_MINUTES * 60 * 1000;
+      localStorage.setItem(STORAGE_KEY, endTime);
+    } else {
+      endTime = parseInt(endTime, 10);
+    }
+
+    const timerEl = document.getElementById('timer');
+
+    function formatTimeLeft(msLeft) {
+      const totalSeconds = Math.max(0, Math.floor(msLeft / 1000));
+      const minutes = Math.floor(totalSeconds / 60);
+      const seconds = totalSeconds % 60;
+      return (
+        String(minutes).padStart(2, '0') +
+        ':' +
+        String(seconds).padStart(2, '0')
+      );
+    }
+
+    function handleTimeIsUp() {
+      const userFormEl = document.getElementById('user-form');
+      const resultEl = document.getElementById('result');
+
+      // Если уже на форме или на результате — ничего не делаем
+      if (
+        (userFormEl && userFormEl.style.display === 'block') ||
+        (resultEl && resultEl.style.display === 'block')
+      ) {
+        localStorage.removeItem(STORAGE_KEY);
+        return;
+      }
+
+      const modal = document.getElementById('timeup-modal');
+      const okBtn = document.getElementById('timeup-ok-btn');
+
+      if (modal && okBtn) {
+        modal.style.display = 'flex';
+
+        okBtn.onclick = () => {
+          modal.style.display = 'none';
+
+          if (typeof showResult === 'function') {
+            showResult();
+          }
+
+          localStorage.removeItem(STORAGE_KEY);
+        };
+      } else {
+        if (typeof showResult === 'function') {
+          showResult();
+        }
+        localStorage.removeItem(STORAGE_KEY);
+      }
+    }
+
+    function updateTimer() {
+      const now = Date.now();
+      const msLeft = endTime - now;
+
+      if (msLeft <= 0) {
+        timerEl.textContent = 'Время вышло';
+        handleTimeIsUp();
+        if (window.timerInterval) {
+          clearInterval(window.timerInterval);
+        }
+        return;
+      }
+
+      timerEl.textContent = 'Осталось: ' + formatTimeLeft(msLeft);
+    }
+
+    window.timerInterval = setInterval(updateTimer, 1000);
+    updateTimer();
+  </script>
 </body>
 </html>

@@ -129,16 +129,27 @@ function handleAnswer(selectedIndex) {
 }
 
 function showResult() {
+  const userFormEl = document.getElementById('user-form');
+  const form = document.getElementById('data-form');
+
+  // Если результат уже показан — ничего не делаем
+  if (resultEl.style.display === 'block') {
+    return;
+  }
+
   quizEl.style.display = 'none';
   resultEl.style.display = 'none';
-
-  const userFormEl = document.getElementById('user-form');
   userFormEl.style.display = 'block';
+  
+   // Останавливаем таймер, как только перешли к форме
+  if (window.timerInterval) {
+    clearInterval(window.timerInterval);
+  }
 
   const total = questions.length;
   const percent = Math.round((correctCount / total) * 100);
 
-  const form = document.getElementById('data-form');
+  // Сбрасываем предыдущий обработчик, чтобы не навешивать дубль
   form.onsubmit = e => {
     e.preventDefault();
 
