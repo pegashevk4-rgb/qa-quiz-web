@@ -10,10 +10,6 @@ env/
 *.db
 quiz_results.db
 
-# Секретные ключи Google
-*.json
-!package.json
-
 # Python
 __pycache__/
 *.pyc
