@@ -152,7 +152,7 @@ function showQuestion() {
 
   // Рендер вариантов как radio/checkbox
   renderOptions(q);
-  
+
 }
 
 
@@ -184,12 +184,15 @@ function renderOptions(question) {
     wrapper.appendChild(label);
     optionsList.appendChild(wrapper);
 
-    // Клик по всей строке: прокидываем его на сам input
+    // Клик по ЛЮБОМУ месту строки: ищем input внутри и кликаем по нему
     wrapper.addEventListener('click', (e) => {
-      // если кликнули прямо по инпуту — даём браузеру всё сделать самому
-      if (e.target === input) return;
+      const inputInside = wrapper.querySelector('input');
+      if (!inputInside) return;
 
-      input.click(); // стандартный клик по input
+      // если кликнули прямо по input, даём браузеру сделать своё
+      if (e.target === inputInside) return;
+
+      inputInside.click(); // стандартный клик по input
     });
   });
 
@@ -216,6 +219,7 @@ function renderOptions(question) {
   nextBtn.disabled = true;
   nextBtn.onclick = handleAnswer;
 }
+
 
 function getUserAnswer(question) {
   if (question.type === 'single') {

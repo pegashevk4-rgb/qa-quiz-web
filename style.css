@@ -123,14 +123,14 @@ h1 {
   margin-bottom: 4px;
   border-radius: 6px;
   border: 1px solid #e5e7eb;
-  display: block;             /* важно */
+  display: block;
   background-color: #ffffff;
 }
 
 .option-item label {
-  display: flex;              /* важно */
+  display: flex;
   align-items: center;
-  width: 100%;                /* растягиваем на всю строку */
+  width: 100%;
   cursor: pointer;
 }
 
