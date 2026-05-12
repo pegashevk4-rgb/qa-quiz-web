@@ -243,3 +243,14 @@ h1 {
 #result {
   text-align: center;
 }
+
+/* Цвет кружочков и квадратиков */
+#options input[type="radio"],
+#options input[type="checkbox"] {
+  accent-color: #2563eb; /* текущий синий, можно заменить */
+}
+
+.timer {
+  font-weight: 600;
+  color: #4b5563; /* спокойный серый вместо красного */
+}
