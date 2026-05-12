@@ -42,7 +42,6 @@ async function loadQuestions() {
       throw new Error(`Неизвестный test_id: ${testId}`);
     }
 
-    // Файл лежит рядом с index.html на GitHub Pages
     const res = await fetch(jsonPath);
     if (!res.ok) {
       throw new Error('Ошибка загрузки теста: ' + res.status);
@@ -51,10 +50,9 @@ async function loadQuestions() {
     const data = await res.json();
     console.log('data из JSON:', data);
 
-    // ВРЕМЕННО, для дебага:
-    questions = data; // т.к. у тебя questions_senior.json — это массив
+    // ТВОЙ senior-файл — это МАССИВ вопросов.
+    questions = data;
     console.log('questions после загрузки:', questions.length);
-
 
     if (questions.length > QUESTIONS_PER_RUN) {
       questions = questions.slice(0, QUESTIONS_PER_RUN);
@@ -64,13 +62,12 @@ async function loadQuestions() {
     if (testTitleEl) {
       testTitleEl.textContent = TEST_TITLES[testId] || 'QA Quiz';
     }
-
-    console.log('Загружено вопросов:', questions.length);
   } catch (e) {
     console.error('Ошибка в loadQuestions:', e);
     alert('Не удалось загрузить вопросы. Проверь JSON и test_id в URL.');
   }
 }
+
 
 function shuffleArray(array) {
   const arr = array.slice();
@@ -82,10 +79,14 @@ function shuffleArray(array) {
 }
 
 function startQuiz() {
+  if (!questions || questions.length === 0) {
+    alert('Вопросы ещё не загрузились или список пуст. Обновите страницу.');
+    return;
+  }
+
   currentIndex = 0;
-  // correctCount = 0;
   totalScore = 0;
-  maxScore = questions.length; // по 1 максимальному баллу за вопрос
+  maxScore = questions.length;
 
   if (introEl) introEl.style.display = 'none';
   quizEl.style.display = 'block';
