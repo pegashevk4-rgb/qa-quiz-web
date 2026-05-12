@@ -45,11 +45,18 @@ async function loadQuestions() {
     // Файл лежит рядом с index.html на GitHub Pages
     const res = await fetch(jsonPath);
     if (!res.ok) {
-      throw new Error('Ошибка загрузки теста');
+      throw new Error('Ошибка загрузки теста: ' + res.status);
     }
 
     const data = await res.json();
-    questions = data.questions || [];
+
+    // У ТЕБЯ ФАЙЛ - ЭТО МАССИВ ВОПРОСОВ, А НЕ ОБЪЕКТ
+    if (Array.isArray(data)) {
+      questions = data;
+    } else {
+      // На всякий случай, если когда-то сделаешь { title, questions }
+      questions = data.questions || [];
+    }
 
     if (questions.length > QUESTIONS_PER_RUN) {
       questions = questions.slice(0, QUESTIONS_PER_RUN);
@@ -57,12 +64,12 @@ async function loadQuestions() {
 
     const testTitleEl = document.getElementById('test-title');
     if (testTitleEl) {
-      testTitleEl.textContent = data.title || TEST_TITLES[testId] || 'QA Quiz';
+      testTitleEl.textContent = TEST_TITLES[testId] || 'QA Quiz';
     }
 
-    // Ждём, пока пользователь нажмёт "Начать тест".
+    console.log('Загружено вопросов:', questions.length);
   } catch (e) {
-    console.error(e);
+    console.error('Ошибка в loadQuestions:', e);
     alert('Не удалось загрузить вопросы. Проверь JSON и test_id в URL.');
   }
 }
