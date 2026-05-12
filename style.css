@@ -123,10 +123,15 @@ h1 {
   margin-bottom: 4px;
   border-radius: 6px;
   border: 1px solid #e5e7eb;
-  display: flex;
-  align-items: center;
-  gap: 8px;
+  display: block;             /* важно */
   background-color: #ffffff;
+}
+
+.option-item label {
+  display: flex;              /* важно */
+  align-items: center;
+  width: 100%;                /* растягиваем на всю строку */
+  cursor: pointer;
 }
 
 .option-item:hover {
