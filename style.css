@@ -244,13 +244,13 @@ h1 {
   text-align: center;
 }
 
-/* Цвет кружочков и квадратиков */
+/* Мягкий цвет для radio и checkbox */
 #options input[type="radio"],
 #options input[type="checkbox"] {
-  accent-color: #2563eb; /* текущий синий, можно заменить */
+  accent-color: #4b5563;  /* спокойный серо-синий */
 }
 
 .timer {
   font-weight: 600;
-  color: #4b5563; /* спокойный серый вместо красного */
+  color: #4b5563; /* спокойный серый */
 }
