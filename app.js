@@ -4,9 +4,6 @@ let currentIndex = 0;
 let totalScore = 0;      // набранные баллы (может быть дробным)
 let maxScore = 0;        // максимум (по сути = числу вопросов)
 
-// базовый URL бэкенда на PythonAnywhere
-const API_BASE = 'https://kirilla5.pythonanywhere.com';
-
 // testId из URL (?test_id=qa_middle_web), по умолчанию middle
 const params = new URLSearchParams(window.location.search);
 const testId = params.get('test_id') || 'qa_middle_web';
@@ -30,13 +27,27 @@ const TEST_TITLES = {
   qa_senior_web: 'QA Senior (Web)',
 };
 
-// Загрузка вопросов с бэка по test_id
+// мапа testId -> файл с вопросами (лежат рядом с index.html)
+const TEST_JSON_MAP = {
+  qa_junior_web: 'questions_junior.json',
+  qa_middle_web: 'questions_middle.json',
+  qa_senior_web: 'questions_senior.json',
+};
+
+// Загрузка вопросов из статического JSON по test_id
 async function loadQuestions() {
   try {
-    const res = await fetch(`${API_BASE}/api/test/${testId}`);
+    const jsonPath = TEST_JSON_MAP[testId];
+    if (!jsonPath) {
+      throw new Error(`Неизвестный test_id: ${testId}`);
+    }
+
+    // Файл лежит рядом с index.html на GitHub Pages
+    const res = await fetch(jsonPath);
     if (!res.ok) {
       throw new Error('Ошибка загрузки теста');
     }
+
     const data = await res.json();
     questions = data.questions || [];
 
@@ -49,11 +60,10 @@ async function loadQuestions() {
       testTitleEl.textContent = data.title || TEST_TITLES[testId] || 'QA Quiz';
     }
 
-    // ВАЖНО: не запускаем тест автоматически.
     // Ждём, пока пользователь нажмёт "Начать тест".
   } catch (e) {
     console.error(e);
-    alert('Не удалось загрузить вопросы. Проверь сервер и test_id в URL.');
+    alert('Не удалось загрузить вопросы. Проверь JSON и test_id в URL.');
   }
 }
 
@@ -105,7 +115,9 @@ function showQuestion() {
 
   // Пересчитываем правильные индексы под перемешанный порядок
   const originalCorrectIndexes = q.correct_indexes || [];
-  const shuffledCorrectIndexes = originalCorrectIndexes.map(oldIdx => indexMap[oldIdx]);
+  const shuffledCorrectIndexes = originalCorrectIndexes.map(
+    oldIdx => indexMap[oldIdx]
+  );
 
   // Сохраняем во временные поля
   q._shuffledOptions = shuffledOptions;
@@ -174,7 +186,9 @@ function renderOptions(question) {
 
 function getUserAnswer(question) {
   if (question.type === 'single') {
-    const checked = document.querySelector('#options input[name="answer"]:checked');
+    const checked = document.querySelector(
+      '#options input[name="answer"]:checked'
+    );
     if (!checked) return null;
     return parseInt(checked.value, 10);
   } else {
@@ -249,7 +263,6 @@ function handleAnswer() {
   }
 }
 
-
 function showResult() {
   const userFormEl = document.getElementById('user-form');
   const form = document.getElementById('data-form');
@@ -269,48 +282,35 @@ function showResult() {
   }
 
   const totalQuestions = questions.length;
-const percent = Math.round((totalScore / maxScore) * 100);
+  const percent = Math.round((totalScore / maxScore) * 100);
 
-// Сбрасываем предыдущий обработчик, чтобы не навешивать дубль
-form.onsubmit = e => {
-  e.preventDefault();
+  // Сбрасываем предыдущий обработчик, чтобы не навешивать дубль
+  form.onsubmit = e => {
+    e.preventDefault();
 
-  const firstName = document.getElementById('firstName').value;
-  const lastName = document.getElementById('lastName').value;
-  const email = document.getElementById('email').value;
+    const firstName = document.getElementById('firstName').value;
+    const lastName = document.getElementById('lastName').value;
+    const email = document.getElementById('email').value;
 
-  submitResults(firstName, lastName, email, totalScore, maxScore);
+    submitResults(firstName, lastName, email, totalScore, maxScore);
 
-  userFormEl.style.display = 'none';
-  resultEl.style.display = 'block';
-  resultTextEl.textContent =
-    `Ваш результат: ${percent}%. (Вопросов: ${totalQuestions})`;
+    userFormEl.style.display = 'none';
+    resultEl.style.display = 'block';
+    resultTextEl.textContent =
+      `Ваш результат: ${percent}%. (Вопросов: ${totalQuestions})`;
   };
 }
 
 function submitResults(firstName, lastName, email, score, total) {
-  fetch(`${API_BASE}/api/save-result`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({
-      firstName: firstName,
-      lastName: lastName,
-      email: email,
-      score: score,
-      total: total,
-      testId: testId,
-    }),
-  })
-    .then(response => response.json())
-    .then(data => {
-      console.log('✅ Результат сохранён в БД:', data);
-    })
-    .catch(error => {
-      console.error('❌ Ошибка при сохранении:', error);
-      alert('Не удалось сохранить результат. Проверь, запущен ли сервер.');
-    });
+  // Пока без бэкенда: просто логируем в консоль
+  console.log('Результат теста:', {
+    firstName,
+    lastName,
+    email,
+    score,
+    total,
+    testId,
+  });
 }
 
 // Кнопка "Начать тест"
