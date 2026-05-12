@@ -119,6 +119,16 @@ function showQuestion() {
   categoryTextEl.textContent = `Категория: ${q.category}`;
   questionTextEl.textContent = q.question;
 
+  // Подсказка под вопросом: один / несколько вариантов
+  const questionHintEl = document.getElementById('question-hint');
+  if (questionHintEl) {
+    if (q.type === 'multiple') {
+      questionHintEl.textContent = 'Тип вопроса: можно выбрать несколько вариантов ответа.';
+    } else {
+      questionHintEl.textContent = 'Тип вопроса: выберите один вариант ответа.';
+    }
+  }
+
   // Перемешиваем варианты, сохраняем соответствие индексов
   const originalOptions = q.options;
   const shuffledOptions = shuffleArray(originalOptions);
@@ -142,8 +152,9 @@ function showQuestion() {
 
   // Рендер вариантов как radio/checkbox
   renderOptions(q);
-
+  
 }
+
 
 function renderOptions(question) {
   // очищаем контейнер
@@ -173,17 +184,12 @@ function renderOptions(question) {
     wrapper.appendChild(label);
     optionsList.appendChild(wrapper);
 
-    // Клик по всей строке переключает input (кроме прямого клика по самому input)
+    // Клик по всей строке: прокидываем его на сам input
     wrapper.addEventListener('click', (e) => {
+      // если кликнули прямо по инпуту — даём браузеру всё сделать самому
       if (e.target === input) return;
 
-      if (isMultiple) {
-        input.checked = !input.checked;
-      } else {
-        input.checked = true;
-      }
-
-      updateNextButtonState();
+      input.click(); // стандартный клик по input
     });
   });
 
