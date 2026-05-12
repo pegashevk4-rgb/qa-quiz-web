@@ -49,14 +49,12 @@ async function loadQuestions() {
     }
 
     const data = await res.json();
+    console.log('data из JSON:', data);
 
-    // У ТЕБЯ ФАЙЛ - ЭТО МАССИВ ВОПРОСОВ, А НЕ ОБЪЕКТ
-    if (Array.isArray(data)) {
-      questions = data;
-    } else {
-      // На всякий случай, если когда-то сделаешь { title, questions }
-      questions = data.questions || [];
-    }
+    // ВРЕМЕННО, для дебага:
+    questions = data; // т.к. у тебя questions_senior.json — это массив
+    console.log('questions после загрузки:', questions.length);
+
 
     if (questions.length > QUESTIONS_PER_RUN) {
       questions = questions.slice(0, QUESTIONS_PER_RUN);
