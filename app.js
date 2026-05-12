@@ -142,9 +142,7 @@ function showQuestion() {
 
   // Рендер вариантов как radio/checkbox
   renderOptions(q);
-
-  nextBtn.style.display = 'none';
-  nextBtn.onclick = null;
+  
 }
 
 function renderOptions(question) {
