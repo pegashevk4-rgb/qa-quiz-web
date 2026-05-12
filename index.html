@@ -14,43 +14,62 @@
         <!-- Шапка с таймером -->
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
           <h1 style="margin: 0;">QA Quiz</h1>
-          <div id="timer" style="font-weight: bold; color: #c0392b;">Осталось: 15:00</div>
+          <!-- здесь больше нет захардкоженных 15:00 -->
+          <div id="timer" style="font-weight: bold; color: #c0392b;">Осталось: --:--</div>
         </div>
 
+        <!-- Заголовок теста, который мы обновляем из app.js по testId -->
         <h2 id="test-title"></h2>
 
+        <!-- Интро-блок -->
         <div id="intro">
+          <h2>QA Senior (Web)</h2>
           <p>
-            Это тест <strong>QA Senior (Web)</strong>. Нажмите кнопку ниже, чтобы начать.
+            Это тест на уровень <strong>QA Senior (Web)</strong>.
           </p>
-          <button id="start-btn">Начать тест</button>
+          <p>
+            В тесте 30 вопросов: часть с одним правильным вариантом, часть — с несколькими.
+            Читайте подсказку под вопросом, чтобы понять, сколько ответов можно выбрать.
+          </p>
+          <div id="start-container">
+            <button id="start-btn">Начать тест</button>
+          </div>
         </div>
 
-        <div id="quiz">
+        <!-- Сам квиз (по умолчанию скрыт, app.js показывает) -->
+        <div id="quiz" style="display:none;">
           <div id="progress"></div>
-          <p id="category-text"></p>
-          <h2 id="question-text"></h2>
+          <div id="category-text"></div>
+          <h3 id="question-text"></h3>
+
+          <!-- подсказка под вопросом: один вариант / несколько -->
+          <p id="question-hint" class="question-hint"></p>
+
           <div id="options"></div>
-
-          <button id="next-btn" style="display: none;">Далее</button>
+          <button id="next-btn" style="display:none;">Далее</button>
         </div>
 
+        <!-- Форма данных пользователя -->
         <div id="user-form" style="display: none;">
-          <h2>Введите ваши данные</h2>
-          <form id="data-form">
-            <input type="text" id="firstName" placeholder="Имя *" required>
-            <input type="text" id="lastName" placeholder="Фамилия *" required>
-            <input type="email" id="email" placeholder="Email (необязательно)">
-            <button type="submit">Сохранить результат</button>
-          </form>
+          <div class="card">
+            <h2>Введите ваши данные</h2>
+            <form id="data-form">
+              <input type="text" id="firstName" placeholder="Имя *" required>
+              <input type="text" id="lastName" placeholder="Фамилия *" required>
+              <input type="email" id="email" placeholder="Email (необязательно)">
+              <button type="submit" class="primary-btn">Сохранить результат</button>
+            </form>
+          </div>
         </div>
 
+        <!-- Блок результата -->
         <div id="result" style="display:none;">
-          <h2>Результат</h2>
-          <p id="result-text"></p>
-          <button id="restart-btn">Пройти ещё раз</button>
+          <div class="card">
+            <h2>Результат</h2>
+            <p id="result-text"></p>
+            <button id="restart-btn" class="secondary-btn">Пройти ещё раз</button>
+          </div>
         </div>
-      </div>
     </div>
   </div>
 
@@ -76,98 +95,98 @@
   <script src="app.js"></script>
 
   <!-- Скрипт таймера -->
-<script>
-  // Определяем test_id из URL
-  const TEST_ID = new URLSearchParams(window.location.search).get('test_id') || 'default_test';
+  <script>
+    // Определяем test_id из URL
+    const TEST_ID = new URLSearchParams(window.location.search).get('test_id') || 'default_test';
 
-  // Время для разных уровней
-  let QUIZ_MINUTES = 15;
-  if (TEST_ID === 'qa_junior_web') QUIZ_MINUTES = 20;
-  if (TEST_ID === 'qa_middle_web') QUIZ_MINUTES = 20;
-  if (TEST_ID === 'qa_senior_web') QUIZ_MINUTES = 25;
+    // Время для разных уровней
+    let QUIZ_MINUTES = 15;
+    if (TEST_ID === 'qa_junior_web') QUIZ_MINUTES = 20;
+    if (TEST_ID === 'qa_middle_web') QUIZ_MINUTES = 20;
+    if (TEST_ID === 'qa_senior_web') QUIZ_MINUTES = 25;
 
-  const STORAGE_KEY = 'quiz_end_time_' + TEST_ID;
+    const STORAGE_KEY = 'quiz_end_time_' + TEST_ID;
 
-  let endTime = null;
-  const timerEl = document.getElementById('timer');
+    let endTime = null;
+    const timerEl = document.getElementById('timer');
 
-  function formatTimeLeft(msLeft) {
-    const totalSeconds = Math.max(0, Math.floor(msLeft / 1000));
-    const minutes = Math.floor(totalSeconds / 60);
-    const seconds = totalSeconds % 60;
-    return (
-      String(minutes).padStart(2, '0') +
-      ':' +
-      String(seconds).padStart(2, '0')
-    );
-  }
-
-  function handleTimeIsUp() {
-    const userFormEl = document.getElementById('user-form');
-    const resultEl = document.getElementById('result');
-
-    // Если уже на форме или на результате — ничего не делаем
-    if (
-      (userFormEl && userFormEl.style.display === 'block') ||
-      (resultEl && resultEl.style.display === 'block')
-    ) {
-      localStorage.removeItem(STORAGE_KEY);
-      return;
+    function formatTimeLeft(msLeft) {
+      const totalSeconds = Math.max(0, Math.floor(msLeft / 1000));
+      const minutes = Math.floor(totalSeconds / 60);
+      const seconds = totalSeconds % 60;
+      return (
+        String(minutes).padStart(2, '0') +
+        ':' +
+        String(seconds).padStart(2, '0')
+      );
     }
 
-    const modal = document.getElementById('timeup-modal');
-    const okBtn = document.getElementById('timeup-ok-btn');
+    function handleTimeIsUp() {
+      const userFormEl = document.getElementById('user-form');
+      const resultEl = document.getElementById('result');
 
-    if (modal && okBtn) {
-      modal.style.display = 'flex';
+      // Если уже на форме или на результате — ничего не делаем
+      if (
+        (userFormEl && userFormEl.style.display === 'block') ||
+        (resultEl && resultEl.style.display === 'block')
+      ) {
+        localStorage.removeItem(STORAGE_KEY);
+        return;
+      }
 
-      okBtn.onclick = () => {
-        modal.style.display = 'none';
+      const modal = document.getElementById('timeup-modal');
+      const okBtn = document.getElementById('timeup-ok-btn');
 
+      if (modal && okBtn) {
+        modal.style.display = 'flex';
+
+        okBtn.onclick = () => {
+          modal.style.display = 'none';
+
+          if (typeof showResult === 'function') {
+            showResult();
+          }
+
+          localStorage.removeItem(STORAGE_KEY);
+        };
+      } else {
         if (typeof showResult === 'function') {
           showResult();
         }
-
         localStorage.removeItem(STORAGE_KEY);
-      };
-    } else {
-      if (typeof showResult === 'function') {
-        showResult();
       }
-      localStorage.removeItem(STORAGE_KEY);
     }
-  }
 
-  function updateTimer() {
-    if (!endTime) return;
+    function updateTimer() {
+      if (!endTime) return;
 
-    const now = Date.now();
-    const msLeft = endTime - now;
+      const now = Date.now();
+      const msLeft = endTime - now;
 
-    if (msLeft <= 0) {
-      timerEl.textContent = 'Время вышло';
-      handleTimeIsUp();
+      if (msLeft <= 0) {
+        timerEl.textContent = 'Время вышло';
+        handleTimeIsUp();
+        if (window.timerInterval) {
+          clearInterval(window.timerInterval);
+        }
+        return;
+      }
+
+      timerEl.textContent = 'Осталось: ' + formatTimeLeft(msLeft);
+    }
+
+    // Запуск таймера только после старта теста (вызывается из startQuiz в app.js)
+    function startTimer() {
+      const now = Date.now();
+      endTime = now + QUIZ_MINUTES * 60 * 1000;
+      localStorage.setItem(STORAGE_KEY, endTime);
+
       if (window.timerInterval) {
         clearInterval(window.timerInterval);
       }
-      return;
+      window.timerInterval = setInterval(updateTimer, 1000);
+      updateTimer();
     }
-
-    timerEl.textContent = 'Осталось: ' + formatTimeLeft(msLeft);
-  }
-
-  // Запуск таймера только после старта теста
-  function startTimer() {
-    const now = Date.now();
-    endTime = now + QUIZ_MINUTES * 60 * 1000;
-    localStorage.setItem(STORAGE_KEY, endTime);
-
-    if (window.timerInterval) {
-      clearInterval(window.timerInterval);
-    }
-    window.timerInterval = setInterval(updateTimer, 1000);
-    updateTimer();
-  }
-</script>
+  </script>
 </body>
 </html>

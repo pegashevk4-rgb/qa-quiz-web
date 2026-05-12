@@ -3,91 +3,124 @@ body {
   background-color: #f5f5f5;
   margin: 0;
   padding: 0;
-  color: #000000; 
+  color: #000000;
 }
 
-/* ОСТАВЛЯЕМ контейнер, как есть */
+/* Контейнер страницы */
 .container {
-  max-width: 600px;
+  max-width: 800px;
   width: 100%;
   margin: 0 auto;
   padding: 16px;
   box-sizing: border-box;
 }
 
-.option-item {
-  padding: 8px 10px;
-  margin-bottom: 6px;
-  border-radius: 4px;
-  border: 1px solid #ddd;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.option-item:hover {
-  background-color: #f5f5f5;
-}
-
-#test-title {
-  text-align: center;
-  margin-top: 4px;
-  margin-bottom: 16px;
-  font-weight: 500;
-}
-/* Центруем только корень приложения, а не body */
+/* Центруем приложение по вертикали/горизонтали */
 #app-root {
   display: flex;
   justify-content: center;
-  align-items: center;
+  align-items: flex-start;
   min-height: 100vh;
 }
 
-#quiz, #result {
-  background: #ffffff;
-  padding: 24px 20px;
-  border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+/* Общая карточка: интро, форма, результат, сам квиз */
+#intro,
+#quiz,
+#user-form,
+#result {
   max-width: 600px;
   width: 100%;
+  margin: 40px auto 0 auto;
+  padding: 24px 28px;
+  border-radius: 12px;
+  background-color: #f9fafb;
+  box-shadow: 0 10px 25px rgba(15, 23, 42, 0.08);
+  border: 1px solid #e5e7eb;
   box-sizing: border-box;
 }
 
-h1 {
-  text-align: center;
-  margin-bottom: 16px;
+/* Заголовки в карточках */
+#intro h2,
+#user-form h2,
+#result h2 {
+  margin-top: 0;
+  margin-bottom: 12px;
+  font-size: 24px;
 }
 
+#intro p,
+#user-form p,
+#result p {
+  margin: 6px 0;
+  color: #4b5563;
+}
+
+/* Заголовок теста под шапкой */
+#test-title {
+  text-align: center;
+  margin-top: 4px;
+  margin-bottom: 8px;
+  font-weight: 500;
+}
+
+/* Заголовок страницы */
+h1 {
+  text-align: left;
+  margin-bottom: 8px;
+}
+
+/* Прогресс и категория */
 #progress {
   text-align: center;
-  margin-bottom: 12px;
-  color: #555;
+  margin-bottom: 8px;
+  color: #6b7280;
 }
 
+#category-text {
+  text-align: left;
+  margin-bottom: 4px;
+  font-size: 14px;
+  color: #6b7280;
+}
+
+/* Текст вопроса */
 #question-text {
   font-size: 18px;
-  margin-bottom: 16px;
+  margin-bottom: 8px;
   text-align: left;
 }
 
+/* Подсказка под вопросом */
+.question-hint {
+  font-size: 14px;
+  color: #6b7280;
+  margin-bottom: 10px;
+}
+
+/* Варианты */
 #options {
   display: flex;
   flex-direction: column;
   gap: 10px;
 }
 
-#options button {
-  display: block;
-  text-align: left;
-  padding: 10px 12px;
-  border-radius: 8px;
-  border: 1px solid #ddd;
-  background: #fafafa;
-  cursor: pointer;
-  transition: background-color 0.15s, border-color 0.15s;
-  color: #000000;
+/* Обёртка варианта */
+.option-item {
+  padding: 8px 10px;
+  margin-bottom: 4px;
+  border-radius: 6px;
+  border: 1px solid #e5e7eb;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background-color: #ffffff;
 }
 
+.option-item:hover {
+  background-color: #f3f4f6;
+}
+
+/* Кнопка "Далее" */
 #next-btn {
   width: 100%;
   max-width: 300px;
@@ -95,106 +128,118 @@ h1 {
   padding: 12px 16px;
   border-radius: 999px;
   border: none;
-  background: #1976d2;
+  background: #2563eb;
   color: #ffffff;
   cursor: pointer;
   font-size: 16px;
   display: block;
+  font-weight: 500;
+  transition: background-color 0.15s ease, transform 0.1s ease, box-shadow 0.15s ease;
 }
 
 #next-btn:hover {
-  background: #1565c0;
+  background: #1d4ed8;
+  transform: translateY(-1px);
+  box-shadow: 0 8px 18px rgba(37, 99, 235, 0.35);
 }
 
-#options button:hover:not(:disabled) {
-  background: #f0f0f0;
-}
-
-#options button:disabled {
-  cursor: default;
-}
-
-#result {
-  text-align: center;
-}
-
-#restart-btn {
-  margin-top: 16px;
-  padding: 10px 16px;
-  border-radius: 8px;
-  border: none;
-  background: #1976d2;
-  color: #fff;
-  cursor: pointer;
+#next-btn:active {
+  background: #1e40af;
+  transform: translateY(0);
+  box-shadow: none;
 }
 
 /* Форма ввода данных */
 #user-form {
-  background: #ffffff;
-  padding: 32px 24px;
-  border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-  max-width: 600px;
-  width: 100%;
-  box-sizing: border-box;
   text-align: center;
-}
-
-#user-form h2 {
-  margin-bottom: 24px;
-  color: #000;
-  font-size: 24px;
-  font-weight: 600;
 }
 
 #data-form {
   display: flex;
   flex-direction: column;
   gap: 14px;
+  margin-top: 12px;
 }
 
 #data-form input {
   width: 100%;
-  padding: 14px 16px;
-  border: 1px solid #ddd;
+  padding: 12px 14px;
+  border: 1px solid #d1d5db;
   border-radius: 8px;
   font-size: 16px;
   box-sizing: border-box;
-  background: #fafafa;
-  transition: border-color 0.2s, background 0.2s;
+  background: #ffffff;
+  transition: border-color 0.2s, box-shadow 0.2s;
 }
 
 #data-form input:focus {
   outline: none;
-  border-color: #1976d2;
-  background: #fff;
-  box-shadow: 0 0 0 3px rgba(25, 118, 210, 0.1);
+  border-color: #2563eb;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
 }
 
 #data-form input::placeholder {
-  color: #999;
+  color: #9ca3af;
 }
 
+/* Контейнер для кнопки старта по центру */
+#start-container {
+  display: flex;
+  justify-content: center;
+  margin-top: 20px;
+}
+
+/* Primary-кнопки: старт и сохранить */
+#start-btn,
 #data-form button {
+  padding: 10px 24px;
+  font-size: 16px;
+  border-radius: 999px;
+  border: none;
+  cursor: pointer;
+  background-color: #2563eb;
+  color: #fff;
+  font-weight: 500;
+  transition: background-color 0.15s ease, transform 0.1s ease, box-shadow 0.15s ease;
   width: 100%;
   max-width: 300px;
   margin: 16px auto 0;
-  padding: 12px 16px;
-  border-radius: 999px; /* Овальная кнопка как в квизе */
-  border: none;
-  background: #1976d2; /* Голубой цвет как в квизе */
-  color: #ffffff;
-  font-size: 16px;
-  font-weight: 500;
-  cursor: pointer;
-  transition: background 0.2s, transform 0.1s;
 }
 
+#start-btn:hover,
 #data-form button:hover {
-  background: #1565c0;
+  background-color: #1d4ed8;
   transform: translateY(-1px);
+  box-shadow: 0 8px 18px rgba(37, 99, 235, 0.35);
 }
 
+#start-btn:active,
 #data-form button:active {
+  background-color: #1e40af;
   transform: translateY(0);
+  box-shadow: none;
+}
+
+/* Кнопка "Пройти ещё раз" как secondary */
+#restart-btn {
+  margin-top: 16px;
+  padding: 10px 20px;
+  border-radius: 999px;
+  border: 1px solid #d1d5db;
+  background: #ffffff;
+  color: #374151;
+  cursor: pointer;
+  font-size: 15px;
+  font-weight: 500;
+  transition: background-color 0.15s ease, border-color 0.15s ease;
+}
+
+#restart-btn:hover {
+  background-color: #f3f4f6;
+  border-color: #9ca3af;
+}
+
+/* Центровка текста результата */
+#result {
+  text-align: center;
 }

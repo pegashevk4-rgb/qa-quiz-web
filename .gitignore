@@ -9,7 +9,7 @@ env/
 # База данных
 *.db
 quiz_results.db
-quiz-results*.json
+
 
 # Python
 __pycache__/

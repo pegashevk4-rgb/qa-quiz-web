@@ -180,8 +180,7 @@ function renderOptions(question) {
 
   optionsContainer.appendChild(optionsList);
 
-  // Подсказка для multiple
-  let hintEl = document.getElementById('multiple-hint');
+    let hintEl = document.getElementById('multiple-hint');
   if (!hintEl) {
     hintEl = document.createElement('p');
     hintEl.id = 'multiple-hint';
@@ -190,8 +189,7 @@ function renderOptions(question) {
   }
   if (isMultiple) {
     hintEl.style.display = 'block';
-    hintEl.textContent =
-      'Для этого вопроса может быть несколько правильных ответов. Полный балл — за все верные варианты без лишних, частичный — за частично правильный выбор.';
+    hintEl.textContent = 'Можно выбрать несколько вариантов ответа.';
   } else {
     hintEl.style.display = 'none';
   }
