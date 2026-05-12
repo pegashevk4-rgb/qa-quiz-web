@@ -142,7 +142,7 @@ function showQuestion() {
 
   // Рендер вариантов как radio/checkbox
   renderOptions(q);
-  
+
 }
 
 function renderOptions(question) {
@@ -150,7 +150,6 @@ function renderOptions(question) {
   optionsContainer.innerHTML = '';
 
   const isMultiple = question.type === 'multiple';
-
   const optionsList = document.createElement('div');
 
   question._shuffledOptions.forEach((opt, i) => {
@@ -171,29 +170,44 @@ function renderOptions(question) {
 
     label.appendChild(input);
     label.appendChild(document.createTextNode(` ${i + 1}. ${opt}`));
-
     wrapper.appendChild(label);
     optionsList.appendChild(wrapper);
+
+    // Клик по всей строке переключает input (кроме прямого клика по самому input)
+    wrapper.addEventListener('click', (e) => {
+      if (e.target === input) return;
+
+      if (isMultiple) {
+        input.checked = !input.checked;
+      } else {
+        input.checked = true;
+      }
+
+      updateNextButtonState();
+    });
   });
 
   optionsContainer.appendChild(optionsList);
 
-    let hintEl = document.getElementById('multiple-hint');
-  if (!hintEl) {
-    hintEl = document.createElement('p');
-    hintEl.id = 'multiple-hint';
-    hintEl.className = 'hint';
-    optionsContainer.appendChild(hintEl);
-  }
-  if (isMultiple) {
-    hintEl.style.display = 'block';
-    hintEl.textContent = 'Можно выбрать несколько вариантов ответа.';
-  } else {
-    hintEl.style.display = 'none';
+  // Собираем все инпуты текущего вопроса
+  const inputs = optionsContainer.querySelectorAll('input[type="radio"], input[type="checkbox"]');
+
+  function updateNextButtonState() {
+    let hasSelection = false;
+    inputs.forEach(inp => {
+      if (inp.checked) hasSelection = true;
+    });
+    nextBtn.disabled = !hasSelection;
   }
 
-  // Вешаем обработчик на "Далее"
+  // Следим за изменениями в инпутах
+  inputs.forEach(inp => {
+    inp.addEventListener('change', updateNextButtonState);
+  });
+
+  // Изначально показываем "Далее", но блокируем, пока нет выбора
   nextBtn.style.display = 'block';
+  nextBtn.disabled = true;
   nextBtn.onclick = handleAnswer;
 }
 
