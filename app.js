@@ -1,6 +1,8 @@
 let questions = [];
 let currentIndex = 0;
-let correctCount = 0;
+// let correctCount = 0;
+let totalScore = 0;      // набранные баллы (может быть дробным)
+let maxScore = 0;        // максимум (по сути = числу вопросов)
 
 // базовый URL бэкенда на PythonAnywhere
 const API_BASE = 'https://kirilla5.pythonanywhere.com';
@@ -10,7 +12,7 @@ const params = new URLSearchParams(window.location.search);
 const testId = params.get('test_id') || 'qa_middle_web';
 
 const questionTextEl = document.getElementById('question-text');
-const optionButtons = document.querySelectorAll('#options button');
+const optionsContainer = document.getElementById('options');
 const progressEl = document.getElementById('progress');
 const quizEl = document.getElementById('quiz');
 const resultEl = document.getElementById('result');
@@ -18,6 +20,9 @@ const resultTextEl = document.getElementById('result-text');
 const restartBtn = document.getElementById('restart-btn');
 const categoryTextEl = document.getElementById('category-text');
 const nextBtn = document.getElementById('next-btn');
+const introEl = document.getElementById('intro');
+const startBtn = document.getElementById('start-btn');
+
 const QUESTIONS_PER_RUN = 30;
 const TEST_TITLES = {
   qa_junior_web: 'QA Junior (Web)',
@@ -41,11 +46,11 @@ async function loadQuestions() {
 
     const testTitleEl = document.getElementById('test-title');
     if (testTitleEl) {
-      // берём title с бэка, если его нет — из TEST_TITLES, если и там нет — просто QA Quiz
       testTitleEl.textContent = data.title || TEST_TITLES[testId] || 'QA Quiz';
     }
 
-    startQuiz();
+    // ВАЖНО: не запускаем тест автоматически.
+    // Ждём, пока пользователь нажмёт "Начать тест".
   } catch (e) {
     console.error(e);
     alert('Не удалось загрузить вопросы. Проверь сервер и test_id в URL.');
@@ -63,7 +68,11 @@ function shuffleArray(array) {
 
 function startQuiz() {
   currentIndex = 0;
-  correctCount = 0;
+  // correctCount = 0;
+  totalScore = 0;
+  maxScore = questions.length; // по 1 максимальному баллу за вопрос
+
+  if (introEl) introEl.style.display = 'none';
   quizEl.style.display = 'block';
   resultEl.style.display = 'none';
 
@@ -71,6 +80,8 @@ function startQuiz() {
   if (userFormEl) userFormEl.style.display = 'none';
 
   nextBtn.style.display = 'none';
+  nextBtn.onclick = null;
+
   showQuestion();
 }
 
@@ -81,52 +92,163 @@ function showQuestion() {
   categoryTextEl.textContent = `Категория: ${q.category}`;
   questionTextEl.textContent = q.question;
 
+  // Перемешиваем варианты, сохраняем соответствие индексов
   const originalOptions = q.options;
-  const originalCorrectIndex = q.correct_index;
-  const correctText = originalOptions[originalCorrectIndex];
-
   const shuffledOptions = shuffleArray(originalOptions);
-  const newCorrectIndex = shuffledOptions.indexOf(correctText);
 
-  q._shuffledOptions = shuffledOptions;
-  q._correctIndexShuffled = newCorrectIndex;
-
-  optionButtons.forEach((btn, index) => {
-    const optionText = shuffledOptions[index];
-    btn.textContent = `${index + 1}. ${optionText}`;
-    btn.disabled = false;
-    btn.style.backgroundColor = '';
-    btn.onclick = () => handleAnswer(index);
+  // Строим карту "старый индекс -> новый индекс"
+  const indexMap = {};
+  shuffledOptions.forEach((opt, newIdx) => {
+    const oldIdx = originalOptions.indexOf(opt);
+    indexMap[oldIdx] = newIdx;
   });
+
+  // Пересчитываем правильные индексы под перемешанный порядок
+  const originalCorrectIndexes = q.correct_indexes || [];
+  const shuffledCorrectIndexes = originalCorrectIndexes.map(oldIdx => indexMap[oldIdx]);
+
+  // Сохраняем во временные поля
+  q._shuffledOptions = shuffledOptions;
+  q._correctIndexesShuffled = shuffledCorrectIndexes;
+
+  // Рендер вариантов как radio/checkbox
+  renderOptions(q);
 
   nextBtn.style.display = 'none';
   nextBtn.onclick = null;
 }
 
-function handleAnswer(selectedIndex) {
-  const q = questions[currentIndex];
-  const correctIndex = q._correctIndexShuffled;
+function renderOptions(question) {
+  // очищаем контейнер
+  optionsContainer.innerHTML = '';
 
-  if (selectedIndex === correctIndex) {
-    correctCount++;
-    optionButtons[selectedIndex].style.backgroundColor = '#c8e6c9';
+  const isMultiple = question.type === 'multiple';
+
+  const optionsList = document.createElement('div');
+
+  question._shuffledOptions.forEach((opt, i) => {
+    const wrapper = document.createElement('div');
+    wrapper.className = 'option-item';
+
+    const label = document.createElement('label');
+    const input = document.createElement('input');
+
+    if (isMultiple) {
+      input.type = 'checkbox';
+      input.name = `answer_${i}`;
+    } else {
+      input.type = 'radio';
+      input.name = 'answer';
+    }
+    input.value = i;
+
+    label.appendChild(input);
+    label.appendChild(document.createTextNode(` ${i + 1}. ${opt}`));
+
+    wrapper.appendChild(label);
+    optionsList.appendChild(wrapper);
+  });
+
+  optionsContainer.appendChild(optionsList);
+
+  // Подсказка для multiple
+  let hintEl = document.getElementById('multiple-hint');
+  if (!hintEl) {
+    hintEl = document.createElement('p');
+    hintEl.id = 'multiple-hint';
+    hintEl.className = 'hint';
+    optionsContainer.appendChild(hintEl);
+  }
+  if (isMultiple) {
+    hintEl.style.display = 'block';
+    hintEl.textContent =
+      'Для этого вопроса может быть несколько правильных ответов. Полный балл — за все верные варианты без лишних, частичный — за частично правильный выбор.';
   } else {
-    optionButtons[selectedIndex].style.backgroundColor = '#ffcdd2';
-    optionButtons[correctIndex].style.backgroundColor = '#c8e6c9';
+    hintEl.style.display = 'none';
   }
 
-  optionButtons.forEach(btn => (btn.disabled = true));
-
+  // Вешаем обработчик на "Далее"
   nextBtn.style.display = 'block';
-  nextBtn.onclick = () => {
-    currentIndex++;
-    if (currentIndex < questions.length) {
-      showQuestion();
-    } else {
-      showResult();
-    }
-  };
+  nextBtn.onclick = handleAnswer;
 }
+
+function getUserAnswer(question) {
+  if (question.type === 'single') {
+    const checked = document.querySelector('#options input[name="answer"]:checked');
+    if (!checked) return null;
+    return parseInt(checked.value, 10);
+  } else {
+    const inputs = document.querySelectorAll('#options input[type="checkbox"]');
+    const indexes = [];
+    inputs.forEach(inp => {
+      if (inp.checked) {
+        indexes.push(parseInt(inp.value, 10));
+      }
+    });
+    return indexes;
+  }
+}
+
+function scoreSingle(userIndex, question) {
+  if (userIndex === null) return 0;
+  const correctIdx = question._correctIndexesShuffled[0];
+  return userIndex === correctIdx ? 1 : 0;
+}
+
+function scoreMultiple(userIndexes, question) {
+  const correctIndexes = question._correctIndexesShuffled;
+  const K = correctIndexes.length;
+
+  if (!Array.isArray(userIndexes) || userIndexes.length === 0) {
+    return 0;
+  }
+
+  const correctSet = new Set(correctIndexes);
+  const userSet = new Set(userIndexes);
+
+  let score = 0;
+
+  // +1/K за каждый правильный отмеченный
+  for (const idx of userSet) {
+    if (correctSet.has(idx)) {
+      score += 1 / K;
+    } else {
+      // -1/K за каждый лишний
+      score -= 1 / K;
+    }
+  }
+
+  // Не уходим ниже 0
+  if (score < 0) score = 0;
+  // Не больше 1 на всякий случай
+  if (score > 1) score = 1;
+
+  return score;
+}
+
+function handleAnswer() {
+  const q = questions[currentIndex];
+  const userAnswer = getUserAnswer(q);
+
+  let gained = 0;
+
+  if (q.type === 'single') {
+    gained = scoreSingle(userAnswer, q);
+  } else {
+    gained = scoreMultiple(userAnswer, q);
+  }
+
+  totalScore += gained;
+
+  // Переходим к следующему
+  currentIndex++;
+  if (currentIndex < questions.length) {
+    showQuestion();
+  } else {
+    showResult();
+  }
+}
+
 
 function showResult() {
   const userFormEl = document.getElementById('user-form');
@@ -140,28 +262,29 @@ function showResult() {
   quizEl.style.display = 'none';
   resultEl.style.display = 'none';
   userFormEl.style.display = 'block';
-  
-   // Останавливаем таймер, как только перешли к форме
+
+  // Останавливаем таймер, как только перешли к форме
   if (window.timerInterval) {
     clearInterval(window.timerInterval);
   }
 
-  const total = questions.length;
-  const percent = Math.round((correctCount / total) * 100);
+  const totalQuestions = questions.length;
+const percent = Math.round((totalScore / maxScore) * 100);
 
-  // Сбрасываем предыдущий обработчик, чтобы не навешивать дубль
-  form.onsubmit = e => {
-    e.preventDefault();
+// Сбрасываем предыдущий обработчик, чтобы не навешивать дубль
+form.onsubmit = e => {
+  e.preventDefault();
 
-    const firstName = document.getElementById('firstName').value;
-    const lastName = document.getElementById('lastName').value;
-    const email = document.getElementById('email').value;
+  const firstName = document.getElementById('firstName').value;
+  const lastName = document.getElementById('lastName').value;
+  const email = document.getElementById('email').value;
 
-    submitResults(firstName, lastName, email, correctCount, total);
+  submitResults(firstName, lastName, email, totalScore, maxScore);
 
-    userFormEl.style.display = 'none';
-    resultEl.style.display = 'block';
-    resultTextEl.textContent = `Правильных ответов: ${correctCount} из ${total} (${percent}%).`;
+  userFormEl.style.display = 'none';
+  resultEl.style.display = 'block';
+  resultTextEl.textContent =
+    `Ваш результат: ${percent}%. (Вопросов: ${totalQuestions})`;
   };
 }
 
@@ -177,7 +300,7 @@ function submitResults(firstName, lastName, email, score, total) {
       email: email,
       score: score,
       total: total,
-      testId: testId, // ВАЖНО: передаём, чтобы сохранить, по какому тесту
+      testId: testId,
     }),
   })
     .then(response => response.json())
@@ -190,6 +313,23 @@ function submitResults(firstName, lastName, email, score, total) {
     });
 }
 
-restartBtn.addEventListener('click', startQuiz);
+// Кнопка "Начать тест"
+if (startBtn) {
+  startBtn.addEventListener('click', () => {
+    // Если вопросы ещё не загрузились по какой‑то причине — ничего не делаем
+    if (!questions || questions.length === 0) {
+      alert('Вопросы ещё не загрузились, попробуйте через пару секунд.');
+      return;
+    }
+    startQuiz();
+  });
+}
+
+// Кнопка "Пройти ещё раз"
+restartBtn.addEventListener('click', () => {
+  // Можно сбросить таймер в localStorage, если нужно начинать заново по времени
+  // localStorage.removeItem('quiz_end_time_' + testId);
+  startQuiz();
+});
 
 loadQuestions();
