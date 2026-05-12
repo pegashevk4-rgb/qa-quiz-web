@@ -76,95 +76,98 @@
   <script src="app.js"></script>
 
   <!-- Скрипт таймера -->
-  <script>
-    // Определяем test_id из URL
-    const TEST_ID = new URLSearchParams(window.location.search).get('test_id') || 'default_test';
+<script>
+  // Определяем test_id из URL
+  const TEST_ID = new URLSearchParams(window.location.search).get('test_id') || 'default_test';
 
-    // Время для разных уровней (сейчас для теста по 1 минуте)
-    let QUIZ_MINUTES = 15;
-    if (TEST_ID === 'qa_junior_web') QUIZ_MINUTES = 20;
-    if (TEST_ID === 'qa_middle_web') QUIZ_MINUTES = 20;
-    if (TEST_ID === 'qa_senior_web') QUIZ_MINUTES = 25;
+  // Время для разных уровней
+  let QUIZ_MINUTES = 15;
+  if (TEST_ID === 'qa_junior_web') QUIZ_MINUTES = 20;
+  if (TEST_ID === 'qa_middle_web') QUIZ_MINUTES = 20;
+  if (TEST_ID === 'qa_senior_web') QUIZ_MINUTES = 25;
 
-    const STORAGE_KEY = 'quiz_end_time_' + TEST_ID;
+  const STORAGE_KEY = 'quiz_end_time_' + TEST_ID;
 
-    let endTime = localStorage.getItem(STORAGE_KEY);
+  let endTime = null;
+  const timerEl = document.getElementById('timer');
 
-    if (!endTime) {
-      const now = Date.now();
-      endTime = now + QUIZ_MINUTES * 60 * 1000;
-      localStorage.setItem(STORAGE_KEY, endTime);
-    } else {
-      endTime = parseInt(endTime, 10);
+  function formatTimeLeft(msLeft) {
+    const totalSeconds = Math.max(0, Math.floor(msLeft / 1000));
+    const minutes = Math.floor(totalSeconds / 60);
+    const seconds = totalSeconds % 60;
+    return (
+      String(minutes).padStart(2, '0') +
+      ':' +
+      String(seconds).padStart(2, '0')
+    );
+  }
+
+  function handleTimeIsUp() {
+    const userFormEl = document.getElementById('user-form');
+    const resultEl = document.getElementById('result');
+
+    // Если уже на форме или на результате — ничего не делаем
+    if (
+      (userFormEl && userFormEl.style.display === 'block') ||
+      (resultEl && resultEl.style.display === 'block')
+    ) {
+      localStorage.removeItem(STORAGE_KEY);
+      return;
     }
 
-    const timerEl = document.getElementById('timer');
+    const modal = document.getElementById('timeup-modal');
+    const okBtn = document.getElementById('timeup-ok-btn');
 
-    function formatTimeLeft(msLeft) {
-      const totalSeconds = Math.max(0, Math.floor(msLeft / 1000));
-      const minutes = Math.floor(totalSeconds / 60);
-      const seconds = totalSeconds % 60;
-      return (
-        String(minutes).padStart(2, '0') +
-        ':' +
-        String(seconds).padStart(2, '0')
-      );
-    }
+    if (modal && okBtn) {
+      modal.style.display = 'flex';
 
-    function handleTimeIsUp() {
-      const userFormEl = document.getElementById('user-form');
-      const resultEl = document.getElementById('result');
+      okBtn.onclick = () => {
+        modal.style.display = 'none';
 
-      // Если уже на форме или на результате — ничего не делаем
-      if (
-        (userFormEl && userFormEl.style.display === 'block') ||
-        (resultEl && resultEl.style.display === 'block')
-      ) {
-        localStorage.removeItem(STORAGE_KEY);
-        return;
-      }
-
-      const modal = document.getElementById('timeup-modal');
-      const okBtn = document.getElementById('timeup-ok-btn');
-
-      if (modal && okBtn) {
-        modal.style.display = 'flex';
-
-        okBtn.onclick = () => {
-          modal.style.display = 'none';
-
-          if (typeof showResult === 'function') {
-            showResult();
-          }
-
-          localStorage.removeItem(STORAGE_KEY);
-        };
-      } else {
         if (typeof showResult === 'function') {
           showResult();
         }
+
         localStorage.removeItem(STORAGE_KEY);
+      };
+    } else {
+      if (typeof showResult === 'function') {
+        showResult();
       }
+      localStorage.removeItem(STORAGE_KEY);
+    }
+  }
+
+  function updateTimer() {
+    if (!endTime) return;
+
+    const now = Date.now();
+    const msLeft = endTime - now;
+
+    if (msLeft <= 0) {
+      timerEl.textContent = 'Время вышло';
+      handleTimeIsUp();
+      if (window.timerInterval) {
+        clearInterval(window.timerInterval);
+      }
+      return;
     }
 
-    function updateTimer() {
-      const now = Date.now();
-      const msLeft = endTime - now;
+    timerEl.textContent = 'Осталось: ' + formatTimeLeft(msLeft);
+  }
 
-      if (msLeft <= 0) {
-        timerEl.textContent = 'Время вышло';
-        handleTimeIsUp();
-        if (window.timerInterval) {
-          clearInterval(window.timerInterval);
-        }
-        return;
-      }
+  // Запуск таймера только после старта теста
+  function startTimer() {
+    const now = Date.now();
+    endTime = now + QUIZ_MINUTES * 60 * 1000;
+    localStorage.setItem(STORAGE_KEY, endTime);
 
-      timerEl.textContent = 'Осталось: ' + formatTimeLeft(msLeft);
+    if (window.timerInterval) {
+      clearInterval(window.timerInterval);
     }
-
     window.timerInterval = setInterval(updateTimer, 1000);
     updateTimer();
-  </script>
+  }
+</script>
 </body>
 </html>

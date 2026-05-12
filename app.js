@@ -50,13 +50,18 @@ async function loadQuestions() {
     const data = await res.json();
     console.log('data из JSON:', data);
 
-    // ТВОЙ senior-файл — это МАССИВ вопросов.
+    // senior-файл — массив вопросов
     questions = data;
-    console.log('questions после загрузки:', questions.length);
 
+    // перемешиваем
+    questions = shuffleArray(questions);
+
+    // ограничиваем 30 вопросами
     if (questions.length > QUESTIONS_PER_RUN) {
       questions = questions.slice(0, QUESTIONS_PER_RUN);
     }
+
+    console.log('questions после шифла:', questions.length);
 
     const testTitleEl = document.getElementById('test-title');
     if (testTitleEl) {
@@ -86,7 +91,7 @@ function startQuiz() {
 
   currentIndex = 0;
   totalScore = 0;
-  maxScore = questions.length;
+  maxScore = questions.length; // по 1 максимальному баллу за вопрос
 
   if (introEl) introEl.style.display = 'none';
   quizEl.style.display = 'block';
@@ -98,8 +103,14 @@ function startQuiz() {
   nextBtn.style.display = 'none';
   nextBtn.onclick = null;
 
+  // запускаем таймер только при старте теста
+  if (typeof startTimer === 'function') {
+    startTimer();
+  }
+
   showQuestion();
 }
+
 
 function showQuestion() {
   const q = questions[currentIndex];
