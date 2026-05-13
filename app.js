@@ -168,58 +168,24 @@ function renderOptions(question) {
     wrapper.className = 'option-item';
 
     const label = document.createElement('label');
-    const input = document.createElement('input');
+    label.className = 'option-label';
 
-    if (isMultiple) {
-      input.type = 'checkbox';
-      input.name = `answer_${i}`;
-    } else {
-      input.type = 'radio';
-      input.name = 'answer';
-    }
+    const input = document.createElement('input');
+    input.type = isMultiple ? 'checkbox' : 'radio';
+    // для множественного выбора лучше одно имя на вопрос
+    input.name = isMultiple ? `answer_${question.id}` : 'answer';
     input.value = i;
 
     label.appendChild(input);
     label.appendChild(document.createTextNode(` ${i + 1}. ${opt}`));
+
     wrapper.appendChild(label);
     optionsList.appendChild(wrapper);
-
-    // Клик по ЛЮБОМУ месту строки: ищем input внутри и кликаем по нему
-    wrapper.addEventListener('click', (e) => {
-      const inputInside = wrapper.querySelector('input');
-      if (!inputInside) return;
-
-      // если кликнули прямо по input, даём браузеру сделать своё
-      if (e.target === inputInside) return;
-
-      inputInside.click(); // стандартный клик по input
-    });
   });
-
+  
+  
   optionsContainer.appendChild(optionsList);
-
-  // Собираем все инпуты текущего вопроса
-  const inputs = optionsContainer.querySelectorAll('input[type="radio"], input[type="checkbox"]');
-
-  function updateNextButtonState() {
-    let hasSelection = false;
-    inputs.forEach(inp => {
-      if (inp.checked) hasSelection = true;
-    });
-    nextBtn.disabled = !hasSelection;
-  }
-
-  // Следим за изменениями в инпутах
-  inputs.forEach(inp => {
-    inp.addEventListener('change', updateNextButtonState);
-  });
-
-  // Изначально показываем "Далее", но блокируем, пока нет выбора
-  nextBtn.style.display = 'block';
-  nextBtn.disabled = true;
-  nextBtn.onclick = handleAnswer;
 }
-
 
 function getUserAnswer(question) {
   if (question.type === 'single') {

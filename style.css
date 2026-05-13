@@ -119,18 +119,14 @@ h1 {
 
 /* Обёртка варианта */
 .option-item {
-  padding: 8px 10px;
-  margin-bottom: 4px;
-  border-radius: 6px;
-  border: 1px solid #e5e7eb;
-  display: block;
-  background-color: #ffffff;
+  margin-bottom: 8px;
 }
 
-.option-item label {
+.option-label {
   display: flex;
   align-items: center;
   width: 100%;
+  padding: 6px 10px;
   cursor: pointer;
 }
 
