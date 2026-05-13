@@ -143,9 +143,8 @@ h1 {
 }
 
 /* когда чекбокс/радио выбран — лёгкий акцент */
-.option-label input:checked + span,
-.option-label input:checked {
-  /* акцент уже есть через accent-color, но можно чуть усилить фон */
+.option-label input:checked + span {
+  font-weight: 500;
 }
 
 #options input[type="radio"],

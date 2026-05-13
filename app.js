@@ -91,7 +91,7 @@ function startQuiz() {
 
   currentIndex = 0;
   totalScore = 0;
-  maxScore = questions.length; // по 1 максимальному баллу за вопрос
+  maxScore = questions.length;
 
   if (introEl) introEl.style.display = 'none';
   quizEl.style.display = 'block';
@@ -100,10 +100,11 @@ function startQuiz() {
   const userFormEl = document.getElementById('user-form');
   if (userFormEl) userFormEl.style.display = 'none';
 
-  nextBtn.style.display = 'none';
-  nextBtn.onclick = null;
+  // показываем кнопку и сбрасываем состояние
+  nextBtn.style.display = 'block';
+  nextBtn.disabled = true;
+  nextBtn.onclick = handleAnswer;
 
-  // запускаем таймер только при старте теста
   if (typeof startTimer === 'function') {
     startTimer();
   }
