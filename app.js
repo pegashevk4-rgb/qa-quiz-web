@@ -157,7 +157,7 @@ function showQuestion() {
 
 
 function renderOptions(question) {
-  // очищаем контейнер
+    // очищаем контейнер
   optionsContainer.innerHTML = '';
 
   const isMultiple = question.type === 'multiple';
@@ -172,7 +172,6 @@ function renderOptions(question) {
 
     const input = document.createElement('input');
     input.type = isMultiple ? 'checkbox' : 'radio';
-    // для множественного выбора лучше одно имя на вопрос
     input.name = isMultiple ? `answer_${question.id}` : 'answer';
     input.value = i;
 
@@ -182,10 +181,22 @@ function renderOptions(question) {
     wrapper.appendChild(label);
     optionsList.appendChild(wrapper);
   });
-  
-  
+
   optionsContainer.appendChild(optionsList);
+
+  const nextBtn = document.getElementById('next-btn');
+  nextBtn.disabled = true;
+
+  const inputs = optionsList.querySelectorAll('input[type="radio"], input[type="checkbox"]');
+  inputs.forEach(input => {
+    input.addEventListener('change', () => {
+      const anyChecked = Array.from(inputs).some(inp => inp.checked);
+      nextBtn.disabled = !anyChecked;
+    });
+  });
 }
+
+
 
 function getUserAnswer(question) {
   if (question.type === 'single') {
