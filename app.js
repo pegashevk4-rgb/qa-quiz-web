@@ -353,6 +353,23 @@ function showResult() {
       })
     );
 
+    const allZero = categoryPercents.every(item => item.percent === 0);
+
+    if (allZero) {
+      // если всё по нулям — просто чистим списки и пишем заглушку
+      if (strongAreasEl) {
+        strongAreasEl.innerHTML = '<li>Сильные стороны не определены (слишком мало правильных ответов)</li>';
+      }
+      if (weakAreasEl) {
+      weakAreasEl.innerHTML = '<li>Слабые зоны не определены по тем же причинам</li>';
+      }
+      if (breakdownEl) {
+        breakdownEl.innerHTML = '';
+      }
+      return;
+    }
+
+
     categoryPercents.sort((a, b) => b.percent - a.percent);
 
     if (strongAreasEl) strongAreasEl.innerHTML = '';
