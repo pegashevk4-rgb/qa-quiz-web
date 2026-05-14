@@ -285,21 +285,23 @@ function showResult() {
   const userFormEl = document.getElementById('user-form');
   const form = document.getElementById('data-form');
 
-  // Если результат уже показан — ничего не делаем
+  // Если результат уже показан — выходим
   if (resultEl.style.display === 'block') {
     return;
   }
 
-  // Полностью прячем блок с вопросами
+  // 1) прячем блок с вопросами
   if (quizQuestionsEl) {
     quizQuestionsEl.style.display = 'none';
   }
 
-  // Прячем результат (на всякий случай) и показываем только форму
+  // 2) гарантированно прячем результат
   resultEl.style.display = 'none';
+
+  // 3) показываем форму
   userFormEl.style.display = 'block';
-  
-  // Останавливаем таймер, как только перешли к форме
+
+  // Останавливаем таймер
   if (window.timerInterval) {
     clearInterval(window.timerInterval);
   }
@@ -316,10 +318,10 @@ function showResult() {
 
     submitResults(firstName, lastName, email, totalScore, maxScore);
 
-    // Жёстко прячем форму
+    // 4) прячем форму
     userFormEl.style.display = 'none';
 
-    // И показываем только результат
+    // 5) показываем только результат
     resultEl.style.display = 'block';
     resultTextEl.textContent =
       `Ваш результат: ${percent}%. (Вопросов: ${totalQuestions})`;
