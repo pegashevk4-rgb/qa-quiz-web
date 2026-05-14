@@ -335,7 +335,7 @@ function showResult() {
 
     // общий текст
     resultTextEl.textContent =
-      `Ваш результат: ${percent}%. (Вопросов: ${totalQuestions})`;
+    `Ваш результат: ${percent}%. (Вопросов: ${totalQuestions})`;
 
     // вердикт
     const verdict = getVerdict(percent);
@@ -346,22 +346,15 @@ function showResult() {
 
     if (verdictTextEl) verdictTextEl.textContent = verdict;
 
-    const categoryPercents = Object.entries(categoryStats).map(
-      ([category, { gained, max }]) => ({
-        category,
-        percent: max > 0 ? Math.round((gained / max) * 100) : 0
-      })
-    );
-
-    const allZero = categoryPercents.every(item => item.percent === 0);
-
-    if (allZero) {
-      // если всё по нулям — просто чистим списки и пишем заглушку
+    // Если общий результат меньше 30% — не пытаемся искать сильные/слабые стороны
+    if (percent < 30) {
       if (strongAreasEl) {
-        strongAreasEl.innerHTML = '<li>Сильные стороны не определены (слишком мало правильных ответов)</li>';
+        strongAreasEl.innerHTML =
+          '<li>Сильные стороны не определены — слишком мало правильных ответов</li>';
       }
       if (weakAreasEl) {
-      weakAreasEl.innerHTML = '<li>Слабые зоны не определены по тем же причинам</li>';
+        weakAreasEl.innerHTML =
+      '<li>Слабые зоны не определены по тем же причинам</li>';
       }
       if (breakdownEl) {
         breakdownEl.innerHTML = '';
@@ -369,21 +362,48 @@ function showResult() {
       return;
     }
 
+    // собираем проценты по категориям
+    const categoryPercents = Object.entries(categoryStats).map(
+      ([category, { gained, max }]) => ({
+        category,
+        percent: max > 0 ? Math.round((gained / max) * 100) : 0
+      })
+    );
 
+    // сортируем по убыванию
     categoryPercents.sort((a, b) => b.percent - a.percent);
 
+    // чистим списки
     if (strongAreasEl) strongAreasEl.innerHTML = '';
     if (weakAreasEl)   weakAreasEl.innerHTML   = '';
     if (breakdownEl)   breakdownEl.innerHTML   = '';
 
+    // top-2 как сильные стороны
     const strongAreas = categoryPercents.slice(0, 2);
+    // bottom-2 как слабые (разворачиваем, чтобы шли от худшего к лучше)
     const weakAreas   = categoryPercents.slice(-2).reverse();
 
+    // выводим сильные
     strongAreas.forEach(item => {
       const li = document.createElement('li');
       li.textContent = `${item.category}: ${item.percent}%`;
       strongAreasEl.appendChild(li);
     });
+
+    // выводим слабые
+    weakAreas.forEach(item => {
+      const li = document.createElement('li');
+      li.textContent = `${item.category}: ${item.percent}%`;
+      weakAreasEl.appendChild(li);
+    });
+
+    // полный breakdown
+    categoryPercents.forEach(item => {
+      const li = document.createElement('li');
+      li.textContent = `${item.category}: ${item.percent}%`;
+      breakdownEl.appendChild(li);
+    });
+
 
     weakAreas.forEach(item => {
       const li = document.createElement('li');
