@@ -297,8 +297,8 @@ h1 {
 #strong-areas,
 #weak-areas,
 #categories-breakdown {
-  list-style-type: none;   /* убрать кружки */
-  padding-left: 0;         /* убрать отступ слева */
+  list-style-type: none;  /* убираем маркеры у ul */
+  padding-left: 0;        /* убираем отступ слева */
   margin-left: 0;
 }
 
@@ -310,8 +310,10 @@ h1 {
 }
 
 /* Запрет выделения/копирования текста в квизе */
-#quiz {
+#quiz,
+#result,
+#intro {
   user-select: none;
-  -webkit-user-select: none; /* Safari */
-  -ms-user-select: none;     /* старый IE/Edge */
+  -webkit-user-select: none;
+  -ms-user-select: none;
 }
