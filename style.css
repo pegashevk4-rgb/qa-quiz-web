@@ -294,9 +294,24 @@ h1 {
   transform: none;
 }
 
+#strong-areas,
+#weak-areas,
+#categories-breakdown {
+  list-style-type: none;   /* убрать кружки */
+  padding-left: 0;         /* убрать отступ слева */
+  margin-left: 0;
+}
+
 #strong-areas li,
 #weak-areas li,
 #categories-breakdown li {
   text-align: left;
   margin-bottom: 4px;
+}
+
+/* Запрет выделения/копирования текста в квизе */
+#quiz {
+  user-select: none;
+  -webkit-user-select: none; /* Safari */
+  -ms-user-select: none;     /* старый IE/Edge */
 }
