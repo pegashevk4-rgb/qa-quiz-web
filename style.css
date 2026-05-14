@@ -255,11 +255,6 @@ h1 {
   box-shadow: none;
 }
 
-#restart-btn:hover {
-  background-color: #f3f4f6;
-  border-color: #9ca3af;
-}
-
 /* Центровка текста результата */
 #result {
   text-align: center;
