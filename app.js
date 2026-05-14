@@ -295,16 +295,10 @@ function showResult() {
     quizQuestionsEl.style.display = 'none';
   }
 
-  // Можно ещё спрятать заголовок теста, если не нужен после окончания
-  const testTitleEl = document.getElementById('test-title');
-  if (testTitleEl) {
-    testTitleEl.style.display = 'none';
-  }
-
-  // Показываем форму
-  userFormEl.style.display = 'block';
+  // Прячем результат (на всякий случай) и показываем только форму
   resultEl.style.display = 'none';
-
+  userFormEl.style.display = 'block';
+  
   // Останавливаем таймер, как только перешли к форме
   if (window.timerInterval) {
     clearInterval(window.timerInterval);
@@ -322,12 +316,16 @@ function showResult() {
 
     submitResults(firstName, lastName, email, totalScore, maxScore);
 
+    // Жёстко прячем форму
     userFormEl.style.display = 'none';
+
+    // И показываем только результат
     resultEl.style.display = 'block';
     resultTextEl.textContent =
       `Ваш результат: ${percent}%. (Вопросов: ${totalQuestions})`;
   };
 }
+
 
 function submitResults(firstName, lastName, email, score, total) {
   // Пока без бэкенда: просто логируем в консоль
