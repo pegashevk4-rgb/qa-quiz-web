@@ -19,6 +19,7 @@ const categoryTextEl = document.getElementById('category-text');
 const nextBtn = document.getElementById('next-btn');
 const introEl = document.getElementById('intro');
 const startBtn = document.getElementById('start-btn');
+const quizQuestionsEl = document.getElementById('quiz-questions');
 
 const QUESTIONS_PER_RUN = 30;
 const TEST_TITLES = {
@@ -100,7 +101,8 @@ function startQuiz() {
   const userFormEl = document.getElementById('user-form');
   if (userFormEl) userFormEl.style.display = 'none';
 
-  // показываем кнопку и сбрасываем состояние
+  if (quizQuestionsEl) quizQuestionsEl.style.display = 'block';
+
   nextBtn.style.display = 'block';
   nextBtn.disabled = true;
   nextBtn.onclick = handleAnswer;
@@ -111,6 +113,7 @@ function startQuiz() {
 
   showQuestion();
 }
+
 
 
 function showQuestion() {

@@ -31,41 +31,45 @@
         </div>
     </div>
 
-        <!-- Сам квиз (по умолчанию скрыт, app.js показывает) -->
-        <div id="quiz" style="display:none;">
+      <!-- Сам квиз (по умолчанию скрыт, app.js показывает) -->
+      <div id="quiz" style="display:none;">
+
+        <!-- Блок с вопросами -->
+        <div id="quiz-questions">
           <div id="progress"></div>
           <div id="category-text"></div>
           <h3 id="question-text"></h3>
 
-          <!-- подсказка под вопросом: один вариант / несколько -->
+
           <p id="question-hint" class="question-hint"></p>
 
           <div id="options"></div>
           <button id="next-btn" disabled>Далее</button>
-
-        <!-- Форма данных пользователя -->
-        <div id="user-form" style="display: none;">
-          <div class="card">
-            <h2>Введите ваши данные</h2>
-            <form id="data-form">
-              <input type="text" id="firstName" placeholder="Имя *" required>
-              <input type="text" id="lastName" placeholder="Фамилия *" required>
-              <input type="email" id="email" placeholder="Email (необязательно)">
-              <button type="submit" class="primary-btn">Сохранить результат</button>
-            </form>
-          </div>
         </div>
 
-        <!-- Блок результата -->
-        <div id="result" style="display:none;">
-          <div class="card">
-            <h2>Результат</h2>
-            <p id="result-text"></p>
-            <button id="restart-btn" class="secondary-btn">Пройти ещё раз</button>
-          </div>
-        </div>
+      <!-- Форма данных пользователя -->
+      <div id="user-form" style="display: none;">
+        <div class="card">
+          <h2>Введите ваши данные</h2>
+          <form id="data-form">
+            <input type="text" id="firstName" placeholder="Имя *" required>
+            <input type="text" id="lastName" placeholder="Фамилия *" required>
+            <input type="email" id="email" placeholder="Email (необязательно)">
+            <button type="submit" class="primary-btn">Сохранить результат</button>
+        </form>
+      </div>
+    </div>
+
+  <!-- Блок результата -->
+  <div id="result" style="display:none;">
+    <div class="card">
+      <h2>Результат</h2>
+      <p id="result-text"></p>
+      <button id="restart-btn" class="secondary-btn">Пройти ещё раз</button>
     </div>
   </div>
+
+</div>
 
   <!-- Модальное окно "Время вышло" -->
   <div id="timeup-modal" style="display:none;
