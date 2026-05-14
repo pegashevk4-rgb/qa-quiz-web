@@ -223,7 +223,8 @@ h1 {
 
 /* Primary-кнопки: старт и сохранить */
 #start-btn,
-#data-form button {
+#data-form button,
+#restart-btn {
   padding: 10px 24px;
   font-size: 16px;
   border-radius: 999px;
@@ -250,20 +251,6 @@ h1 {
   background-color: #1e40af;
   transform: translateY(0);
   box-shadow: none;
-}
-
-/* Кнопка "Пройти ещё раз" как secondary */
-#restart-btn {
-  margin-top: 16px;
-  padding: 10px 20px;
-  border-radius: 999px;
-  border: 1px solid #d1d5db;
-  background: #ffffff;
-  color: #374151;
-  cursor: pointer;
-  font-size: 15px;
-  font-weight: 500;
-  transition: background-color 0.15s ease, border-color 0.15s ease;
 }
 
 #restart-btn:hover {
