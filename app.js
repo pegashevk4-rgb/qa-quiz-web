@@ -1,25 +1,25 @@
 let questions = [];
-let currentIndex = 0;
-// let correctCount = 0;
+let currentIndex = 0;    // let correctCount = 0;
 let totalScore = 0;      // набранные баллы (может быть дробным)
 let maxScore = 0;        // максимум (по сути = числу вопросов)
+let categoryStats = {};  // { "SQL": { gained: 0, max: 0 }, ... }
 
 // testId из URL (?test_id=qa_middle_web), по умолчанию middle
 const params = new URLSearchParams(window.location.search);
 const testId = params.get('test_id') || 'qa_middle_web';
 
-const questionTextEl = document.getElementById('question-text');
+const questionTextEl   = document.getElementById('question-text');
 const optionsContainer = document.getElementById('options');
-const progressEl = document.getElementById('progress');
-const quizEl = document.getElementById('quiz');
-const resultEl = document.getElementById('result');
-const resultTextEl = document.getElementById('result-text');
-const restartBtn = document.getElementById('restart-btn');
-const categoryTextEl = document.getElementById('category-text');
-const nextBtn = document.getElementById('next-btn');
-const introEl = document.getElementById('intro');
-const startBtn = document.getElementById('start-btn');
-const quizQuestionsEl = document.getElementById('quiz-questions');
+const progressEl       = document.getElementById('progress');
+const quizEl           = document.getElementById('quiz');
+const resultEl         = document.getElementById('result');
+const resultTextEl     = document.getElementById('result-text');
+const restartBtn       = document.getElementById('restart-btn');
+const categoryTextEl   = document.getElementById('category-text');
+const nextBtn          = document.getElementById('next-btn');
+const introEl          = document.getElementById('intro');
+const startBtn         = document.getElementById('start-btn');
+const quizQuestionsEl  = document.getElementById('quiz-questions');
 
 const QUESTIONS_PER_RUN = 30;
 const TEST_TITLES = {
@@ -51,11 +51,7 @@ async function loadQuestions() {
     const data = await res.json();
     console.log('data из JSON:', data);
 
-    // senior-файл — массив вопросов
-    questions = data;
-
-    // перемешиваем
-    questions = shuffleArray(questions);
+    questions = shuffleArray(data);
 
     // ограничиваем 30 вопросами
     if (questions.length > QUESTIONS_PER_RUN) {
@@ -73,7 +69,6 @@ async function loadQuestions() {
     alert('Не удалось загрузить вопросы. Проверь JSON и test_id в URL.');
   }
 }
-
 
 function shuffleArray(array) {
   const arr = array.slice();
@@ -94,6 +89,14 @@ function startQuiz() {
   totalScore = 0;
   maxScore = questions.length;
 
+  // Инициализируем статистику по категориям
+  categoryStats = {};
+  questions.forEach(q => {
+    if (!categoryStats[q.category]) {
+      categoryStats[q.category] = { gained: 0, max: 0 };
+    }
+  });
+
   if (introEl) introEl.style.display = 'none';
   quizEl.style.display = 'block';
   resultEl.style.display = 'none';
@@ -113,8 +116,6 @@ function startQuiz() {
 
   showQuestion();
 }
-
-
 
 function showQuestion() {
   const q = questions[currentIndex];
@@ -200,8 +201,6 @@ function renderOptions(question) {
   });
 }
 
-
-
 function getUserAnswer(question) {
   if (question.type === 'single') {
     const checked = document.querySelector(
@@ -240,19 +239,15 @@ function scoreMultiple(userIndexes, question) {
 
   let score = 0;
 
-  // +1/K за каждый правильный отмеченный
   for (const idx of userSet) {
     if (correctSet.has(idx)) {
       score += 1 / K;
     } else {
-      // -1/K за каждый лишний
       score -= 1 / K;
     }
   }
 
-  // Не уходим ниже 0
   if (score < 0) score = 0;
-  // Не больше 1 на всякий случай
   if (score > 1) score = 1;
 
   return score;
@@ -272,13 +267,27 @@ function handleAnswer() {
 
   totalScore += gained;
 
-  // Переходим к следующему
+  // обновляем статистику по категории
+  const cat = q.category;
+  if (!categoryStats[cat]) {
+    categoryStats[cat] = { gained: 0, max: 0 };
+  }
+  categoryStats[cat].gained += gained;
+  categoryStats[cat].max += 1;
+
   currentIndex++;
   if (currentIndex < questions.length) {
     showQuestion();
   } else {
     showResult();
   }
+}
+
+function getVerdict(percent) {
+  if (percent >= 80) return 'Strong Middle';
+  if (percent >= 65) return 'Middle';
+  if (percent >= 50) return 'Junior+';
+  return 'Not recommended';
 }
 
 function showResult() {
@@ -323,11 +332,55 @@ function showResult() {
 
     // 5) показываем только результат
     resultEl.style.display = 'block';
+
+    // общий текст
     resultTextEl.textContent =
       `Ваш результат: ${percent}%. (Вопросов: ${totalQuestions})`;
+
+    // вердикт
+    const verdict = getVerdict(percent);
+    const verdictTextEl   = document.getElementById('verdict-text');
+    const strongAreasEl   = document.getElementById('strong-areas');
+    const weakAreasEl     = document.getElementById('weak-areas');
+    const breakdownEl     = document.getElementById('categories-breakdown');
+
+    if (verdictTextEl) verdictTextEl.textContent = verdict;
+
+    const categoryPercents = Object.entries(categoryStats).map(
+      ([category, { gained, max }]) => ({
+        category,
+        percent: max > 0 ? Math.round((gained / max) * 100) : 0
+      })
+    );
+
+    categoryPercents.sort((a, b) => b.percent - a.percent);
+
+    if (strongAreasEl) strongAreasEl.innerHTML = '';
+    if (weakAreasEl)   weakAreasEl.innerHTML   = '';
+    if (breakdownEl)   breakdownEl.innerHTML   = '';
+
+    const strongAreas = categoryPercents.slice(0, 2);
+    const weakAreas   = categoryPercents.slice(-2).reverse();
+
+    strongAreas.forEach(item => {
+      const li = document.createElement('li');
+      li.textContent = `${item.category}: ${item.percent}%`;
+      strongAreasEl.appendChild(li);
+    });
+
+    weakAreas.forEach(item => {
+      const li = document.createElement('li');
+      li.textContent = `${item.category}: ${item.percent}%`;
+      weakAreasEl.appendChild(li);
+    });
+
+    categoryPercents.forEach(item => {
+      const li = document.createElement('li');
+      li.textContent = `${item.category}: ${item.percent}%`;
+      breakdownEl.appendChild(li);
+    });
   };
 }
-
 
 function submitResults(firstName, lastName, email, score, total) {
   // Пока без бэкенда: просто логируем в консоль

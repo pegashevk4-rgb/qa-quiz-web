@@ -34,40 +34,50 @@
       <!-- Сам квиз (по умолчанию скрыт, app.js показывает) -->
       <div id="quiz" style="display:none;">
 
-        <!-- Блок с вопросами -->
-        <div id="quiz-questions">
-          <div id="progress"></div>
-          <div id="category-text"></div>
-          <h3 id="question-text"></h3>
+  <!-- Блок с вопросами -->
+  <div id="quiz-questions">
+    <div id="progress"></div>
+    <div id="category-text"></div>
+    <h3 id="question-text"></h3>
 
+    <p id="question-hint" class="question-hint"></p>
 
-          <p id="question-hint" class="question-hint"></p>
+    <div id="options"></div>
+    <button id="next-btn" disabled>Далее</button>
+  </div>
 
-          <div id="options"></div>
-          <button id="next-btn" disabled>Далее</button>
-        </div>
-
-      <!-- Форма данных пользователя -->
-      <div id="user-form" style="display: none;">
-        <div class="card">
-          <h2>Введите ваши данные</h2>
-          <form id="data-form">
-            <input type="text" id="firstName" placeholder="Имя *" required>
-            <input type="text" id="lastName" placeholder="Фамилия *" required>
-            <input type="email" id="email" placeholder="Email (необязательно)">
-            <button type="submit" class="primary-btn">Сохранить результат</button>
-        </form>
-      </div>
+  <!-- Форма данных пользователя -->
+  <div id="user-form" style="display: none;">
+    <div class="card">
+      <h2>Введите ваши данные</h2>
+      <form id="data-form">
+        <input type="text" id="firstName" placeholder="Имя *" required>
+        <input type="text" id="lastName" placeholder="Фамилия *" required>
+        <input type="email" id="email" placeholder="Email (необязательно)">
+        <button type="submit" class="primary-btn">Сохранить результат</button>
+      </form>
     </div>
+  </div>
 
-      <!-- Блок результата -->
-      <div id="result" style="display:none;">
-        <div class="card">
-          <h2>Результат</h2>
-          <p id="result-text"></p>
-          <button id="restart-btn" class="secondary-btn">Пройти ещё раз</button>
-        </div>
-      </div>
+  <!-- Блок результата -->
+  <div id="result" style="display:none;">
+    <h2>Результат</h2>
+    <p id="result-text"></p>
+
+    <h3>Предварительная оценка</h3>
+    <p id="verdict-text"></p>
+
+    <h3>Сильные стороны</h3>
+    <ul id="strong-areas"></ul>
+
+    <h3>Слабые зоны</h3>
+    <ul id="weak-areas"></ul>
+
+    <h3>Результаты по категориям</h3>
+    <ul id="categories-breakdown"></ul>
+
+    <button id="restart-btn" class="secondary-btn">Пройти ещё раз</button>
+  </div>
 
 </div>
 
