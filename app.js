@@ -290,25 +290,18 @@ function showResult() {
     return;
   }
 
-  // НЕ прячем весь quiz, он родитель формы и результата
-  // quizEl.style.display = 'none';
+  // Полностью прячем блок с вопросами
+  if (quizQuestionsEl) {
+    quizQuestionsEl.style.display = 'none';
+  }
 
-  // прячем только блок с вопросами
-  const questionBlock = document.getElementById('options');
-  const nextBtn = document.getElementById('next-btn');
-  const progressEl = document.getElementById('progress');
-  const categoryTextEl = document.getElementById('category-text');
-  const questionTextEl = document.getElementById('question-text');
-  const questionHintEl = document.getElementById('question-hint');
+  // Можно ещё спрятать заголовок теста, если не нужен после окончания
+  const testTitleEl = document.getElementById('test-title');
+  if (testTitleEl) {
+    testTitleEl.style.display = 'none';
+  }
 
-  if (questionBlock) questionBlock.style.display = 'none';
-  if (nextBtn) nextBtn.style.display = 'none';
-  if (progressEl) progressEl.style.display = 'none';
-  if (categoryTextEl) categoryTextEl.style.display = 'none';
-  if (questionTextEl) questionTextEl.style.display = 'none';
-  if (questionHintEl) questionHintEl.style.display = 'none';
-
-  // показываем форму
+  // Показываем форму
   userFormEl.style.display = 'block';
   resultEl.style.display = 'none';
 
@@ -319,7 +312,6 @@ function showResult() {
 
   const totalQuestions = questions.length;
   const percent = Math.round((totalScore / maxScore) * 100);
-
 
   form.onsubmit = e => {
     e.preventDefault();
