@@ -293,3 +293,10 @@ h1 {
   box-shadow: none;
   transform: none;
 }
+
+#strong-areas li,
+#weak-areas li,
+#categories-breakdown li {
+  text-align: left;
+  margin-bottom: 4px;
+}
