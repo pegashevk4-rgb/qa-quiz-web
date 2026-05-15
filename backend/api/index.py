@@ -6,9 +6,9 @@ from sqlalchemy import create_engine, Column, Integer, String, Numeric, Boolean,
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 from datetime import datetime
+import os
 
-# ВАЖНО: Замени YOUR_PASSWORD на свой пароль PostgreSQL!
-DATABASE_URL = "postgresql://postgres:13Reno!@localhost:5433/qa_quiz"
+DATABASE_URL = os.getenv("DATABASE_URL", "postgresql://postgres:pass@localhost:5433/qa_quiz")
 
 engine = create_engine(DATABASE_URL)
 SessionLocal = sessionmaker(bind=engine)
