@@ -331,14 +331,13 @@ function showResult() {
   const totalQuestions = questions.length;
   const percent = Math.round((totalScore / maxScore) * 100);
 
-  form.onsubmit = e => {
-    e.preventDefault();
-
-    const firstName = document.getElementById('firstName').value;
-    const lastName  = document.getElementById('lastName').value;
-    const email     = document.getElementById('email').value;
-
-    submitResults(firstName, lastName, email, totalScore, maxScore);
+  form.onsubmit = async e => {
+  e.preventDefault();
+  const firstName = document.getElementById('firstName').value;
+  const lastName = document.getElementById('lastName').value;
+  const email = document.getElementById('email').value;
+  
+  await submitResults(firstName, lastName, email, totalScore, maxScore);
 
     // 4) прячем форму
     userFormEl.style.display = 'none';
@@ -424,16 +423,58 @@ function showResult() {
   };
 }
 
-function submitResults(firstName, lastName, email, score, total) {
-  // Пока без бэкенда: просто логируем в консоль
-  console.log('Результат теста:', {
-    firstName,
-    lastName,
-    email,
-    score,
-    total,
-    testId,
-  });
+async function submitResults(firstName, lastName, email, score, total) {
+  const percent = Math.round((score / total) * 100);
+  
+  // Готовим категории
+  const categories = Object.entries(categoryStats).map(([category, stats]) => ({
+    category,
+    percent: stats.max > 0 ? Math.round((stats.gained / stats.max) * 100) : 0
+  }));
+
+  // Сортируем для определения сильных/слабых сторон
+  const sortedCategories = [...categories].sort((a, b) => b.percent - a.percent);
+  const strong_areas = sortedCategories.slice(0, 2); // Топ-2
+  const weak_areas = sortedCategories.slice(-2).reverse(); // Худшие 2
+
+  // Вердикт
+  const verdict = getVerdict(percent);
+
+  // Данные для отправки
+  const resultData = {
+    first_name: firstName,
+    last_name: lastName,
+    email: email,
+    test_id: testId,
+    total_score: score,
+    max_score: total,
+    percent: percent,
+    verdict: verdict,
+    categories: categories,
+    strong_areas: strong_areas,
+    weak_areas: weak_areas
+  };
+
+  try {
+    const response = await fetch('http://127.0.0.1:8000/api/results', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(resultData)
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    const data = await response.json();
+    console.log('✅ Результаты сохранены в БД:', data);
+    
+  } catch (error) {
+    console.error('❌ Ошибка при сохранении результатов:', error);
+    alert('Не удалось сохранить результаты. Проверьте, что backend запущен.');
+  }
 }
 
 // Кнопка "Начать тест"
