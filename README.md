@@ -59,20 +59,21 @@ PostgreSQL Database (Neon, Frankfurt)
 - Таблицы: `users`, `results`, `detailed_results`
 
 ## Структура проекта
+###
 qa-quiz-web/
-├── index.html # Главная страница квиза#
-├── app.js # Логика квиза (frontend)#
-├── style.css # Стили#
-├── questions/ # JSON-файлы с вопросами по уровням#
-│ ├── qa_junior_web.json#
-│ ├── qa_middle_web.json#
-│ └── qa_senior_web.json#
-└── backend/ # Backend API#
-├── #api/#
-│ └── index.py # FastAPI endpoints#
-├── requirements.txt # Python зависимости#
-└── vercel.json # Конфигурация для деплоя#
-
+├── index.html # Главная страница квиза
+├── app.js # Логика квиза (frontend)
+├── style.css # Стили
+├── questions/ # JSON-файлы с вопросами по уровням
+│ ├── qa_junior_web.json
+│ ├── qa_middle_web.json
+│ └── qa_senior_web.json
+└── backend/ # Backend API
+├── api/
+│ └── index.py # FastAPI endpoints
+├── requirements.txt # Python зависимости
+└── vercel.json # Конфигурация для деплоя
+###
 ## Локальный запуск
 
 ### Frontend
