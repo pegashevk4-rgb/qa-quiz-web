@@ -20,6 +20,7 @@ const nextBtn          = document.getElementById('next-btn');
 const introEl          = document.getElementById('intro');
 const startBtn         = document.getElementById('start-btn');
 const quizQuestionsEl  = document.getElementById('quiz-questions');
+const questionHintEl   = document.getElementById('question-hint');
 
 const QUESTIONS_PER_RUN = 30;
 const TEST_TITLES = {
@@ -125,7 +126,6 @@ function showQuestion() {
   questionTextEl.textContent = q.question;
 
   // Подсказка под вопросом: один / несколько вариантов
-  const questionHintEl = document.getElementById('question-hint');
   if (questionHintEl) {
     if (q.type === 'multiple') {
       questionHintEl.textContent = 'Тип вопроса: можно выбрать несколько вариантов ответа.';
@@ -284,10 +284,23 @@ function handleAnswer() {
 }
 
 function getVerdict(percent) {
-  if (percent >= 80) return 'Strong Middle';
-  if (percent >= 65) return 'Middle';
-  if (percent >= 50) return 'Junior+';
-  return 'Not recommended';
+  if (percent >= 80) return 'Recommended (Strong Middle level)';
+  if (percent >= 65) return 'Recommended (Middle level)';
+  if (percent >= 50) return 'Potential Junior/Middle';
+  return 'Requires additional evaluation';
+}
+
+function getRecommendationText(percent) {
+  if (percent >= 80) {
+    return 'Кандидат демонстрирует сильные знания уровня Middle и может быть рекомендован к следующему этапу интервью.';
+  }
+  if (percent >= 65) {
+    return 'Кандидат показывает уверенные знания QA и может рассматриваться на позицию Middle.';
+  }
+  if (percent >= 50) {
+    return 'Кандидат обладает базовыми знаниями и может подойти на Junior+/Middle после дополнительного интервью.';
+  }
+  return 'Рекомендуется дополнительная проверка практических навыков кандидата.';
 }
 
 function showResult() {
@@ -346,6 +359,11 @@ function showResult() {
 
     if (verdictTextEl) verdictTextEl.textContent = verdict;
 
+    const verdictExplanationEl = document.getElementById('verdict-explanation');
+    if (verdictExplanationEl) {
+      verdictExplanationEl.textContent = getRecommendationText(percent);
+    }
+
     // Если общий результат меньше 30% — не пытаемся искать сильные/слабые стороны
     if (percent < 30) {
       if (strongAreasEl) {
@@ -379,7 +397,7 @@ function showResult() {
     if (breakdownEl)   breakdownEl.innerHTML   = '';
 
     // top-2 как сильные стороны
-    const strongAreas = categoryPercents.slice(0, 2);
+    const strongAreas = categoryPercents.slice(0, Math.min(2, categoryPercents.length));
     // bottom-2 как слабые (разворачиваем, чтобы шли от худшего к лучше)
     const weakAreas   = categoryPercents.slice(-2).reverse();
 
@@ -398,19 +416,6 @@ function showResult() {
     });
 
     // полный breakdown
-    categoryPercents.forEach(item => {
-      const li = document.createElement('li');
-      li.textContent = `${item.category}: ${item.percent}%`;
-      breakdownEl.appendChild(li);
-    });
-
-
-    weakAreas.forEach(item => {
-      const li = document.createElement('li');
-      li.textContent = `${item.category}: ${item.percent}%`;
-      weakAreasEl.appendChild(li);
-    });
-
     categoryPercents.forEach(item => {
       const li = document.createElement('li');
       li.textContent = `${item.category}: ${item.percent}%`;
