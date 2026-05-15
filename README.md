@@ -1,163 +1,160 @@
 ## QA Quiz Web
 
-Веб‑приложение для тестирования знаний по QA (Junior / Middle / Senior) с онлайн‑квизами и автоматическим отчётом по сильным и слабым сторонам.
+Веб-приложение для тестирования знаний по QA (Junior / Middle / Senior) с онлайн-квизами, автоматическим отчётом по сильным и слабым сторонам и сохранением результатов в базу данных.
 
 ## Демо
 
-GitHub Pages (frontend, без VPN):
-
+**Frontend (GitHub Pages):**
 - Junior: https://pegashevk4-rgb.github.io/qa-quiz-web/index.html?test_id=qa_junior_web  
 - Middle: https://pegashevk4-rgb.github.io/qa-quiz-web/index.html?test_id=qa_middle_web  
 - Senior: https://pegashevk4-rgb.github.io/qa-quiz-web/index.html?test_id=qa_senior_web
 
-## Что умеет сейчас
+**Backend API (Vercel):**
+- API URL: https://qa-quiz-web.vercel.app
 
-- Три уровня сложности: Junior / Middle / Senior.
-- Выбор теста через test_id в query‑параметре (qa_junior_web, qa_middle_web, qa_senior_web).
-- До 30 случайных вопросов за попытку (можно менять через QUESTIONS_PER_RUN в app.js).
-- Поддержка вопросов с одним и несколькими правильными вариантами.
-- Таймер прохождения, зависящий от уровня (junior/middle/senior).
-- Подсчёт общего процента и предварительная оценка (например, Strong Middle, Not recommended).
-- Автоматический расчёт результатов по категориям (q.category) с выделением сильных/слабых зон.
-- Форма ввода имени/фамилии/email перед показом результата (подготовка к сохранению в базу).
-- Интерфейс на русском, поддержка кириллицы.
-- Защита от копирования текста квиза (отключено выделение текста в зоне теста).
+## Возможности
 
-## Локальный запуск (frontend)
-Минимальный вариант:
-- Откройте `index.html` в браузере  
-  или  
-- Запустите локальный сервер в корне проекта:
+### Тестирование
+- Три уровня сложности: Junior / Middle / Senior
+- До 30 случайных вопросов за попытку (настраивается через QUESTIONS_PER_RUN в app.js)
+- Поддержка вопросов с одним и несколькими правильными вариантами
+- Таймер прохождения, зависящий от уровня сложности
+- Автоматический расчёт результатов по категориям (SQL, API, Testing theory и т.д.)
+- Выделение сильных и слабых зон кандидата
 
-```bash
-python -m http.server 8000
-```
+### Сохранение результатов
+- ✅ Автоматическое сохранение результатов в облачную БД PostgreSQL (Neon)
+- ✅ Сбор данных: имя, фамилия, email, результаты по категориям
+- ✅ Детализация: общий балл, процент, вердикт, сильные/слабые стороны
+- 🔄 Админ-панель для HR (в разработке)
 
-и перейдите по адресу `http://localhost:8000/`.
+### UX
+- Интерфейс на русском языке
+- Защита от копирования текста квиза
+- Адаптивный дизайн
+
+## Архитектура
+Frontend (GitHub Pages)
+↓
+Backend API (Vercel, FastAPI)
+↓
+PostgreSQL Database (Neon, Frankfurt)
 
 ## Технологии
 
-- **Frontend:** HTML, CSS, чистый JavaScript (без фреймворков). 
-- **Backend (опционально / в разработке):** Python, Flask, SQLite, интеграция с Google Sheets (gspread).
-- **Интеграция:** Google Sheets API (через сервисный аккаунт).
-- **Хостинг фронтенда:** GitHub Pages.
+**Frontend:**
+- HTML, CSS, чистый JavaScript
+- Хостинг: GitHub Pages
+
+**Backend:**
+- Python 3.10+
+- FastAPI (веб-фреймворк)
+- SQLAlchemy (ORM для работы с БД)
+- Uvicorn (ASGI сервер)
+- Хостинг: Vercel (бесплатно, 24/7)
+
+**База данных:**
+- PostgreSQL 17
+- Хостинг: Neon.tech (бесплатно, регион Frankfurt)
+- Таблицы: `users`, `results`, `detailed_results`
 
 ## Структура проекта
-
-```text
 qa-quiz-web/
-├── index.html          # Страница квиза (frontend)
-├── app.js              # Логика квиза на стороне клиента
-├── style.css           # Стили
-├── server.py           # Flask-сервер и API (загрузка тестов, сохранение результатов) [опционально]
-├── export_to_csv.py    # Скрипт экспорта результатов из БД в CSV
-├── view_results.py     # Скрипт просмотра результатов и выгрузки в Google Sheets
-├── quiz_results.db     # Локальная база данных SQLite (игнорируется в Git)
-├── requirements.txt    # Python-зависимости
-├── .env.example        # Шаблон переменных окружения для интеграции с Google Sheets
-├── .gitignore          # Настройки Git-игнора
-└── README.md           # Документация
-```
+├── index.html # Главная страница квиза
+├── app.js # Логика квиза (frontend)
+├── style.css # Стили
+├── questions/ # JSON-файлы с вопросами по уровням
+│ ├── qa_junior_web.json
+│ ├── qa_middle_web.json
+│ └── qa_senior_web.json
+└── backend/ # Backend API
+├── api/
+│ └── index.py # FastAPI endpoints
+├── requirements.txt # Python зависимости
+└── vercel.json # Конфигурация для деплоя
 
-## Как это работает
+## Локальный запуск
 
-1. Пользователь открывает одну из ссылок (Junior / Middle / Senior), где уровень задаётся через `test_id` в query‑параметре.
-
-2. app.js по test_id выбирает JSON‑файл с вопросами, загружает их, перемешивает и ограничивает количеством QUESTIONS_PER_RUN.
-
-3. Вопросы задаются по одному, варианты ответа тоже перемешиваются.
-
-4. Для каждого вопроса считается балл (1 за одиночный ответ, дробный за multiple‑choice с частично верными/лишними вариантами).
-
-5. После окончания теста пользователь вводит свои данные (имя, фамилия, email).
-
-6. Приложение считает:
-- общий процент;
-- вердикт по порогам (Strong Middle, Middle, Junior+, Not recommended);
-- результат по каждой категории (q.category);
-- топ‑2 сильных и топ‑2 слабых зон (если общий результат ≥ 30%).
-
-7. Сейчас результат просто логируется в консоль (как подготовка к интеграции с backend/API).
-
-## Локальный запуск backend'а
-
-Если нужно развернуть backend локально:
-
-1. Клонировать репозиторий:
-
+### Frontend
 ```bash
-git clone https://github.com/pegashevk4-rgb/qa-quiz-web.git
-cd qa-quiz-web
-```
+# Простой способ
+python -m http.server 8000
+# Откройте http://localhost:8000
 
-2. Создать виртуальное окружение и установить зависимости:
-
+### Backend (для разработки)
 ```bash
+cd backend
+
+# Создайте виртуальное окружение
 python -m venv .venv
-. .venv/bin/activate      # Linux/Mac
-# или
-.venv\Scripts\activate    # Windows
+.venv\Scripts\activate  # Windows
+source .venv/bin/activate  # Linux/Mac
 
+# Установите зависимости
 pip install -r requirements.txt
+
+# Добавьте переменную окружения DATABASE_URL
+# (строку подключения к PostgreSQL)
+
+# Запустите сервер
+uvicorn api.index:app --reload --port 8000
 ```
 
-3. (Опционально) Настроить интеграцию с Google Sheets:
+## База данных
 
-Создать файл `.env` (на основе `.env.example`):
+### Схема таблиц
 
-```bash
-cp .env.example .env
-```
+**users** - информация о кандидатах
+- `id` (SERIAL PRIMARY KEY)
+- `first_name` (VARCHAR)
+- `last_name` (VARCHAR)
+- `email` (VARCHAR, UNIQUE)
+- `created_at` (TIMESTAMP)
 
-Заполнить `.env` своими данными:
-- `SERVICE_ACCOUNT_FILE` — имя JSON‑файла с ключом Google API.
-- `SPREADSHEET_ID` — ID вашей Google Таблицы (из URL).
+**results** - общие результаты тестов
+- `id` (SERIAL PRIMARY KEY)
+- `user_id` (FK → users)
+- `test_id` (VARCHAR) - уровень теста
+- `total_score` (DECIMAL)
+- `max_score` (DECIMAL)
+- `percent` (INTEGER)
+- `verdict` (VARCHAR)
+- `created_at` (TIMESTAMP)
 
-Шаги по настройке Google Sheets API:
-- Создать проект в [Google Cloud Console](https://console.cloud.google.com).
-- Включить Google Sheets API.
-- Создать сервисный аккаунт и скачать JSON‑ключ.
-- Поместить JSON‑ключ в корень проекта.
-- Добавить email сервисного аккаунта (`...@....iam.gserviceaccount.com`) в настройки доступа Google Таблицы как **Редактор**.
+**detailed_results** - результаты по категориям
+- `id` (SERIAL PRIMARY KEY)
+- `result_id` (FK → results)
+- `category` (VARCHAR)
+- `percent` (INTEGER)
+- `is_strong` (BOOLEAN)
+- `is_weak` (BOOLEAN)
 
-4. Запустить сервер:
+## API Endpoints
 
-```bash
-python server.py
-```
+- `GET /` - проверка работы API
+- `POST /api/results` - сохранение результатов теста
 
-Открыть в браузере: `http://localhost:5000`
+## Планы развития
 
-(Frontend можно раздавать либо из самого Flask, либо как статические файлы с любого статического сервера, указывая в `app.js` базовый URL API.)
+- [ ] Админ-панель для просмотра результатов HR-специалистами
+- [ ] Проверка ответов на сервере (безопасность вопросов)
+- [ ] Email-уведомления для компаний
+- [ ] Экспорт результатов в Excel/CSV
+- [ ] Дашборд с аналитикой
+- [ ] Авторизация и роли (кандидат / HR)
 
-## Деплой на PythonAnywhere (кратко)
+## Деплой
 
-- Код backend'а и конфиг Flask разворачиваются как Web App на `kirilla5.pythonanywhere.com`.
-- Статические файлы (`index.html`, `app.js`, `style.css`) лежат в `/home/KirillA5/qa-quiz-web-static` и проброшены в разделе **Static files** как:
-  - URL: `/quiz/`
-  - Directory: `/home/KirillA5/qa-quiz-web-static`
-- Frontend использует API по адресу `https://kirilla5.pythonanywhere.com/api/...` с динамическим `test_id`.
+**Frontend:** автоматически деплоится на GitHub Pages при push в `main`  
+**Backend:** автоматически деплоится на Vercel при push в `main`  
+**База данных:** хостится на Neon.tech (регион Frankfurt)
 
-Итоговые боевые ссылки:
+## Лицензия
 
-- Junior — `?test_id=qa_junior_web`
-- Middle — `?test_id=qa_middle_web`
-- Senior — `?test_id=qa_senior_web`
-
-## Для кого и сценарии использования
-
-- **HR и рекрутеры.** Быстрая первичная оценка уровня кандидата по QA без ручной проверки.
-- **Тимлиды и руководители.** Регулярный чек‑ап команды, отслеживание прогресса и слабых зон.
-- **Кандидаты и джуны.** Тренировка перед собеседованием на реальных вопросах по QA.
-- **Курсы и менторы.** Готовый инструмент для контрольных работ и домашних заданий.
-
-Примеры сценариев:
-
-- отправка ссылки на квиз кандидату перед техническим интервью;
-- периодическое тестирование команды раз в квартал с анализом результатов в Google Sheets;
-- самоподготовка и самооценка знаний по QA.
+MIT
 
 ## Автор
 
-Кирилл Пегашев — Junior Python Developer / QA Engineer  
-GitHub: https://github.com/pegashevk4-rgb
+Кирилл Пегашев  
+Email: pegashevk4@gmail.com  
+GitHub: [@pegashevk4-rgb](https://github.com/pegashevk4-rgb)
