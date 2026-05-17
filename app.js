@@ -90,22 +90,35 @@ function prepareQuestion(question) {
 
   const shuffledOptions = shuffleArray(optionsWithIndexes);
 
+  const originalCorrectIndexes = Array.isArray(question.correct_indexes)
+    ? question.correct_indexes
+    : [];
+
+  if (!Array.isArray(question.correct_indexes)) {
+    console.warn(
+      'Вопрос без корректных correct_indexes:',
+      question.id,
+      question.question
+    );
+  }
+
+  const correctIndexesShuffled = shuffledOptions
+    .map((option, newIndex) => ({
+      newIndex,
+      originalIndex: option.originalIndex
+    }))
+    .filter(item =>
+      originalCorrectIndexes.includes(item.originalIndex)
+    )
+    .map(item => item.newIndex);
+
   return {
     ...question,
-
     shuffledOptions,
-
-    correctIndexesShuffled: shuffledOptions
-      .map((option, newIndex) => ({
-        newIndex,
-        originalIndex: option.originalIndex
-      }))
-      .filter(item =>
-        question.correct_indexes.includes(item.originalIndex)
-      )
-      .map(item => item.newIndex)
+    correctIndexesShuffled
   };
 }
+
 
 // =========================
 // LOAD QUESTIONS
