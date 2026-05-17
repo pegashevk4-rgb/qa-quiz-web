@@ -125,7 +125,6 @@ function showQuestion() {
   categoryTextEl.textContent = `Категория: ${q.category}`;
   questionTextEl.textContent = q.question;
 
-  // Подсказка под вопросом: один / несколько вариантов
   if (questionHintEl) {
     if (q.type === 'multiple') {
       questionHintEl.textContent = 'Тип вопроса: можно выбрать несколько вариантов ответа.';
@@ -134,30 +133,34 @@ function showQuestion() {
     }
   }
 
-  // Перемешиваем варианты, сохраняем соответствие индексов
-  const originalOptions = q.options;
-  const shuffledOptions = shuffleArray(originalOptions);
+  // Готовим массив объектов: текст + исходный индекс
+  const optionObjects = q.options.map((opt, index) => ({
+    text: opt,
+    originalIndex: index
+  }));
 
-  // Строим карту "старый индекс -> новый индекс"
-  const indexMap = {};
-  shuffledOptions.forEach((opt, newIdx) => {
-    const oldIdx = originalOptions.indexOf(opt);
-    indexMap[oldIdx] = newIdx;
-  });
+  // Перемешиваем эти объекты
+  const shuffledOptionObjects = shuffleArray(optionObjects);
 
   // Пересчитываем правильные индексы под перемешанный порядок
   const originalCorrectIndexes = q.correct_indexes || [];
-  const shuffledCorrectIndexes = originalCorrectIndexes.map(
-    oldIdx => indexMap[oldIdx]
-  );
+  const shuffledCorrectIndexes = shuffledOptionObjects
+    .map((optObj, newIdx) => ({
+      newIdx,
+      originalIndex: optObj.originalIndex
+    }))
+    .filter(item => originalCorrectIndexes.includes(item.originalIndex))
+    .map(item => item.newIdx);
 
-  // Сохраняем во временные поля
-  q._shuffledOptions = shuffledOptions;
-  q._correctIndexesShuffled = shuffledCorrectIndexes;
+  // Готовим «подготовленный» вопрос без мутации исходного q
+  const preparedQuestion = {
+    ...q,
+    _shuffledOptions: shuffledOptionObjects,      // здесь объекты { text, originalIndex }
+    _correctIndexesShuffled: shuffledCorrectIndexes
+  };
 
-  // Рендер вариантов как radio/checkbox
-  renderOptions(q);
-
+  // Рендерим варианты
+  renderOptions(preparedQuestion);
 }
 
 
@@ -167,7 +170,8 @@ function renderOptions(question) {
   const isMultiple = question.type === 'multiple';
   const optionsList = document.createElement('div');
 
-  question._shuffledOptions.forEach((opt, i) => {
+  // Здесь question._shuffledOptions — массив объектов { text, originalIndex }
+  question._shuffledOptions.forEach((optObj, i) => {
     const wrapper = document.createElement('div');
     wrapper.className = 'option-item';
 
@@ -180,7 +184,7 @@ function renderOptions(question) {
     input.value = i;
 
     const textSpan = document.createElement('span');
-    textSpan.textContent = `${i + 1}. ${opt}`;
+    textSpan.textContent = `${i + 1}. ${optObj.text}`;
 
     label.appendChild(input);
     label.appendChild(textSpan);
@@ -191,7 +195,7 @@ function renderOptions(question) {
 
   optionsContainer.appendChild(optionsList);
 
-  const nextBtn = document.getElementById('next-btn');
+  // Используем уже существующий глобальный nextBtn
   nextBtn.disabled = true;
 
   const inputs = optionsList.querySelectorAll(
@@ -204,6 +208,7 @@ function renderOptions(question) {
     });
   });
 }
+
 
 function getUserAnswer(question) {
   if (question.type === 'single') {
@@ -256,6 +261,7 @@ function scoreMultiple(userIndexes, question) {
 
   return score;
 }
+
 
 function handleAnswer() {
   const q = questions[currentIndex];
@@ -333,25 +339,44 @@ function showResult() {
   }
 
   const totalQuestions = questions.length;
-  const percent = Math.round((totalScore / maxScore) * 100);
+  const rawPercent = (totalScore / maxScore) * 100;
+  const percent = Math.round(rawPercent);
+
+  // Округляем набранные баллы до целого
+  const roundedScore = Math.round(totalScore * 10) / 10; // один знак после запятой
 
   form.onsubmit = async e => {
   e.preventDefault();
+
+  const submitButton = form.querySelector('button[type="submit"]');
+  if (submitButton) {
+    submitButton.disabled = true;
+    submitButton.textContent = 'Сохраняем...';
+  }
+
   const firstName = document.getElementById('firstName').value;
   const lastName = document.getElementById('lastName').value;
   const email = document.getElementById('email').value;
-  
-  await submitResults(firstName, lastName, email, totalScore, maxScore);
 
-    // 4) прячем форму
-    userFormEl.style.display = 'none';
+  try {
+    await submitResults(firstName, lastName, email, totalScore, maxScore);
+  } finally {
+    if (submitButton) {
+      submitButton.disabled = true;          // остаёмся задизейбленными
+      submitButton.textContent = 'Результат сохранён';
+    }
+  }
 
-    // 5) показываем только результат
-    resultEl.style.display = 'block';
+  // 4) прячем форму
+  userFormEl.style.display = 'none';
 
-    // общий текст
-    resultTextEl.textContent =
-    `Ваш результат: ${percent}%. (Вопросов: ${totalQuestions})`;
+  // 5) показываем только результат
+  resultEl.style.display = 'block';
+
+  // общий текст
+  resultTextEl.textContent =
+    `Ваш результат: ${roundedScore} правильных из ${totalQuestions} (${percent}%).`;
+
 
     // вердикт
     const verdict = getVerdict(percent);
