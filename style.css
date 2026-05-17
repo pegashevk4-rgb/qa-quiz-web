@@ -24,7 +24,7 @@ body {
   max-width: 800px;
   width: 100%;
   margin: 0 auto;
-  padding: 16px;
+  padding: 16px 12px; /* было 16px; стало 16px по вертикали и 12px по бокам */
   box-sizing: border-box;
 }
 
@@ -51,6 +51,7 @@ body {
   border: 1px solid #e5e7eb;
   box-sizing: border-box;
 }
+
 
 /* Заголовки в карточках */
 #intro h2,
