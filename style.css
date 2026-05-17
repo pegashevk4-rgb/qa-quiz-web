@@ -21,10 +21,10 @@ body {
 
 /* Контейнер страницы */
 .container {
-  max-width: 840px;
+  max-width: 900px;
   width: 100%;
   margin: 0 auto;
-  padding: 16px 16px; /* было 16px; стало 16px по вертикали и 12px по бокам */
+  padding: 16px 12px; /* было 16px; стало 16px по вертикали и 12px по бокам */
   box-sizing: border-box;
 }
 
@@ -41,10 +41,10 @@ body {
 #quiz,
 #user-form,
 #result {
-  max-width: 620px;
+  max-width: 640px;
   width: 100%;
   margin: 40px auto 0 auto;
-  padding: 24px 24px;
+  padding: 20px 20px;
   border-radius: 12px;
   background-color: #f9fafb;
   box-shadow: 0 10px 25px rgba(15, 23, 42, 0.08);
