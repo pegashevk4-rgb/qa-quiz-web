@@ -162,7 +162,7 @@ function showQuestion() {
 
 
 function renderOptions(question) {
-    // очищаем контейнер
+  // очищаем контейнер
   optionsContainer.innerHTML = '';
 
   const isMultiple = question.type === 'multiple';
@@ -180,8 +180,11 @@ function renderOptions(question) {
     input.name = isMultiple ? `answer_${question.id}` : 'answer';
     input.value = i;
 
+    const textSpan = document.createElement('span');
+    textSpan.textContent = `${i + 1}. ${opt}`;
+
     label.appendChild(input);
-    label.appendChild(document.createTextNode(` ${i + 1}. ${opt}`));
+    label.appendChild(textSpan);
 
     wrapper.appendChild(label);
     optionsList.appendChild(wrapper);
@@ -192,7 +195,9 @@ function renderOptions(question) {
   const nextBtn = document.getElementById('next-btn');
   nextBtn.disabled = true;
 
-  const inputs = optionsList.querySelectorAll('input[type="radio"], input[type="checkbox"]');
+  const inputs = optionsList.querySelectorAll(
+    'input[type="radio"], input[type="checkbox"]'
+  );
   inputs.forEach(input => {
     input.addEventListener('change', () => {
       const anyChecked = Array.from(inputs).some(inp => inp.checked);
