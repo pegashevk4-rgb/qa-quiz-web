@@ -11,7 +11,7 @@
       "Тестировщик несёт основную ответственность за качество продукта"
     ],
     "type": "single",
-    "correctIndexes": [1]
+    "correct_indexes": [1]
   },
   {
     "id": 2,
@@ -25,7 +25,7 @@
       "Тестирование стоит прекращать, как только найдены все критические баги"
     ],
     "type": "single",
-    "correctIndexes": [2]
+    "correct_indexes": [2]
   },
   {
     "id": 3,
@@ -39,7 +39,7 @@
       "Тест-кейсы пишутся сразу после деплоя на продакшн"
     ],
     "type": "single",
-    "correctIndexes": [1]
+    "correct_indexes": [1]
   },
   {
     "id": 4,
@@ -53,7 +53,7 @@
       "Количество дефектов прямо зависит от размера команды разработки"
     ],
     "type": "single",
-    "correctIndexes": [1]
+    "correct_indexes": [1]
   },
   {
     "id": 5,
@@ -67,7 +67,7 @@
       "Регрессионные тесты всегда бесполезны после нескольких прогонов"
     ],
     "type": "multiple",
-    "correctIndexes": [1, 2]
+    "correct_indexes": [1, 2]
   },
   {
     "id": 6,
@@ -81,7 +81,7 @@
       "Контекст тестирования ограничен только техническими требованиями"
     ],
     "type": "single",
-    "correctIndexes": [1]
+    "correct_indexes": [1]
   },
   {
     "id": 7,
@@ -95,7 +95,7 @@
       "Дефекты имеют тенденцию скапливаться в отдельных модулях"
     ],
     "type": "single",
-    "correctIndexes": [2]
+    "correct_indexes": [2]
   },
   {
     "id": 8,
@@ -109,7 +109,7 @@
       "Система, прошедшая все тесты, дальнейшего тестирования не требует"
     ],
     "type": "single",
-    "correctIndexes": [1]
+    "correct_indexes": [1]
   },
   {
     "id": 9,
@@ -123,7 +123,7 @@
       "Независимое тестирование уменьшает влияние когнитивной предвзятости"
     ],
     "type": "multiple",
-    "correctIndexes": [0, 1, 3]
+    "correct_indexes": [0, 1, 3]
   },
   {
     "id": 10,
@@ -137,7 +137,7 @@
       "Защищённость каналов передачи данных от перехвата"
     ],
     "type": "single",
-    "correctIndexes": [1]
+    "correct_indexes": [1]
   },
   {
     "id": 11,
@@ -151,7 +151,7 @@
       "Наличие орфографических ошибок и опечаток в интерфейсе"
     ],
     "type": "single",
-    "correctIndexes": [1]
+    "correct_indexes": [1]
   },
   {
     "id": 12,
@@ -165,7 +165,7 @@
       "Тестирование API на соответствие технической документации"
     ],
     "type": "single",
-    "correctIndexes": [1]
+    "correct_indexes": [1]
   },
   {
     "id": 13,
@@ -179,7 +179,7 @@
       "Тестирование удобства использования"
     ],
     "type": "multiple",
-    "correctIndexes": [0, 1, 3]
+    "correct_indexes": [0, 1, 3]
   },
   {
     "id": 14,
@@ -193,7 +193,7 @@
       "Наличие XSS-уязвимостей в пользовательских формах"
     ],
     "type": "single",
-    "correctIndexes": [1]
+    "correct_indexes": [1]
   },
   {
     "id": 15,
@@ -207,7 +207,7 @@
       "Тестирование производительности в условиях пиковой нагрузки"
     ],
     "type": "single",
-    "correctIndexes": [1]
+    "correct_indexes": [1]
   },
   {
     "id": 16,
@@ -221,7 +221,7 @@
       "Различий нет — оба вида решают одинаковые задачи"
     ],
     "type": "single",
-    "correctIndexes": [1]
+    "correct_indexes": [1]
   },
   {
     "id": 17,
@@ -235,7 +235,7 @@
       "Тестирование с участием реальных конечных пользователей продукта"
     ],
     "type": "single",
-    "correctIndexes": [1]
+    "correct_indexes": [1]
   },
   {
     "id": 18,
@@ -249,7 +249,7 @@
       "Запуск тестов в ночное время на выделенных серверах"
     ],
     "type": "single",
-    "correctIndexes": [1]
+    "correct_indexes": [1]
   },
   {
     "id": 19,
@@ -263,7 +263,7 @@
       "Повторное нагрузочное тестирование после оптимизации системы"
     ],
     "type": "single",
-    "correctIndexes": [1]
+    "correct_indexes": [1]
   },
   {
     "id": 20,
@@ -277,7 +277,7 @@
       "Последовательная проверка двух различных API одного сервиса"
     ],
     "type": "single",
-    "correctIndexes": [1]
+    "correct_indexes": [1]
   },
   {
     "id": 21,
@@ -291,7 +291,7 @@
       "Наличие актуальной и понятной документации для пользователей"
     ],
     "type": "single",
-    "correctIndexes": [1]
+    "correct_indexes": [1]
   },
   {
     "id": 22,
@@ -305,7 +305,7 @@
       "Оценка масштабируемости приложения"
     ],
     "type": "multiple",
-    "correctIndexes": [0, 1, 3]
+    "correct_indexes": [0, 1, 3]
   },
   {
     "id": 23,
@@ -319,7 +319,7 @@
       "Проверка доступности системы для пользователей с особыми потребностями"
     ],
     "type": "single",
-    "correctIndexes": [1]
+    "correct_indexes": [1]
   },
   {
     "id": 24,
@@ -333,7 +333,7 @@
       "Учет культурных особенностей региона"
     ],
     "type": "multiple",
-    "correctIndexes": [0, 1, 3]
+    "correct_indexes": [0, 1, 3]
   },
   {
     "id": 25,
@@ -347,7 +347,7 @@
       "Тест, содержащий ошибки в шагах воспроизведения или ожидаемом результате"
     ],
     "type": "single",
-    "correctIndexes": [1]
+    "correct_indexes": [1]
   },
   {
     "id": 26,
@@ -361,7 +361,7 @@
       "Приёмочное тестирование"
     ],
     "type": "single",
-    "correctIndexes": [2]
+    "correct_indexes": [2]
   },
   {
     "id": 27,
@@ -375,7 +375,7 @@
       "Стабильность системы при высокой пользовательской нагрузке"
     ],
     "type": "single",
-    "correctIndexes": [1]
+    "correct_indexes": [1]
   },
   {
     "id": 28,
@@ -389,7 +389,7 @@
       "Только силами разработчиков без участия QA-команды"
     ],
     "type": "single",
-    "correctIndexes": [2]
+    "correct_indexes": [2]
   },
   {
     "id": 29,
@@ -403,7 +403,7 @@
       "Автоматизации регрессионного тестирования перед каждым релизом"
     ],
     "type": "single",
-    "correctIndexes": [1]
+    "correct_indexes": [1]
   },
   {
     "id": 30,
@@ -417,7 +417,7 @@
       "DevOps-инженеры в ходе развёртывания системы"
     ],
     "type": "single",
-    "correctIndexes": [2]
+    "correct_indexes": [2]
   },
   {
     "id": 31,
@@ -431,7 +431,7 @@
       "Нагрузочное тестирование"
     ],
     "type": "single",
-    "correctIndexes": [2]
+    "correct_indexes": [2]
   },
   {
     "id": 32,
@@ -445,7 +445,7 @@
       "DevOps-инженеры при настройке пайплайна сборки"
     ],
     "type": "single",
-    "correctIndexes": [1]
+    "correct_indexes": [1]
   },
   {
     "id": 33,
@@ -459,7 +459,7 @@
       "Список всех разработчиков проекта"
     ],
     "type": "multiple",
-    "correctIndexes": [0, 1, 2]
+    "correct_indexes": [0, 1, 2]
   },
   {
     "id": 34,
@@ -473,7 +473,7 @@
       "Чек-листы применяются только в автоматизированном тестировании"
     ],
     "type": "single",
-    "correctIndexes": [1]
+    "correct_indexes": [1]
   },
   {
     "id": 35,
@@ -487,7 +487,7 @@
       "Реальное состояние системы после прогона тест-кейса"
     ],
     "type": "single",
-    "correctIndexes": [1]
+    "correct_indexes": [1]
   },
   {
     "id": 36,
@@ -501,7 +501,7 @@
       "Severity (степень влияния на систему)"
     ],
     "type": "single",
-    "correctIndexes": [1]
+    "correct_indexes": [1]
   },
   {
     "id": 37,
@@ -515,7 +515,7 @@
       "Для оценки потенциальной нагрузки на серверные компоненты"
     ],
     "type": "single",
-    "correctIndexes": [1]
+    "correct_indexes": [1]
   },
   {
     "id": 38,
@@ -529,7 +529,7 @@
       "Финансовая смета на проведение тестирования проекта"
     ],
     "type": "single",
-    "correctIndexes": [1]
+    "correct_indexes": [1]
   },
   {
     "id": 39,
@@ -543,7 +543,7 @@
       "Система отслеживания и управления дефектами проекта"
     ],
     "type": "single",
-    "correctIndexes": [1]
+    "correct_indexes": [1]
   },
   {
     "id": 40,
@@ -557,7 +557,7 @@
       "Assignee (ответственный за исправление)"
     ],
     "type": "single",
-    "correctIndexes": [2]
+    "correct_indexes": [2]
   },
   {
     "id": 41,
@@ -571,7 +571,7 @@
       "Учёт рабочего времени, затраченного командой на тестирование"
     ],
     "type": "single",
-    "correctIndexes": [1]
+    "correct_indexes": [1]
   },
   {
     "id": 42,
@@ -585,7 +585,7 @@
       "Таблица распределения приоритетов для найденных дефектов"
     ],
     "type": "single",
-    "correctIndexes": [1]
+    "correct_indexes": [1]
   },
   {
     "id": 43,
@@ -599,7 +599,7 @@
       "Пошаговую инструкцию по воспроизведению дефекта"
     ],
     "type": "single",
-    "correctIndexes": [1]
+    "correct_indexes": [1]
   },
   {
     "id": 44,
@@ -613,7 +613,7 @@
       "Чтобы наглядно продемонстрировать объём выполненной работы"
     ],
     "type": "single",
-    "correctIndexes": [1]
+    "correct_indexes": [1]
   },
   {
     "id": 45,
@@ -627,7 +627,7 @@
       "Итоги проведённого тестирования"
     ],
     "type": "multiple",
-    "correctIndexes": [0, 1, 3]
+    "correct_indexes": [0, 1, 3]
   },
   {
     "id": 46,
@@ -641,7 +641,7 @@
       "Имя разработчика, ответственного за устранение дефекта"
     ],
     "type": "single",
-    "correctIndexes": [1]
+    "correct_indexes": [1]
   },
   {
     "id": 47,
@@ -655,7 +655,7 @@
       "Тип операционной системы, на которой воспроизводится баг"
     ],
     "type": "single",
-    "correctIndexes": [1]
+    "correct_indexes": [1]
   },
   {
     "id": 48,
@@ -669,7 +669,7 @@
       "Low severity, low priority"
     ],
     "type": "single",
-    "correctIndexes": [1]
+    "correct_indexes": [1]
   },
   {
     "id": 49,
@@ -683,7 +683,7 @@
       "Low severity, low priority"
     ],
     "type": "single",
-    "correctIndexes": [1]
+    "correct_indexes": [1]
   },
   {
   "id": 50,
@@ -697,7 +697,7 @@
     "Blocker"
   ],
   "type": "single",
-  "correctIndexes": [3]
+  "correct_indexes": [3]
 },
 {
   "id": 51,
@@ -711,7 +711,7 @@
     "Баг переназначен другому разработчику для исправления"
   ],
   "type": "single",
-  "correctIndexes": [1]
+  "correct_indexes": [1]
 },
 {
   "id": 52,
@@ -725,7 +725,7 @@
     "Verified"
   ],
   "type": "single",
-  "correctIndexes": [3]
+  "correct_indexes": [3]
 },
 {
   "id": 53,
@@ -739,7 +739,7 @@
     "Minor"
   ],
   "type": "single",
-  "correctIndexes": [2]
+  "correct_indexes": [2]
 },
 {
   "id": 54,
@@ -753,7 +753,7 @@
     "Содержащим технические детали реализации и стек вызовов"
   ],
   "type": "single",
-  "correctIndexes": [1]
+  "correct_indexes": [1]
 },
 {
   "id": 55,
@@ -767,7 +767,7 @@
     "Проверка системы на устойчивость к внешним угрозам безопасности"
   ],
   "type": "single",
-  "correctIndexes": [1]
+  "correct_indexes": [1]
 },
 {
   "id": 56,
@@ -781,7 +781,7 @@
     "Кроссбраузерное тестирование интерфейса на разных устройствах"
   ],
   "type": "single",
-  "correctIndexes": [1]
+  "correct_indexes": [1]
 },
 {
   "id": 57,
@@ -795,7 +795,7 @@
     "Исключительно в рамках нагрузочного или стресс-тестирования"
   ],
   "type": "single",
-  "correctIndexes": [1]
+  "correct_indexes": [1]
 },
 {
   "id": 58,
@@ -809,7 +809,7 @@
     "Это разные названия одного и того же процесса проверки"
   ],
   "type": "single",
-  "correctIndexes": [1]
+  "correct_indexes": [1]
 },
 {
   "id": 59,
@@ -823,7 +823,7 @@
     "Проверить корректность отображения интерфейса после дизайн-правок"
   ],
   "type": "single",
-  "correctIndexes": [1]
+  "correct_indexes": [1]
 },
 {
   "id": 61,
@@ -837,7 +837,7 @@
     "Фреймворк для написания и запуска автоматизированных тестов"
   ],
   "type": "single",
-  "correctIndexes": [1]
+  "correct_indexes": [1]
 },
 {
   "id": 62,
@@ -851,7 +851,7 @@
     "Гибкая итеративная методология разработки продукта"
   ],
   "type": "single",
-  "correctIndexes": [1]
+  "correct_indexes": [1]
 },
 {
   "id": 63,
@@ -865,7 +865,7 @@
     "После публичного релиза по обратной связи от пользователей"
   ],
   "type": "single",
-  "correctIndexes": [1]
+  "correct_indexes": [1]
 },
 {
   "id": 64,
@@ -879,7 +879,7 @@
     "Специализированный вид тестирования безопасности веб-приложений"
   ],
   "type": "single",
-  "correctIndexes": [1]
+  "correct_indexes": [1]
 },
 {
   "id": 65,
@@ -893,7 +893,7 @@
     "Регулярная встреча команды с представителями заказчика"
   ],
   "type": "single",
-  "correctIndexes": [1]
+  "correct_indexes": [1]
 },
 {
   "id": 66,
@@ -907,7 +907,7 @@
     "Agile применяется только для разработки мобильных приложений"
   ],
   "type": "single",
-  "correctIndexes": [1]
+  "correct_indexes": [1]
 },
 {
   "id": 67,
@@ -921,7 +921,7 @@
     "Техническая документация по публичному API продукта"
   ],
   "type": "single",
-  "correctIndexes": [1]
+  "correct_indexes": [1]
 },
 {
   "id": 68,
@@ -935,7 +935,7 @@
     "Тип реляционной базы данных с поддержкой транзакций"
   ],
   "type": "single",
-  "correctIndexes": [1]
+  "correct_indexes": [1]
 },
 {
   "id": 69,
@@ -949,7 +949,7 @@
     "Вид технической документации по архитектуре системы"
   ],
   "type": "single",
-  "correctIndexes": [1]
+  "correct_indexes": [1]
 },
 {
   "id": 70,
@@ -963,7 +963,7 @@
     "Структурированный список тест-кейсов для конкретного модуля"
   ],
   "type": "single",
-  "correctIndexes": [1]
+  "correct_indexes": [1]
 },
 {
   "id": 71,
@@ -977,7 +977,7 @@
     "Только максимально возможные значения входных параметров"
   ],
   "type": "single",
-  "correctIndexes": [1]
+  "correct_indexes": [1]
 },
 {
   "id": 72,
@@ -991,7 +991,7 @@
     "1, 50 и 100"
   ],
   "type": "single",
-  "correctIndexes": [1]
+  "correct_indexes": [1]
 },
 {
   "id": 73,
@@ -1005,7 +1005,7 @@
     "Подход, при котором на каждый модуль пишется юнит и интеграционный тест"
   ],
   "type": "single",
-  "correctIndexes": [1]
+  "correct_indexes": [1]
 },
 {
   "id": 74,
@@ -1019,7 +1019,7 @@
     "Таблица распределения задач между членами команды тестирования"
   ],
   "type": "single",
-  "correctIndexes": [1]
+  "correct_indexes": [1]
 },
 {
   "id": 75,
@@ -1033,7 +1033,7 @@
     "Тестирование корректности миграции данных между средами"
   ],
   "type": "single",
-  "correctIndexes": [1]
+  "correct_indexes": [1]
 },
 {
   "id": 76,
@@ -1047,7 +1047,7 @@
     "Тестирование системы на устойчивость к атакам и вторжениям"
   ],
   "type": "single",
-  "correctIndexes": [1]
+  "correct_indexes": [1]
 },
 {
   "id": 77,
@@ -1061,7 +1061,7 @@
     "Для формирования технической документации по найденным дефектам"
   ],
   "type": "single",
-  "correctIndexes": [1]
+  "correct_indexes": [1]
 },
 {
   "id": 78,
@@ -1075,7 +1075,7 @@
     "Число тестировщиков, задействованных в проекте"
   ],
   "type": "single",
-  "correctIndexes": [1]
+  "correct_indexes": [1]
 },
 {
   "id": 79,
@@ -1089,7 +1089,7 @@
     "100"
   ],
   "type": "single",
-  "correctIndexes": [2]
+  "correct_indexes": [2]
 },
 {
   "id": 80,
@@ -1103,7 +1103,7 @@
     "Инструмент визуализации метрик производительности системы"
   ],
   "type": "single",
-  "correctIndexes": [1]
+  "correct_indexes": [1]
   },
   {
     "id": 81,
@@ -1117,7 +1117,7 @@
       "Система управления задачами и проектами для разработчиков"
     ],
     "type": "single",
-    "correctIndexes": [1]
+    "correct_indexes": [1]
   },
   {
     "id": 82,
@@ -1131,7 +1131,7 @@
       "DELETE"
     ],
     "type": "single",
-    "correctIndexes": [2]
+    "correct_indexes": [2]
   },
   {
     "id": 83,
@@ -1145,7 +1145,7 @@
       "PATCH"
     ],
     "type": "single",
-    "correctIndexes": [1]
+    "correct_indexes": [1]
   },
   {
     "id": 84,
@@ -1159,7 +1159,7 @@
       "Доступ запрещён из-за отсутствия авторизации"
     ],
     "type": "single",
-    "correctIndexes": [2]
+    "correct_indexes": [2]
   },
   {
     "id": 85,
@@ -1173,7 +1173,7 @@
       "Запрос перенаправлен на другой адрес"
     ],
     "type": "single",
-    "correctIndexes": [1]
+    "correct_indexes": [1]
   },
   {
     "id": 86,
@@ -1187,7 +1187,7 @@
       "Запрос принят, но ещё не обработан"
     ],
     "type": "single",
-    "correctIndexes": [2]
+    "correct_indexes": [2]
   },
   {
     "id": 87,
@@ -1201,7 +1201,7 @@
       "Тип реляционной базы данных для хранения структурированных данных"
     ],
     "type": "single",
-    "correctIndexes": [1]
+    "correct_indexes": [1]
   },
   {
     "id": 88,
@@ -1215,7 +1215,7 @@
       "Только уязвимости и проблемы безопасности сервиса"
     ],
     "type": "single",
-    "correctIndexes": [1]
+    "correct_indexes": [1]
   },
   {
     "id": 89,
@@ -1229,7 +1229,7 @@
       "TestRail"
     ],
     "type": "single",
-    "correctIndexes": [1]
+    "correct_indexes": [1]
   },
   {
     "id": 90,
@@ -1243,7 +1243,7 @@
       "Метод аутентификации пользователя в системе"
     ],
     "type": "single",
-    "correctIndexes": [1]
+    "correct_indexes": [1]
   },
   {
     "id": 91,
@@ -1257,7 +1257,7 @@
       "Передаётся в HTTP-заголовках запроса"
     ],
     "type": "multiple",
-    "correctIndexes": [0, 1, 3]
+    "correct_indexes": [0, 1, 3]
   },
   {
     "id": 92,
@@ -1271,7 +1271,7 @@
       "Ресурс не найден"
     ],
     "type": "multiple",
-    "correctIndexes": [0, 2]
+    "correct_indexes": [0, 2]
   },
   {
     "id": 93,
@@ -1285,7 +1285,7 @@
       "Являются частью endpoint URL"
     ],
     "type": "multiple",
-    "correctIndexes": [0, 1, 3]
+    "correct_indexes": [0, 1, 3]
   },
   {
     "id": 94,
@@ -1299,7 +1299,7 @@
       "Правила обязательности полей"
     ],
     "type": "multiple",
-    "correctIndexes": [0, 1, 3]
+    "correct_indexes": [0, 1, 3]
   },
   {
     "id": 95,
@@ -1313,7 +1313,7 @@
       "Позволяет выбирать определённые столбцы"
     ],
     "type": "multiple",
-    "correctIndexes": [0, 1, 3]
+    "correct_indexes": [0, 1, 3]
   },
   {
     "id": 96,
@@ -1327,7 +1327,7 @@
       "GROUP BY"
     ],
     "type": "multiple",
-    "correctIndexes": [0, 1]
+    "correct_indexes": [0, 1]
   },
   {
     "id": 97,
@@ -1341,7 +1341,7 @@
       "Позволяет получать связанные данные"
     ],
     "type": "multiple",
-    "correctIndexes": [0, 1, 3]
+    "correct_indexes": [0, 1, 3]
   },
   {
     "id": 98,
@@ -1355,7 +1355,7 @@
       "DELETE относится к операциям удаления данных"
     ],
     "type": "multiple",
-    "correctIndexes": [0, 1, 3]
+    "correct_indexes": [0, 1, 3]
   },
   {
     "id": 99,
@@ -1369,7 +1369,7 @@
       "Для проверки удаления и обновления записей"
     ],
     "type": "multiple",
-    "correctIndexes": [0, 1, 3]
+    "correct_indexes": [0, 1, 3]
   },
   {
     "id": 100,
@@ -1383,7 +1383,7 @@
       "Часто используется с GROUP BY"
     ],
     "type": "multiple",
-    "correctIndexes": [0, 1, 3]
+    "correct_indexes": [0, 1, 3]
   },
   {
     "id": 101,
@@ -1397,7 +1397,7 @@
       "Позволяет обновлять значения полей"
     ],
     "type": "multiple",
-    "correctIndexes": [0, 1, 3]
+    "correct_indexes": [0, 1, 3]
   },
   {
     "id": 102,
@@ -1411,7 +1411,7 @@
       "Используется для связи данных"
     ],
     "type": "multiple",
-    "correctIndexes": [0, 1, 3]
+    "correct_indexes": [0, 1, 3]
   },
   {
     "id": 103,
@@ -1425,7 +1425,7 @@
       "Часто используется в SELECT-запросах"
     ],
     "type": "multiple",
-    "correctIndexes": [0, 1, 3]
+    "correct_indexes": [0, 1, 3]
   },
   {
     "id": 104,
@@ -1439,7 +1439,7 @@
       "Статус часто является начальным"
     ],
     "type": "multiple",
-    "correctIndexes": [0, 1, 3]
+    "correct_indexes": [0, 1, 3]
   },
   {
     "id": 105,
@@ -1453,7 +1453,7 @@
       "Требуется повторная проверка"
     ],
     "type": "multiple",
-    "correctIndexes": [0, 1, 3]
+    "correct_indexes": [0, 1, 3]
   },
   {
     "id": 106,
@@ -1467,7 +1467,7 @@
       "После успешного ретеста"
     ],
     "type": "multiple",
-    "correctIndexes": [0, 1, 3]
+    "correct_indexes": [0, 1, 3]
   },
   {
     "id": 107,
@@ -1481,7 +1481,7 @@
       "Баг может быть слишком дорогим в исправлении"
     ],
     "type": "multiple",
-    "correctIndexes": [0, 1, 3]
+    "correct_indexes": [0, 1, 3]
   },
   {
     "id": 108,
@@ -1495,7 +1495,7 @@
       "Повторное создание бага не требуется"
     ],
     "type": "multiple",
-    "correctIndexes": [0, 1, 3]
+    "correct_indexes": [0, 1, 3]
   },
   {
     "id": 109,
@@ -1509,6 +1509,6 @@
       "Решение об исправлении перенесено на будущее"
     ],
     "type": "multiple",
-    "correctIndexes": [0, 1, 3]
+    "correct_indexes": [0, 1, 3]
   }
 ]
