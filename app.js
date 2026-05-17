@@ -162,7 +162,6 @@ function showQuestion() {
 
 
 function renderOptions(question) {
-  // очищаем контейнер
   optionsContainer.innerHTML = '';
 
   const isMultiple = question.type === 'multiple';
