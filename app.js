@@ -590,23 +590,26 @@ async function submitResults({
   const analytics = buildCategoryAnalytics();
 
   const payload = {
-    first_name: firstName,
-    last_name: lastName,
-    email,
+  company_id: 1,                // ← добавили
 
-    test_id: testId,
+  first_name: firstName,
+  last_name: lastName,
+  email,
 
-    total_score: state.totalScore,
-    max_score: state.maxScore,
+  test_id: testId,
 
-    percent,
+  total_score: state.totalScore,
+  max_score: state.maxScore,
 
-    verdict: getVerdict(percent),
+  percent,
 
-    categories: analytics.categories,
-    strong_areas: analytics.strongAreas,
-    weak_areas: analytics.weakAreas
-  };
+  verdict: getVerdict(percent),
+
+  categories: analytics.categories,
+  strong_areas: analytics.strongAreas,
+  weak_areas: analytics.weakAreas
+};
+
 
   try {
     const response = await fetch(
