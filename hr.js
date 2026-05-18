@@ -1,168 +1,85 @@
-// Базовый URL API твоего бэка
-const API_BASE = 'https://qa-quiz-web.vercel.app';
-
-// Порог для вердиктов (можно потом вынести в конфиг)
-function getVerdictClass(verdict) {
-  if (!verdict) return 'verdict verdict--review';
-
-  const v = verdict.toLowerCase();
-  if (v.includes('recommended')) return 'verdict verdict--pass';
-  if (v.includes('potential')) return 'verdict verdict--review';
-  if (v.includes('requires')) return 'verdict verdict--fail';
-
-  return 'verdict verdict--review';
-}
-
-// Показ/скрытие дашборда (логика из исходного скрипта)
+// Показать панель
 function showDashboard() {
   const dash = document.getElementById('dashboard');
+  if (!dash) return;
   dash.classList.add('visible');
 }
 
+// Переключить панель (кнопка "Войти")
 function toggleDashboard() {
   const dash = document.getElementById('dashboard');
+  if (!dash) return;
   dash.classList.toggle('visible');
   if (dash.classList.contains('visible')) {
-    setTimeout(
-      () => dash.scrollIntoView({ behavior: 'smooth', block: 'start' }),
-      50
-    );
+    setTimeout(() => {
+      dash.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 50);
   }
 }
 
-// Навешиваем обработчик на кнопку CTA
+// Навешиваем обработчики после загрузки DOM
 document.addEventListener('DOMContentLoaded', () => {
-  const cta = document.querySelector('.btn-cta');
-  if (cta) {
-    cta.addEventListener('click', function (e) {
+  const ctaBtn = document.getElementById('cta-btn');
+  if (ctaBtn) {
+    ctaBtn.addEventListener('click', (e) => {
       e.preventDefault();
       showDashboard();
       setTimeout(() => {
-        document
-          .getElementById('dashboard')
-          .scrollIntoView({ behavior: 'smooth', block: 'start' });
+        const dash = document.getElementById('dashboard');
+        if (dash) {
+          dash.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
       }, 50);
     });
   }
 
-  // Стартовая инициализация данных
-  loadResults();
-  updateSubscriptionInfo();
-});
-
-// Подгружаем реальные результаты из API компании 1
-async function loadResults() {
+  // Загрузка данных в таблицу из API
   const tbody = document.getElementById('results-table-body');
   if (!tbody) return;
 
-  // Очищаем демо-строки
-  tbody.innerHTML = '';
+  fetch('https://qa-quiz-web.vercel.app/api/company/1/results')
+    .then((res) => res.json())
+    .then((data) => {
+      tbody.innerHTML = '';
 
-  try {
-    const resp = await fetch(`${API_BASE}/api/company/1/results`);
-    if (!resp.ok) {
-      throw new Error(`HTTP ${resp.status}`);
-    }
-    const data = await resp.json();
+      data.results.forEach((row) => {
+        const tr = document.createElement('tr');
 
-    if (!Array.isArray(data) || data.length === 0) {
-      const tr = document.createElement('tr');
-      const td = document.createElement('td');
-      td.colSpan = 7;
-      td.textContent = 'Пока нет результатов';
-      tbody.appendChild(tr);
-      tr.appendChild(td);
-      return;
-    }
+        const created = new Date(row.created_at);
+        const dateStr = created.toLocaleDateString('ru-RU');
 
-    data.forEach((row) => {
-      const tr = document.createElement('tr');
+        const percent = Math.round(row.score_percent);
+        const verdict = row.verdict; // 'pass' | 'fail' | 'review'
 
-      const firstNameTd = document.createElement('td');
-      firstNameTd.textContent = row.first_name || '';
-      tr.appendChild(firstNameTd);
+        const verdictMap = {
+          pass:  { class: 'verdict--pass',   text: '✓ Прошёл' },
+          fail:  { class: 'verdict--fail',   text: '✕ Не прошёл' },
+          review:{ class: 'verdict--review', text: '⚠ На ревью' }
+        };
 
-      const lastNameTd = document.createElement('td');
-      lastNameTd.textContent = row.last_name || '';
-      tr.appendChild(lastNameTd);
+        const verdictConf = verdictMap[verdict] || verdictMap.review;
 
-      const emailTd = document.createElement('td');
-      emailTd.textContent = row.email || '';
-      tr.appendChild(emailTd);
+        tr.innerHTML = `
+          <td>${row.first_name || ''}</td>
+          <td>${row.last_name  || ''}</td>
+          <td>${row.email      || ''}</td>
+          <td>${row.test_name  || ''}</td>
+          <td>
+            <div class="pct-bar">
+              <div class="pct-track">
+                <div class="pct-fill" style="width:${percent}%"></div>
+              </div>
+              ${percent}%
+            </div>
+          </td>
+          <td><span class="verdict ${verdictConf.class}">${verdictConf.text}</span></td>
+          <td>${dateStr}</td>
+        `;
 
-      const testTd = document.createElement('td');
-      testTd.textContent = row.test_id || '';
-      tr.appendChild(testTd);
-
-      const percentTd = document.createElement('td');
-      const pctBar = document.createElement('div');
-      pctBar.className = 'pct-bar';
-
-      const track = document.createElement('div');
-      track.className = 'pct-track';
-      const fill = document.createElement('div');
-      fill.className = 'pct-fill';
-      const pct = Number(row.percent) || 0;
-      fill.style.width = `${Math.max(0, Math.min(100, pct))}%`;
-      track.appendChild(fill);
-
-      const pctText = document.createTextNode(`${pct}%`);
-
-      pctBar.appendChild(track);
-      pctBar.appendChild(pctText);
-      percentTd.appendChild(pctBar);
-      tr.appendChild(percentTd);
-
-      const verdictTd = document.createElement('td');
-      const verdictSpan = document.createElement('span');
-      verdictSpan.className = getVerdictClass(row.verdict);
-      verdictSpan.textContent = row.verdict || 'На ревью';
-      verdictTd.appendChild(verdictSpan);
-      tr.appendChild(verdictTd);
-
-      const createdTd = document.createElement('td');
-      // Преобразуем ISO-дату в DD.MM.YYYY
-      if (row.created_at) {
-        const d = new Date(row.created_at);
-        if (!isNaN(d)) {
-          const dd = String(d.getDate()).padStart(2, '0');
-          const mm = String(d.getMonth() + 1).padStart(2, '0');
-          const yyyy = d.getFullYear();
-          createdTd.textContent = `${dd}.${mm}.${yyyy}`;
-        } else {
-          createdTd.textContent = row.created_at;
-        }
-      } else {
-        createdTd.textContent = '';
-      }
-      tr.appendChild(createdTd);
-
-      tbody.appendChild(tr);
+        tbody.appendChild(tr);
+      });
+    })
+    .catch((err) => {
+      console.error('Ошибка загрузки результатов', err);
     });
-  } catch (err) {
-    console.error('Ошибка загрузки результатов:', err);
-    const tr = document.createElement('tr');
-    const td = document.createElement('td');
-    td.colSpan = 7;
-    td.textContent = 'Ошибка загрузки результатов';
-    tbody.appendChild(tr);
-    tr.appendChild(td);
-  }
-}
-
-// Временная заглушка для подписки: считаем дни до фиксированной даты
-function updateSubscriptionInfo() {
-  const subEl = document.getElementById('subscription-info');
-  if (!subEl) return;
-
-  const daysSpan = subEl.querySelector('.sub-days');
-  if (!daysSpan) return;
-
-  // TODO: потом возьмём дату из БД
-  const today = new Date();
-  const until = new Date('2026-06-30'); // временная дата конца подписки
-  const diffMs = until.getTime() - today.getTime();
-  const diffDays = Math.max(0, Math.ceil(diffMs / (1000 * 60 * 60 * 24)));
-
-  daysSpan.textContent = `${diffDays} дней`;
-}
+});
