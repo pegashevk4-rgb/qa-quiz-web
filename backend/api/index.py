@@ -60,6 +60,17 @@ class TestResult(BaseModel):
     strong_areas: List[Category]
     weak_areas: List[Category]
 
+class ResultRow(BaseModel):
+    result_id: int
+    user_id: int
+    first_name: str
+    last_name: str
+    email: Optional[str]
+    test_id: str
+    percent: int
+    verdict: str
+    created_at: datetime
+
 
 # ---------- SQLAlchemy-модели ----------
 
@@ -202,5 +213,45 @@ async def save_results(data: TestResult):
     except Exception as e:
         db.rollback()
         raise HTTPException(status_code=500, detail=str(e))
+    finally:
+        db.close()
+
+@app.get("/api/company/{company_id}/results", response_model=List[ResultRow])
+async def get_company_results(company_id: int, limit: int = 50):
+    db = SessionLocal()
+    try:
+        rows = (
+            db.query(
+                Result.id.label("result_id"),
+                Result.user_id,
+                User.first_name,
+                User.last_name,
+                User.email,
+                Result.test_id,
+                Result.percent,
+                Result.verdict,
+                Result.created_at,
+            )
+            .join(User, User.id == Result.user_id)
+            .filter(Result.company_id == company_id)
+            .order_by(Result.created_at.desc())
+            .limit(limit)
+            .all()
+        )
+
+        return [
+            ResultRow(
+                result_id=r.result_id,
+                user_id=r.user_id,
+                first_name=r.first_name,
+                last_name=r.last_name,
+                email=r.email,
+                test_id=r.test_id,
+                percent=r.percent,
+                verdict=r.verdict,
+                created_at=r.created_at,
+            )
+            for r in rows
+        ]
     finally:
         db.close()
