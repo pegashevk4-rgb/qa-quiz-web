@@ -102,6 +102,7 @@ class Result(Base):
 
     id = Column(Integer, primary_key=True)
     user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+    company_id = Column(Integer, ForeignKey("companies.id"), nullable=False)  # ← добавить
     test_id = Column(String(50), nullable=False)
     total_score = Column(Numeric(5, 2), nullable=False)
     max_score = Column(Numeric(5, 2), nullable=False)
@@ -170,6 +171,7 @@ async def save_results(data: TestResult):
         # 3. Сохраняем результат теста
         result = Result(
             user_id=user.id,
+            company_id=data.company_id,
             test_id=data.test_id,
             total_score=data.total_score,
             max_score=data.max_score,
