@@ -168,13 +168,25 @@
 
   /* CTA */
   .btn-cta {
-    display: inline-flex; align-items: center; gap: 10px;
-    background: linear-gradient(135deg, var(--accent), var(--accent2));
-    color: #0d0f14; font-family: var(--font-head); font-size: 1rem; font-weight: 700;
-    padding: 15px 34px; border-radius: 10px; border: none; cursor: pointer;
-    box-shadow: 0 0 32px rgba(79,255,176,.3);
-    transition: box-shadow .25s, transform .2s; text-decoration: none;
-  }
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  background: linear-gradient(135deg, var(--accent), var(--accent2));
+  color: #0d0f14;
+  font-family: var(--font-head);
+  font-size: 1rem;
+  font-weight: 700;
+  padding: 15px 34px;
+  border-radius: 10px;
+  border: none;
+  cursor: pointer;
+  box-shadow: 0 0 32px rgba(79,255,176,.3);
+  transition: box-shadow .25s, transform .2s;
+  text-decoration: none;
+
+  /* добавили центрирование */
+  margin: 8px auto 0;   /* сверху 8px, по бокам авто, снизу 0 */
+}
   .btn-cta:hover { box-shadow: 0 0 48px rgba(79,255,176,.5); transform: translateY(-2px); }
   .btn-cta svg { transition: transform .2s; }
   .btn-cta:hover svg { transform: translateX(4px); }
@@ -197,30 +209,48 @@
   #how-inner { max-width: var(--inner); margin: 0 auto; padding: 80px var(--px); }
 
   .steps {
-    display: grid; grid-template-columns: repeat(auto-fit,minmax(240px,1fr));
-    gap: 0; position: relative;
-  }
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 65px;
+  position: relative;
+}
   .steps::before {
   content: '';
   position: absolute;
   top: 28px;
-  left: 3%;
-  right: 27%;
+  left: 12%;      /* подогнано под ноутбук */
+  right: 12%;
   height: 1px;
   background: linear-gradient(90deg, var(--accent), var(--accent2), var(--accent));
   opacity: .3;
 }
-  .step { display: flex; flex-direction: column; align-items: flex-start; padding: 0 28px; }
-  .step:first-child { padding-left: 0; }
-  .step:last-child  { padding-right: 0; }
-  .step-num {
-    width: 56px; height: 56px; border-radius: 50%;
-    background: var(--bg); border: 2px solid var(--accent);
-    display: grid; place-items: center;
-    font-family: var(--font-head); font-size: 1.1rem; font-weight: 800;
-    color: var(--accent); margin-bottom: 20px; position: relative; z-index: 1;
-    box-shadow: 0 0 20px rgba(79,255,176,.2);
-  }
+  .step {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 0 28px;
+}
+
+.step-num {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: var(--bg);
+  border: 2px solid var(--accent);
+  display: grid;
+  place-items: center;
+  font-family: 'DM Sans', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+  font-size: 1.05rem;
+  font-weight: 700;
+  letter-spacing: 0;
+  color: var(--accent);
+  margin-bottom: 16px;   /* чуть ближе к заголовку */
+  position: relative;
+  z-index: 1;
+  box-shadow: 0 0 20px rgba(79,255,176,.2);
+}
+
   .step h3 { font-family: var(--font-head); font-size: 1rem; font-weight: 700; margin-bottom: 8px; }
   .step p  { font-size: .87rem; color: var(--muted); }
 
@@ -290,10 +320,33 @@
   .delay-4 { animation-delay: .48s; }
 
   @media (max-width: 640px) {
-    .steps::before { display: none; }
-    .step { padding: 0; margin-bottom: 40px; }
-    .step:last-child { margin-bottom: 0; }
+  .steps {
+    grid-template-columns: 1fr;
+    gap: 24px;
+    position: static;   /* линия нам больше не нужна */
   }
+
+  .steps::before {
+    display: none;
+  }
+
+  .step {
+    padding: 0;
+    margin-bottom: 24px;
+    align-items: flex-start;  /* всё по левому краю */
+    text-align: left;
+  }
+
+  .step:last-child {
+    margin-bottom: 0;
+  }
+
+  .step-num {
+    margin-left: 0;
+    margin-right: 0;
+    margin-bottom: 12px;
+  }
+}
 </style>
 </head>
 <body>
