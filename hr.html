@@ -102,12 +102,18 @@
 
   /* ── HERO ───────────────────────────────────────── */
   #hero {
-    position: relative;
-    overflow: hidden;
-    padding: clamp(80px, 14vw, 140px) clamp(20px, 5vw, 80px) clamp(80px, 12vw, 120px);
-    display: flex; flex-direction: column; align-items: flex-start;
-    max-width: 1200px; margin: 0 auto;
-  }
+  position: relative;
+  overflow: hidden;
+  padding: clamp(80px, 14vw, 140px) clamp(20px, 5vw, 80px) clamp(80px, 12vw, 120px);
+}
+  
+  .hero-inner {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
 
   #hero .glow-blob--green { top: -60px; left: -80px; }
   #hero .glow-blob--blue  { top: 40px;  right: -60px; }
@@ -437,46 +443,48 @@
     <div class="glow-blob glow-blob--green" style="top:-80px;left:-100px;"></div>
     <div class="glow-blob glow-blob--blue"  style="top:80px;right:-60px;"></div>
 
-    <div class="eyebrow fade-up">
-      <span class="eyebrow-dot"></span>
-      Для HR, тимлидов и фаундеров
+    <div class="hero-inner">
+      <div class="eyebrow fade-up">
+        <span class="eyebrow-dot"></span>
+        Для HR, тимлидов и фаундеров
+      </div>
+
+      <h1 class="fade-up delay-1">
+        Тестируйте<br />
+        QA‑кандидатов<br />
+        <span class="highlight">за 20 минут</span>
+      </h1>
+
+      <p class="hero-sub fade-up delay-2">
+        Забудьте о ручном скрининге резюме и субъективных оценках.
+        Отправьте ссылку — и получите объективный отчёт по уровню кандидата.
+      </p>
+
+      <div class="cards fade-up delay-3">
+        <div class="card">
+          <div class="card-icon">📋</div>
+          <h3>Стандартизированные тесты</h3>
+          <p>Профессионально составленные задания по теории тестирования, SQL, API и инструментам QA. Один формат для всех кандидатов.</p>
+        </div>
+        <div class="card">
+          <div class="card-icon">📊</div>
+          <h3>Подробная аналитика по категориям</h3>
+          <p>Результаты разбиты по навыкам: ручное тестирование, автоматизация, знание процессов. Сразу видно, где кандидат силён, а где пробелы.</p>
+        </div>
+        <div class="card">
+          <div class="card-icon">⚡</div>
+          <h3>Экономия времени на скрининг</h3>
+          <p>Первичный отбор без технических интервью. Только сильные кандидаты добираются до вашего инженера.</p>
+        </div>
+      </div>
+
+      <a href="#dashboard" class="btn-cta fade-up delay-4" onclick="showDashboard()">
+        Получить доступ
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+          <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </a>
     </div>
-
-    <h1 class="fade-up delay-1">
-      Тестируйте<br />
-      QA‑кандидатов<br />
-      <span class="highlight">за 20 минут</span>
-    </h1>
-
-    <p class="hero-sub fade-up delay-2">
-      Забудьте о ручном скрининге резюме и субъективных оценках.
-      Отправьте ссылку — и получите объективный отчёт по уровню кандидата.
-    </p>
-
-    <div class="cards fade-up delay-3">
-      <div class="card">
-        <div class="card-icon">📋</div>
-        <h3>Стандартизированные тесты</h3>
-        <p>Профессионально составленные задания по теории тестирования, SQL, API и инструментам QA. Один формат для всех кандидатов.</p>
-      </div>
-      <div class="card">
-        <div class="card-icon">📊</div>
-        <h3>Подробная аналитика по категориям</h3>
-        <p>Результаты разбиты по навыкам: ручное тестирование, автоматизация, знание процессов. Сразу видно, где кандидат силён, а где пробелы.</p>
-      </div>
-      <div class="card">
-        <div class="card-icon">⚡</div>
-        <h3>Экономия времени на скрининг</h3>
-        <p>Первичный отбор без технических интервью. Только сильные кандидаты добираются до вашего инженера.</p>
-      </div>
-    </div>
-
-    <a href="#dashboard" class="btn-cta fade-up delay-4" onclick="showDashboard()">
-      Получить доступ
-      <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-        <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-      </svg>
-    </a>
   </section>
 </div>
 
