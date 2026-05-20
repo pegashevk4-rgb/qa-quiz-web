@@ -1,492 +1,351 @@
+<!-- hr.html -->
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>QA Hiring Assistant</title>
-<link rel="preconnect" href="https://fonts.googleapis.com" />
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet" />
-<style>
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>QA Hiring Assistant</title>
 
-  :root {
-    --bg:        #0d0f14;
-    --surface:   #14171f;
-    --card:      #1a1e29;
-    --border:    #252a38;
-    --accent:    #4fffb0;
-    --accent2:   #00c9ff;
-    --text:      #e8ecf5;
-    --muted:     #7a849e;
-    --danger:    #ff5f7e;
-    --warning:   #ffd166;
-    --radius:    14px;
-    --font-head: 'Syne', sans-serif;
-    --font-body: 'DM Sans', sans-serif;
-    --inner:     1200px;
-    --px:        clamp(20px, 5vw, 80px);
-  }
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 
-  html { scroll-behavior: smooth; }
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet" />
 
-  body {
-    background: var(--bg);
-    color: var(--text);
-    font-family: var(--font-body);
-    font-size: 16px;
-    line-height: 1.6;
-    overflow-x: hidden;
-    width: 100%;
-  }
-
-  /* NOISE */
-  body::before {
-    content: '';
-    position: fixed; inset: 0;
-    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
-    pointer-events: none; z-index: 0;
-  }
-
-  /* GLOW BLOBS */
-  .glow-blob {
-    position: absolute; border-radius: 50%;
-    filter: blur(110px); opacity: 0.18; pointer-events: none;
-  }
-  .glow-blob--green { background: var(--accent);  width: 600px; height: 600px; }
-  .glow-blob--blue  { background: var(--accent2); width: 420px; height: 420px; }
-
-  /* CENTERED WRAPPER */
-  .inner {
-    max-width: var(--inner);
-    margin: 0 auto;
-    padding: 0 var(--px);
-  }
-
-  /* NAVBAR */
-  nav {
-    position: sticky; top: 0; z-index: 100;
-    width: 100%;
-    background: rgba(13,15,20,.85);
-    backdrop-filter: blur(16px);
-    border-bottom: 1px solid var(--border);
-  }
-  .nav-inner {
-    max-width: var(--inner); margin: 0 auto;
-    padding: 0 var(--px); height: 68px;
-    display: flex; align-items: center; justify-content: space-between;
-  }
-  .nav-logo {
-    display: flex; align-items: center; gap: 10px;
-    font-family: var(--font-head); font-size: 1.15rem; font-weight: 700;
-    letter-spacing: -.02em; text-decoration: none; color: var(--text);
-  }
-  .nav-logo .logo-mark {
-    width: 34px; height: 34px;
-    background: linear-gradient(135deg, var(--accent), var(--accent2));
-    border-radius: 9px; display: grid; place-items: center;
-    font-size: .8rem; font-weight: 800; color: #0d0f14;
-  }
-  .btn { cursor: pointer; border: none; font-family: var(--font-body); transition: all .2s; }
-  .btn-outline {
-    background: transparent; border: 1.5px solid var(--border);
-    color: var(--text); padding: 8px 22px; border-radius: 8px;
-    font-size: .88rem; font-weight: 500;
-  }
-  .btn-outline:hover {
-    border-color: var(--accent); color: var(--accent);
-    box-shadow: 0 0 16px rgba(79,255,176,.15);
-  }
-
-  /* HERO WRAPPER — full viewport width */
-  #hero-wrapper {
-    position: relative; overflow: hidden;
-    width: 100%; background: var(--bg);
-  }
-  #hero-wrapper .glow-blob--green { top: -80px; left: -100px; }
-  #hero-wrapper .glow-blob--blue  { top: 60px;  right: -80px; }
-
-  #hero {
-    position: relative;
-    padding: clamp(80px,14vw,140px) 0 clamp(80px,12vw,120px);
-    display: flex; flex-direction: column; align-items: flex-start;
-  }
-
-  .eyebrow {
-    display: inline-flex; align-items: center; gap: 7px;
-    font-size: .78rem; font-weight: 500; letter-spacing: .12em;
-    text-transform: uppercase; color: var(--accent);
-    background: rgba(79,255,176,.08); border: 1px solid rgba(79,255,176,.22);
-    border-radius: 100px; padding: 5px 14px; margin-bottom: 28px;
-  }
-  .eyebrow-dot {
-    width: 6px; height: 6px; border-radius: 50%;
-    background: var(--accent); animation: pulse 2s infinite;
-  }
-  @keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.5;transform:scale(.8)} }
-
-  h1 {
-    font-family: var(--font-head);
-    font-size: clamp(2.4rem,6vw,5rem); font-weight: 800;
-    line-height: 1.06; letter-spacing: -.03em;
-    max-width: 780px; margin-bottom: 24px;
-  }
-  h1 .highlight {
-    background: linear-gradient(90deg, var(--accent), var(--accent2));
-    -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
-  }
-  .hero-sub {
-    font-size: clamp(1rem,2vw,1.18rem); color: var(--muted);
-    max-width: 540px; margin-bottom: 44px; font-weight: 300;
-  }
-
-  /* CARDS */
-  .cards {
-    display: grid; grid-template-columns: repeat(auto-fit,minmax(260px,1fr));
-    gap: 18px; width: 100%; margin-bottom: 48px;
-  }
-  .card {
-    background: var(--card); border: 1px solid var(--border);
-    border-radius: var(--radius); padding: 28px 26px;
-    position: relative; overflow: hidden;
-    transition: border-color .25s, transform .25s;
-  }
-  .card:hover { border-color: rgba(79,255,176,.35); transform: translateY(-3px); }
-  .card::before {
-    content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
-    background: linear-gradient(90deg, var(--accent), var(--accent2));
-    opacity: 0; transition: opacity .25s;
-  }
-  .card:hover::before { opacity: 1; }
-  .card-icon {
-    width: 42px; height: 42px; border-radius: 10px;
-    background: rgba(79,255,176,.1); border: 1px solid rgba(79,255,176,.2);
-    display: grid; place-items: center; font-size: 1.15rem; margin-bottom: 16px;
-  }
-  .card h3 { font-family: var(--font-head); font-size: 1rem; font-weight: 700; margin-bottom: 8px; letter-spacing: -.01em; }
-  .card p  { font-size: .88rem; color: var(--muted); line-height: 1.55; }
-
-  /* CTA */
-  .btn-cta {
-  display: inline-flex;
-  align-items: center;
-  gap: 10px;
-  background: linear-gradient(135deg, var(--accent), var(--accent2));
-  color: #0d0f14;
-  font-family: var(--font-head);
-  font-size: 1rem;
-  font-weight: 700;
-  padding: 15px 34px;
-  border-radius: 10px;
-  border: none;
-  cursor: pointer;
-  box-shadow: 0 0 32px rgba(79,255,176,.3);
-  transition: box-shadow .25s, transform .2s;
-  text-decoration: none;
-
-  /* добавили центрирование */
-  margin: 8px auto 0;   /* сверху 8px, по бокам авто, снизу 0 */
-}
-  .btn-cta:hover { box-shadow: 0 0 48px rgba(79,255,176,.5); transform: translateY(-2px); }
-  .btn-cta svg { transition: transform .2s; }
-  .btn-cta:hover svg { transform: translateX(4px); }
-
-  /* LABELS */
-  .section-label {
-    font-family: var(--font-head); font-size: .72rem; font-weight: 600;
-    letter-spacing: .15em; text-transform: uppercase; color: var(--muted); margin-bottom: 14px;
-  }
-  .section-title {
-    font-family: var(--font-head); font-size: clamp(1.6rem,4vw,2.4rem);
-    font-weight: 800; letter-spacing: -.025em; margin-bottom: 56px;
-  }
-
-  /* HOW — full viewport width */
-  #how-wrapper {
-    width: 100%; background: var(--surface);
-    border-top: 1px solid var(--border); border-bottom: 1px solid var(--border);
-  }
-  #how-inner { max-width: var(--inner); margin: 0 auto; padding: 80px var(--px); }
-
-  .steps {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 65px;
-  position: relative;
-}
-  .steps::before {
-  content: '';
-  position: absolute;
-  top: 28px;
-  left: 12%;      /* подогнано под ноутбук */
-  right: 12%;
-  height: 1px;
-  background: linear-gradient(90deg, var(--accent), var(--accent2), var(--accent));
-  opacity: .3;
-}
-  .step {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  text-align: center;
-  padding: 0 28px;
-}
-
-.step-num {
-  width: 56px;
-  height: 56px;
-  border-radius: 50%;
-  background: var(--bg);
-  border: 2px solid var(--accent);
-  display: grid;
-  place-items: center;
-  font-family: 'DM Sans', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
-  font-size: 1.05rem;
-  font-weight: 700;
-  letter-spacing: 0;
-  color: var(--accent);
-  margin-bottom: 16px;   /* чуть ближе к заголовку */
-  position: relative;
-  z-index: 1;
-  box-shadow: 0 0 20px rgba(79,255,176,.2);
-}
-
-  .step h3 { font-family: var(--font-head); font-size: 1rem; font-weight: 700; margin-bottom: 8px; }
-  .step p  { font-size: .87rem; color: var(--muted); }
-
-  /* DASHBOARD — full viewport width */
-  #dashboard { display: none; width: 100%; background: var(--bg); }
-  #dashboard.visible { display: block; }
-  #dashboard-inner { max-width: var(--inner); margin: 0 auto; padding: 64px var(--px) 80px; }
-
-  .dashboard-header {
-    display: flex; align-items: center; justify-content: space-between;
-    flex-wrap: wrap; gap: 16px; margin-bottom: 28px;
-  }
-  #subscription-info {
-    display: inline-flex; align-items: center; gap: 10px;
-    background: rgba(255,209,102,.07); border: 1px solid rgba(255,209,102,.25);
-    border-radius: 10px; padding: 10px 18px; font-size: .88rem;
-  }
-  #subscription-info .sub-label { color: var(--muted); }
-  #subscription-info .sub-days  { font-weight: 700; color: var(--warning); font-family: var(--font-head); }
-
-  /* TABLE */
-  .table-wrap {
-    overflow-x: auto; border: 1px solid var(--border);
-    border-radius: var(--radius); background: var(--card);
-  }
-  table { width: 100%; border-collapse: collapse; font-size: .88rem; }
-  thead th {
-    padding: 14px 18px; text-align: left;
-    font-family: var(--font-head); font-size: .72rem; font-weight: 600;
-    letter-spacing: .1em; text-transform: uppercase; color: var(--muted);
-    background: var(--surface); border-bottom: 1px solid var(--border); white-space: nowrap;
-  }
-  tbody tr { border-bottom: 1px solid var(--border); transition: background .15s; }
-  tbody tr:last-child { border-bottom: none; }
-  tbody tr:hover { background: rgba(255,255,255,.03); }
-  tbody td { padding: 13px 18px; white-space: nowrap; vertical-align: middle; }
-  .verdict {
-    display: inline-flex; align-items: center; gap: 5px;
-    padding: 3px 10px; border-radius: 100px; font-size: .78rem; font-weight: 600;
-  }
-  .verdict--pass   { background: rgba(79,255,176,.12);  color: var(--accent);  border: 1px solid rgba(79,255,176,.25); }
-  .verdict--fail   { background: rgba(255,95,126,.12);  color: var(--danger);  border: 1px solid rgba(255,95,126,.25); }
-  .verdict--review { background: rgba(255,209,102,.10); color: var(--warning); border: 1px solid rgba(255,209,102,.25); }
-  .pct-bar { display: flex; align-items: center; gap: 10px; }
-  .pct-track { width: 72px; height: 5px; background: var(--border); border-radius: 100px; overflow: hidden; flex-shrink: 0; }
-  .pct-fill  { height: 100%; border-radius: 100px; background: linear-gradient(90deg, var(--accent), var(--accent2)); }
-
-  /* FOOTER — full viewport width */
-  footer { width: 100%; background: var(--surface); border-top: 1px solid var(--border); }
-  .footer-inner {
-    max-width: var(--inner); margin: 0 auto; padding: 32px var(--px);
-    display: flex; align-items: center; justify-content: space-between;
-    flex-wrap: wrap; gap: 12px; font-size: .84rem; color: var(--muted);
-  }
-  footer a {
-    color: var(--accent); text-decoration: none;
-    display: inline-flex; align-items: center; gap: 6px; transition: opacity .2s;
-  }
-  footer a:hover { opacity: .75; }
-
-  /* ANIMATIONS */
-  .fade-up { opacity: 0; transform: translateY(24px); animation: fadeUp .6s forwards; }
-  @keyframes fadeUp { to { opacity:1; transform:translateY(0); } }
-  .delay-1 { animation-delay: .12s; }
-  .delay-2 { animation-delay: .24s; }
-  .delay-3 { animation-delay: .36s; }
-  .delay-4 { animation-delay: .48s; }
-
-  @media (max-width: 640px) {
-  .steps {
-    grid-template-columns: 1fr;
-    gap: 24px;
-    position: static;   /* линия нам больше не нужна */
-  }
-
-  .steps::before {
-    display: none;
-  }
-
-  .step {
-    padding: 0;
-    margin-bottom: 24px;
-    align-items: flex-start;  /* всё по левому краю */
-    text-align: left;
-  }
-
-  .step:last-child {
-    margin-bottom: 0;
-  }
-
-  .step-num {
-    margin-left: 0;
-    margin-right: 0;
-    margin-bottom: 12px;
-  }
-}
-</style>
+  <link rel="stylesheet" href="hr.css" />
 </head>
+
 <body>
 
-<!-- NAVBAR -->
 <nav>
   <div class="nav-inner">
     <a href="#" class="nav-logo">
       <span class="logo-mark">QA</span>
       QA Hiring Assistant
     </a>
-    <button class="btn btn-outline" onclick="toggleDashboard()">Войти</button>
+
+    <button class="btn btn-outline">Войти</button>
   </div>
 </nav>
 
-<!-- HERO -->
 <div id="hero-wrapper">
   <div class="glow-blob glow-blob--green"></div>
   <div class="glow-blob glow-blob--blue"></div>
+
   <div class="inner">
     <div id="hero">
-      <div class="eyebrow fade-up"><span class="eyebrow-dot"></span>Для HR, тимлидов и фаундеров</div>
-      <h1 class="fade-up delay-1">Тестируйте<br />QA‑кандидатов<br /><span class="highlight">за 20 минут</span></h1>
-      <p class="hero-sub fade-up delay-2">Забудьте о ручном скрининге резюме и субъективных оценках. Отправьте ссылку — и получите объективный отчёт по уровню кандидата.</p>
+
+      <div class="eyebrow fade-up">
+        <span class="eyebrow-dot"></span>
+        Для HR, тимлидов и фаундеров
+      </div>
+
+      <h1 class="fade-up delay-1">
+        Тестируйте<br />
+        QA-кандидатов<br />
+        <span class="highlight">за 20 минут</span>
+      </h1>
+
+      <p class="hero-sub fade-up delay-2">
+        Забудьте о ручном скрининге резюме и субъективных оценках.
+        Отправьте ссылку — и получите объективный отчёт по уровню кандидата.
+      </p>
+
       <div class="cards fade-up delay-3">
+
         <div class="card">
           <div class="card-icon">📋</div>
+
           <h3>Стандартизированные тесты</h3>
-          <p>Профессионально составленные задания по теории тестирования, SQL, API и инструментам QA. Один формат для всех кандидатов.</p>
+
+          <p>
+            Профессиональные задания по теории тестирования,
+            SQL, API и инструментам QA. Один стандартизированный тест вместо десятков разрозненных вопросов.
+          </p>
         </div>
+
         <div class="card">
           <div class="card-icon">📊</div>
+
           <h3>Подробная аналитика по категориям</h3>
-          <p>Результаты разбиты по навыкам: ручное тестирование, автоматизация, знание процессов. Сразу видно, где кандидат силён, а где пробелы.</p>
+
+          <p>
+            Результаты разбиты по навыкам: ручное тестирование,
+            работа с базами, API и понимание процессов. 
+            Сразу видно, в чём кандидат силён, а где пробелы.
+          </p>
         </div>
+
         <div class="card">
           <div class="card-icon">⚡</div>
+
           <h3>Экономия времени на скрининг</h3>
-          <p>Первичный отбор без технических интервью. Только сильные кандидаты добираются до вашего инженера.</p>
+
+          <p>
+            Первичный отбор без технических интервью и созвонов.
+            Инженеры видят уже отфильтрованных кандидатов с понятным отчётом по навыкам.
+          </p>
         </div>
+
       </div>
-      <a href="#dashboard" class="btn-cta fade-up delay-4" id="cta-btn">
+
+      <a class="btn-cta fade-up delay-4" id="cta-btn">
         Получить доступ
+
         <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-          <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          <path
+            d="M3 8h10M9 4l4 4-4 4"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          />
         </svg>
       </a>
+
     </div>
   </div>
 </div>
 
-<!-- HOW IT WORKS -->
 <div id="how-wrapper">
   <div id="how-inner">
+
     <div class="section-label">Процесс</div>
-    <div class="section-title">Как это работает</div>
+
+    <div class="section-title">
+      Как это работает
+    </div>
+
     <div class="steps">
+
       <div class="step">
         <div class="step-num">1</div>
+
         <h3>Отправляете ссылку</h3>
-        <p>Вы создаёте кандидата в панели и получаете уникальную ссылку на тест в один клик.</p>
+
+        <p>
+          Вы просто отправляете кандидату 
+          ссылку на тест. Всё остальное сервис делает за вас.
+        </p>
       </div>
+
       <div class="step">
         <div class="step-num">2</div>
+
         <h3>Кандидат проходит тест</h3>
-        <p>Онлайн, без установки ПО, в удобное время — занимает около 20 минут.</p>
+
+        <p>
+          Онлайн, без установки ПО,
+          в удобное время.
+        </p>
       </div>
+
       <div class="step">
         <div class="step-num">3</div>
+
         <h3>Вы видите результаты</h3>
-        <p>Отчёт с процентом правильных ответов, разбивкой по категориям и рекомендацией по уровню (Junior / Middle / Senior).</p>
+
+        <p>
+          Отчёт с процентом правильных ответов,
+          разбивкой по категориям и рекомендацией.
+        </p>
       </div>
+
     </div>
   </div>
 </div>
 
-<!-- DASHBOARD -->
 <div id="dashboard">
   <div id="dashboard-inner">
+
     <div class="dashboard-header">
       <div>
         <div class="section-label">HR-панель</div>
-        <div class="section-title" style="margin-bottom:0;">Панель кандидатов</div>
+
+        <div class="section-title dashboard-title">
+          Панель кандидатов
+        </div>
       </div>
     </div>
+
     <div class="table-wrap">
+
       <table>
+
         <thead>
           <tr>
-            <th>Имя</th><th>Фамилия</th><th>Email</th>
-            <th>Тест</th><th>Процент</th><th>Вердикт</th><th>Дата</th>
+            <th>Имя</th>
+            <th>Фамилия</th>
+            <th>Email</th>
+            <th>Тест</th>
+            <th>Процент</th>
+            <th>Вердикт</th>
+            <th>Дата</th>
           </tr>
         </thead>
+
         <tbody id="results-table-body">
-          <tr>
-            <td>Анна</td><td>Смирнова</td><td>a.smirnova@mail.ru</td><td>QA Basics v2</td>
-            <td><div class="pct-bar"><div class="pct-track"><div class="pct-fill" style="width:88%"></div></div>88%</div></td>
-            <td><span class="verdict verdict--pass">✓ Прошёл</span></td><td>17.05.2026</td>
-          </tr>
-          <tr>
-            <td>Дмитрий</td><td>Козлов</td><td>d.kozlov@example.com</td><td>QA Basics v2</td>
-            <td><div class="pct-bar"><div class="pct-track"><div class="pct-fill" style="width:54%"></div></div>54%</div></td>
-            <td><span class="verdict verdict--review">⚠ На ревью</span></td><td>16.05.2026</td>
-          </tr>
-          <tr>
-            <td>Мария</td><td>Иванова</td><td>m.ivanova@work.io</td><td>Automation QA</td>
-            <td><div class="pct-bar"><div class="pct-track"><div class="pct-fill" style="width:95%"></div></div>95%</div></td>
-            <td><span class="verdict verdict--pass">✓ Прошёл</span></td><td>15.05.2026</td>
-          </tr>
-          <tr>
-            <td>Игорь</td><td>Петров</td><td>i.petrov@corp.ru</td><td>QA Basics v2</td>
-            <td><div class="pct-bar"><div class="pct-track"><div class="pct-fill" style="width:31%"></div></div>31%</div></td>
-            <td><span class="verdict verdict--fail">✕ Не прошёл</span></td><td>14.05.2026</td>
-          </tr>
-          <tr>
-            <td>Ольга</td><td>Сидорова</td><td>o.sidorova@dev.com</td><td>API Testing</td>
-            <td><div class="pct-bar"><div class="pct-track"><div class="pct-fill" style="width:72%"></div></div>72%</div></td>
-            <td><span class="verdict verdict--pass">✓ Прошёл</span></td><td>13.05.2026</td>
-          </tr>
-        </tbody>
+  <tr>
+    <td>Анна</td><td>Смирнова</td><td>a.smirnova@mail.ru</td><td>Middle</td>
+    <td><div class="pct-bar"><div class="pct-track"><div class="pct-fill" style="width:88%"></div></div>88%</div></td>
+    <td><span class="verdict verdict--pass">✓ Пройден</span></td><td>17.05.2026</td>
+  </tr>
+  <tr>
+    <td>Дмитрий</td><td>Козлов</td><td>d.kozlov@example.com</td><td>Senior</td>
+    <td><div class="pct-bar"><div class="pct-track"><div class="pct-fill" style="width:54%"></div></div>54%</div></td>
+    <td><span class="verdict verdict--review">⚠ На ревью</span></td><td>16.05.2026</td>
+  </tr>
+  <tr>
+    <td>Мария</td><td>Иванова</td><td>m.ivanova@work.io</td><td>Джун</td>
+    <td><div class="pct-bar"><div class="pct-track"><div class="pct-fill" style="width:95%"></div></div>95%</div></td>
+    <td><span class="verdict verdict--pass">✓ Пройден</span></td><td>15.05.2026</td>
+  </tr>
+  <tr>
+    <td>Игорь</td><td>Петров</td><td>i.petrov@corp.ru</td><td>Middle</td>
+    <td><div class="pct-bar"><div class="pct-track"><div class="pct-fill" style="width:31%"></div></div>31%</div></td>
+    <td><span class="verdict verdict--fail">✕ Не пройден</span></td><td>14.05.2026</td>
+  </tr>
+  <tr>
+    <td>Ольга</td><td>Сидорова</td><td>o.sidorova@dev.com</td><td>Джун</td>
+    <td><div class="pct-bar"><div class="pct-track"><div class="pct-fill" style="width:72%"></div></div>72%</div></td>
+    <td><span class="verdict verdict--pass">✓ Пройден</span></td><td>13.05.2026</td>
+  </tr>
+</tbody>
+
       </table>
+
     </div>
   </div>
 </div>
 
-<!-- FOOTER -->
 <footer>
   <div class="footer-inner">
-    <span>© 2026 QA Hiring Assistant — объективный скрининг QA-специалистов</span>
+
+    <span>
+      © 2026 QA Hiring Assistant —
+      объективный скрининг QA-специалистов
+    </span>
+
     <a href="https://github.com" target="_blank" rel="noopener">
+
       <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
         <path d="M12 2C6.477 2 2 6.484 2 12.021c0 4.428 2.865 8.185 6.839 9.51.5.092.682-.217.682-.483 0-.237-.009-.868-.013-1.703-2.782.605-3.369-1.342-3.369-1.342-.454-1.154-1.11-1.462-1.11-1.462-.908-.62.069-.608.069-.608 1.003.07 1.531 1.031 1.531 1.031.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844a9.59 9.59 0 012.504.337c1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.942.359.31.678.921.678 1.856 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482C19.138 20.2 22 16.447 22 12.021 22 6.484 17.522 2 12 2z"/>
       </svg>
+
       GitHub
     </a>
+
   </div>
 </footer>
 
+<div class="modal-overlay" id="auth-overlay"></div>
+
+<div class="modal" id="auth-modal">
+
+  <div class="modal-inner">
+
+    <button class="modal-close" id="auth-close">
+      &times;
+    </button>
+
+    <div class="modal-tabs">
+      <button class="modal-tab active" data-tab="login">
+        Вход
+      </button>
+
+      <button class="modal-tab" data-tab="register">
+        Регистрация
+      </button>
+    </div>
+
+    <form class="modal-form active" id="login-form" novalidate>
+
+      <label>
+        Email *
+        <input
+          type="email"
+          name="email"
+          required
+        />
+      </label>
+
+      <label>
+        Пароль *
+        <input
+          type="password"
+          name="password"
+          required
+          minlength="6"
+        />
+      </label>
+
+      <button type="submit" class="modal-submit">
+        Войти
+      </button>
+
+      <p class="modal-hint">
+        Поля с * обязательны для заполнения.
+      </p>
+
+    </form>
+
+    <form class="modal-form" id="register-form" novalidate>
+
+    <label>
+      Имя *
+      <input
+        type="text"
+        name="name"
+        required
+        minlength="2"
+      />
+    </label>
+
+    <label>
+      Компания *
+      <input
+        type="text"
+        name="company"
+        required
+        minlength="2"
+      />
+    </label>
+
+    <label>
+      Email *
+      <input
+        type="email"
+        name="email"
+        required
+      />
+    </label>
+
+    <label>
+      Пароль *
+      <input
+        type="password"
+        name="password"
+        required
+        minlength="8"
+        pattern="^(?=.*[A-Za-z])(?=.*\d).{8,}$"
+        title="Минимум 8 символов, хотя бы одна буква и одна цифра"
+      />
+    </label>
+
+    <button type="submit" class="modal-submit">
+      Создать аккаунт
+    </button>
+
+    <p class="modal-hint">
+      Поля с * обязательны для заполнения.
+    </p>
+
+  </form>
+
+
+  </div>
+</div>
+
 <script src="hr.js"></script>
 
-</script>
 </body>
 </html>
