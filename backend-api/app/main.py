@@ -6,7 +6,7 @@ from . import models, schemas
 from .auth import get_password_hash
 
 # создаём таблицы при запуске
-Base.metadata.create_all(bind=engine)
+#Base.metadata.create_all(bind=engine)
 
 app = FastAPI()
 

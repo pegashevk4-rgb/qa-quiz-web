@@ -16,7 +16,7 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker, relationship
 from datetime import datetime
 import os
-
+import secrets
 
 DATABASE_URL = os.getenv(
     "DATABASE_URL",
@@ -47,7 +47,7 @@ class Category(BaseModel):
 
 
 class TestResult(BaseModel):
-    company_id: int                # из ссылки/конфига
+    company_token: str          # ← вместо company_id
     first_name: str
     last_name: str
     email: Optional[str] = None
@@ -79,6 +79,7 @@ class Company(Base):
 
     id = Column(Integer, primary_key=True)
     name = Column(String(255), nullable=False)
+    public_token = Column(String(255), unique=True)  # <-- добавили
     created_at = Column(DateTime, default=datetime.utcnow)
 
 
@@ -144,10 +145,14 @@ async def root():
 async def save_results(data: TestResult):
     db = SessionLocal()
     try:
-        # 1. Проверяем, что компания существует
-        company = db.query(Company).filter(Company.id == data.company_id).first()
+        # 1. Ищем компанию по токену, а не по id
+        company = (
+            db.query(Company)
+            .filter(Company.public_token == data.company_token)
+            .first()
+        )
         if not company:
-            raise HTTPException(status_code=400, detail="Unknown company")
+            raise HTTPException(status_code=400, detail="Unknown company token")
 
         # 2. Ищем кандидата только внутри этой компании
         user = None
@@ -155,7 +160,7 @@ async def save_results(data: TestResult):
             user = (
                 db.query(User)
                   .filter(
-                      User.company_id == data.company_id,
+                      User.company_id == company.id,
                       User.email == data.email
                   )
                   .first()
@@ -164,7 +169,7 @@ async def save_results(data: TestResult):
         if not user:
             # создаём нового кандидата
             user = User(
-                company_id=data.company_id,
+                company_id=company.id,
                 first_name=data.first_name,
                 last_name=data.last_name,
                 email=data.email or None
@@ -182,7 +187,7 @@ async def save_results(data: TestResult):
         # 3. Сохраняем результат теста
         result = Result(
             user_id=user.id,
-            company_id=data.company_id,
+            company_id=company.id,  # ← сохраняем company_id в результатах
             test_id=data.test_id,
             total_score=data.total_score,
             max_score=data.max_score,

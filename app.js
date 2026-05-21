@@ -36,6 +36,9 @@ const TEST_JSON_MAP = {
 const params = new URLSearchParams(window.location.search);
 const testId = params.get('test_id') || 'qa_middle_web';
 
+// берём company_id из ссылки
+const companyToken = params.get('company_token') || null;
+
 // =========================
 // DOM
 // =========================
@@ -589,26 +592,31 @@ async function submitResults({
 }) {
   const analytics = buildCategoryAnalytics();
 
+  if (!companyToken) {
+    alert('Не указан токен компании в ссылке');
+    return;
+  }
+
   const payload = {
-  company_id: 1,                // ← добавили
+  company_token: companyToken,   // ← вместо 1
 
-  first_name: firstName,
-  last_name: lastName,
-  email,
+    first_name: firstName,
+    last_name: lastName,
+    email,
 
-  test_id: testId,
+    test_id: testId,
 
-  total_score: state.totalScore,
-  max_score: state.maxScore,
+    total_score: state.totalScore,
+    max_score: state.maxScore,
 
-  percent,
+    percent,
 
-  verdict: getVerdict(percent),
+    verdict: getVerdict(percent),
 
-  categories: analytics.categories,
-  strong_areas: analytics.strongAreas,
-  weak_areas: analytics.weakAreas
-};
+    categories: analytics.categories,
+    strong_areas: analytics.strongAreas,
+    weak_areas: analytics.weakAreas
+  };
 
 
   try {
