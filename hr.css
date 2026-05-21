@@ -315,8 +315,10 @@ h1 .highlight {
   letter-spacing: -.025em;
   margin-bottom: 56px;
 }
+
 .dashboard-title {
-  margin-bottom: 0;
+  color: #ffffff;
+  margin-bottom: 4px;
 }
 
 /* HOW IT WORKS */
@@ -565,6 +567,96 @@ footer a:hover {
   /* центрируем сам блок, но не растягиваем */
   justify-content: center;
   width: auto;
+}
+ 
+#cand-topics-list {
+  list-style: none;
+  padding-left: 0;
+  margin: 8px 0 0;
+}
+
+#cand-topics-list li {
+  font-size: 14px;
+  margin-bottom: 4px;
+}
+
+#candidate-modal 
+.candidate-main {
+  margin-top: 8px;
+  margin-bottom: 16px;
+}
+
+#candidate-modal 
+.candidate-name {
+  font-size: 18px;
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+
+#candidate-modal 
+.candidate-test {
+  font-size: 14px;
+  color: #ffffff;
+  margin-bottom: 4px;
+}
+
+#candidate-modal 
+.candidate-score {
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.dashboard-hint {
+  margin-top: 8px;
+  font-size: 15px;        /* чуть крупнее */
+  line-height: 1.6;       /* побольше межстрочный интервал */
+  letter-spacing: 0.01em; /* слегка раздвинуть */
+  color: #ffffff;
+  max-width: 520px;
+}
+
+#dashboard p {
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.dashboard-hint {
+  color: #ffffff; /* самое читаемое */
+}
+
+#results-table-body tr {
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+}
+
+#results-table-body tr:hover {
+  background-color: #4957f3; /* лёгкий подсвет */
+}
+
+.candidate-topics-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 8px;
+}
+
+.candidate-topics-table td {
+  padding: 4px 0;
+  font-size: 14px;
+  color: #ffffff;
+  border: none;              /* убираем все границы */
+}
+
+.candidate-topics-table tr + tr td {
+  border-top: none;          /* на всякий случай, если где-то что-то наследуется */
+}
+
+.candidate-topics-table td:first-child {
+  text-align: left;
+  opacity: 0.85;
+}
+
+.candidate-topics-table td:last-child {
+  text-align: right;
+  font-weight: 500;
 }
 
 /* чтобы вся группа была по центру внутри модалки */

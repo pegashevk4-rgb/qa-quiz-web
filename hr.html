@@ -23,7 +23,8 @@
       QA Hiring Assistant
     </a>
 
-    <button class="btn btn-outline">Войти</button>
+    <!-- Кнопка открытия модалки авторизации/регистрации -->
+    <button class="btn btn-outline" id="open-auth-btn">Войти</button>
   </div>
 </nav>
 
@@ -88,9 +89,10 @@
 
       </div>
 
-      <a class="btn-cta fade-up delay-4" id="cta-btn">
+      <!-- Кнопка, которая тоже открывает модалку -->
+      <button class="btn-cta fade-up delay-4" id="cta-btn">
         Получить доступ
-
+        
         <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
           <path
             d="M3 8h10M9 4l4 4-4 4"
@@ -100,7 +102,7 @@
             stroke-linejoin="round"
           />
         </svg>
-      </a>
+      </button>
 
     </div>
   </div>
@@ -163,6 +165,13 @@
 
         <div class="section-title dashboard-title">
           Панель кандидатов
+        <div>
+          
+        <p class="dashboard-hint"> 
+          Нажмите на кандидата, чтобы увидеть,
+          из каких тем складывается его результат.
+        </p>  
+          
         </div>
       </div>
     </div>
@@ -184,35 +193,40 @@
         </thead>
 
         <tbody id="results-table-body">
-  <tr>
-    <td>Анна</td><td>Смирнова</td><td>a.smirnova@mail.ru</td><td>Middle</td>
-    <td><div class="pct-bar"><div class="pct-track"><div class="pct-fill" style="width:88%"></div></div>88%</div></td>
-    <td><span class="verdict verdict--pass">✓ Пройден</span></td><td>17.05.2026</td>
-  </tr>
-  <tr>
-    <td>Дмитрий</td><td>Козлов</td><td>d.kozlov@example.com</td><td>Senior</td>
-    <td><div class="pct-bar"><div class="pct-track"><div class="pct-fill" style="width:54%"></div></div>54%</div></td>
-    <td><span class="verdict verdict--review">⚠ На ревью</span></td><td>16.05.2026</td>
-  </tr>
-  <tr>
-    <td>Мария</td><td>Иванова</td><td>m.ivanova@work.io</td><td>Джун</td>
-    <td><div class="pct-bar"><div class="pct-track"><div class="pct-fill" style="width:95%"></div></div>95%</div></td>
-    <td><span class="verdict verdict--pass">✓ Пройден</span></td><td>15.05.2026</td>
-  </tr>
-  <tr>
-    <td>Игорь</td><td>Петров</td><td>i.petrov@corp.ru</td><td>Middle</td>
-    <td><div class="pct-bar"><div class="pct-track"><div class="pct-fill" style="width:31%"></div></div>31%</div></td>
-    <td><span class="verdict verdict--fail">✕ Не пройден</span></td><td>14.05.2026</td>
-  </tr>
-  <tr>
-    <td>Ольга</td><td>Сидорова</td><td>o.sidorova@dev.com</td><td>Джун</td>
-    <td><div class="pct-bar"><div class="pct-track"><div class="pct-fill" style="width:72%"></div></div>72%</div></td>
-    <td><span class="verdict verdict--pass">✓ Пройден</span></td><td>13.05.2026</td>
-  </tr>
-</tbody>
+          <tr>
+            <td>Анна</td><td>Смирнова</td><td>a.smirnova@mail.ru</td><td>Middle</td>
+            <td><div class="pct-bar"><div class="pct-track"><div class="pct-fill" style="width:88%"></div></div>88%</div></td>
+            <td><span class="verdict verdict--pass">✓ Пройден</span></td><td>17.05.2026</td>
+          </tr>
+          <tr>
+            <td>Дмитрий</td><td>Козлов</td><td>d.kozlov@example.com</td><td>Senior</td>
+            <td><div class="pct-bar"><div class="pct-track"><div class="pct-fill" style="width:54%"></div></div>54%</div></td>
+            <td><span class="verdict verdict--review">⚠ На ревью</span></td><td>16.05.2026</td>
+          </tr>
+          <tr>
+            <td>Мария</td><td>Иванова</td><td>m.ivanova@work.io</td><td>Джун</td>
+            <td><div class="pct-bar"><div class="pct-track"><div class="pct-fill" style="width:95%"></div></div>95%</div></td>
+            <td><span class="verdict verdict--pass">✓ Пройден</span></td><td>15.05.2026</td>
+          </tr>
+          <tr>
+            <td>Игорь</td><td>Петров</td><td>i.petrov@corp.ru</td><td>Middle</td>
+            <td><div class="pct-bar"><div class="pct-track"><div class="pct-fill" style="width:31%"></div></div>31%</div></td>
+            <td><span class="verdict verdict--fail">✕ Не пройден</span></td><td>14.05.2026</td>
+          </tr>
+          <tr>
+            <td>Ольга</td><td>Сидорова</td><td>o.sidorova@dev.com</td><td>Джун</td>
+            <td><div class="pct-bar"><div class="pct-track"><div class="pct-fill" style="width:72%"></div></div>72%</div></td>
+            <td><span class="verdict verdict--pass">✓ Пройден</span></td><td>13.05.2026</td>
+          </tr>
+        </tbody>
 
       </table>
+    </div>
 
+    <p class="dashboard-note">
+      На примере показаны демо‑данные. В реальной панели вы увидите своих кандидатов и их результаты.
+    </p>
+    
     </div>
   </div>
 </div>
@@ -290,60 +304,88 @@
 
     <form class="modal-form" id="register-form" novalidate>
 
-    <label>
-      Имя *
-      <input
-        type="text"
-        name="name"
-        required
-        minlength="2"
-      />
-    </label>
+      <label>
+        Имя *
+        <input
+          type="text"
+          name="name"
+          required
+          minlength="2"
+        />
+      </label>
 
-    <label>
-      Компания *
-      <input
-        type="text"
-        name="company"
-        required
-        minlength="2"
-      />
-    </label>
+      <label>
+        Компания *
+        <input
+          type="text"
+          name="company"
+          required
+          minlength="2"
+        />
+      </label>
 
-    <label>
-      Email *
-      <input
-        type="email"
-        name="email"
-        required
-      />
-    </label>
+      <label>
+        Email *
+        <input
+          type="email"
+          name="email"
+          required
+        />
+      </label>
 
-    <label>
-      Пароль *
-      <input
-        type="password"
-        name="password"
-        required
-        minlength="8"
-        pattern="^(?=.*[A-Za-z])(?=.*\d).{8,}$"
-        title="Минимум 8 символов, хотя бы одна буква и одна цифра"
-      />
-    </label>
+      <label>
+        Пароль *
+        <input
+          type="password"
+          name="password"
+          required
+          minlength="8"
+          pattern="^(?=.*[A-Za-z])(?=.*\d).{8,}$"
+          title="Минимум 8 символов, хотя бы одна буква и одна цифра"
+        />
+      </label>
 
-    <button type="submit" class="modal-submit">
-      Создать аккаунт
-    </button>
+      <button type="submit" class="modal-submit">
+        Создать аккаунт
+      </button>
 
-    <p class="modal-hint">
-      Поля с * обязательны для заполнения.
-    </p>
+      <p class="modal-hint">
+        Поля с * обязательны для заполнения.
+      </p>
 
-  </form>
+    </form>
 
 
   </div>
 </div>
+
+<div class="modal-overlay" id="candidate-overlay"></div>
+
+<div class="modal" id="candidate-modal">
+  <div class="modal-inner">
+    <button class="modal-close" id="candidate-close">
+      &times;
+    </button>
+
+    <div class="section-label">Кандидат</div>
+
+    <div class="candidate-main">
+      <div class="candidate-name" id="cand-name"></div>
+      <div class="candidate-test" id="cand-test"></div>
+      <div class="candidate-score" id="cand-score"></div>
+    </div>
+
+    <div class="candidate-topics">
+      <h3>Разбивка по темам</h3>
+
+      <table class="candidate-topics-table">
+        <tbody id="cand-topics-body">
+          <!-- сюда JS подставит темы и проценты -->
+      </tbody>
+    </table>
+  </div>
+</div>
+
 
 <script src="hr.js"></script>
 
