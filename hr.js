@@ -1,4 +1,3 @@
-// Показать панель
 function showDashboard() {
   const dash = document.getElementById('dashboard');
   if (!dash) return;
@@ -65,8 +64,8 @@ document.addEventListener('DOMContentLoaded', () => {
   if (btnCta) {
     btnCta.addEventListener('click', (e) => {
       e.preventDefault();
-      // Можно поставить 'login', если хочешь всегда начинать с авторизации
-      openAuthModal('register');
+      // РАНЬШЕ было 'register' – теперь тоже открываем авторизацию
+      openAuthModal('login');
     });
   }
 
