@@ -29,6 +29,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // Кнопки в шапке и hero
   const btnLogin = document.querySelector('nav .btn-outline'); // "Войти"
   const btnCta = document.getElementById('cta-btn');           // "Получить доступ"
+  
 
   function openAuthModal(initialTab = 'login') {
     if (!authModal || !authOverlay) return;
@@ -90,39 +91,72 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
-  // ----- Модалка кандидата -----
+    // ----- Модалка кандидата -----
   const candidateOverlay = document.getElementById('candidate-overlay');
   const candidateModal = document.getElementById('candidate-modal');
   const candidateClose = document.getElementById('candidate-close');
+
   const candNameEl = document.getElementById('cand-name');
   const candTestEl = document.getElementById('cand-test');
   const candScoreEl = document.getElementById('cand-score');
+  const candVerdictEl = document.getElementById('cand-verdict');
+  const candDateEl = document.getElementById('cand-date');
+  const candTestShortEl = document.getElementById('cand-test-short');
   const candTopicsBody = document.getElementById('cand-topics-body');
   const tableBody = document.getElementById('results-table-body');
+
+  // Временный пример данных — позже сюда поставишь реальные из бэкенда
+  const demoTopics = [
+    { name: 'Теория тестирования', score: 85 },
+    { name: 'SQL', score: 70 },
+    { name: 'API', score: 60 },
+    { name: 'Инструменты QA', score: 90 }
+  ];
 
   function openCandidateModal(candidateData) {
     if (!candidateModal || !candidateOverlay) return;
 
-    candNameEl.textContent = `${candidateData.firstName} ${candidateData.lastName}`;
-    candTestEl.textContent = `Тест: ${candidateData.test}`;
-    candScoreEl.textContent = `Общий результат: ${candidateData.score}%`;
+    const fullName = `${candidateData.firstName} ${candidateData.lastName}`.trim();
 
-    // Очистить строки тем
+    if (candNameEl) {
+      candNameEl.textContent = fullName || 'Кандидат';
+    }
+
+    if (candTestEl) {
+      candTestEl.textContent = candidateData.test
+        ? `Тест: ${candidateData.test}`
+        : 'Тест';
+    }
+
+    if (candScoreEl) {
+      candScoreEl.textContent = `${candidateData.score}%`;
+    }
+
+    if (candVerdictEl) {
+      candVerdictEl.textContent = candidateData.verdict || '';
+    }
+
+    if (candDateEl) {
+      candDateEl.textContent = candidateData.date || '';
+    }
+
+    if (candTestShortEl) {
+      candTestShortEl.textContent = candidateData.test || '';
+    }
+
     if (candTopicsBody) {
       candTopicsBody.innerHTML = '';
 
       candidateData.topics.forEach(topic => {
-        const tr = document.createElement('tr');
+        const row = document.createElement('div');
+        row.className = 'topic-row';
 
-        const tdName = document.createElement('td');
-        tdName.textContent = topic.name;
+        row.innerHTML = `
+          <div class="topic-name">${topic.name}</div>
+          <div class="topic-score">${topic.score}%</div>
+        `;
 
-        const tdScore = document.createElement('td');
-        tdScore.textContent = `${topic.score}%`;
-
-        tr.appendChild(tdName);
-        tr.appendChild(tdScore);
-        candTopicsBody.appendChild(tr);
+        candTopicsBody.appendChild(row);
       });
     }
 
@@ -139,17 +173,10 @@ document.addEventListener('DOMContentLoaded', () => {
   if (candidateClose) {
     candidateClose.addEventListener('click', closeCandidateModal);
   }
+
   if (candidateOverlay) {
     candidateOverlay.addEventListener('click', closeCandidateModal);
   }
-
-  // Временный пример данных — позже сюда поставишь реальные из бэкенда
-  const demoTopics = [
-    { name: 'Теория тестирования', score: 85 },
-    { name: 'SQL', score: 70 },
-    { name: 'API', score: 60 },
-    { name: 'Инструменты QA', score: 90 }
-  ];
 
   // Клик по строке таблицы → открыть модалку кандидата
   if (tableBody) {
@@ -162,6 +189,8 @@ document.addEventListener('DOMContentLoaded', () => {
           lastName: cells[1]?.textContent.trim() || '',
           test: cells[3]?.textContent.trim() || '',
           score: parseInt(cells[4]?.innerText, 10) || 0,
+          verdict: cells[5]?.textContent.trim() || '',
+          date: cells[6]?.textContent.trim() || '',
           topics: demoTopics
         };
 
@@ -206,4 +235,42 @@ document.addEventListener('DOMContentLoaded', () => {
 
   attachRequiredValidation(loginForm);
   attachRequiredValidation(registerForm);
+});
+
+// ----- Переключение светлой и темной темы -----
+const THEME_KEY = 'qa_theme';
+
+function applyTheme(theme) {
+  document.body.setAttribute('data-theme', theme);
+  const btn = document.getElementById('theme-toggle');
+  if (btn) {
+    btn.textContent = theme === 'dark' ? '🌙' : '☀';
+    btn.setAttribute(
+      'aria-label',
+      theme === 'dark' ? 'Переключить на светлую тему' : 'Переключить на тёмную тему'
+    );
+  }
+}
+
+// Инициализация темы при загрузке
+(function initTheme() {
+  const saved = localStorage.getItem(THEME_KEY);
+  const prefersDark =
+    window.matchMedia &&
+    window.matchMedia('(prefers-color-scheme: dark)').matches;
+
+  const initialTheme = saved || (prefersDark ? 'dark' : 'light');
+  applyTheme(initialTheme);
+})();
+
+document.addEventListener('DOMContentLoaded', () => {
+  const toggleBtn = document.getElementById('theme-toggle');
+  if (!toggleBtn) return;
+
+  toggleBtn.addEventListener('click', () => {
+    const current = document.body.getAttribute('data-theme') || 'dark';
+    const next = current === 'dark' ? 'light' : 'dark';
+    applyTheme(next);
+    localStorage.setItem(THEME_KEY, next);
+  });
 });

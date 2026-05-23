@@ -18,13 +18,13 @@
 
 <nav>
   <div class="nav-inner">
-    <a href="#" class="nav-logo">
-      <span class="logo-mark">QA</span>
-      QA Hiring Assistant
-    </a>
-
-    <!-- Кнопка открытия модалки авторизации/регистрации -->
-    <button class="btn btn-outline" id="open-auth-btn">Войти</button>
+    <a href="#" class="nav-logo">QA Hiring Assistant</a>
+    <div class="nav-actions">
+      <button id="theme-toggle" class="theme-toggle" aria-label="Переключить тему">
+        🌙
+      </button>
+      <button class="btn btn-outline" id="open-auth-btn">Войти</button>
+    </div>
   </div>
 </nav>
 
@@ -245,6 +245,8 @@
   </div>
 </footer>
 
+<div class="modal-overlay" id="candidate-overlay"></div>
+
 <div class="modal-overlay" id="auth-overlay"></div>
 
 <div class="modal" id="auth-modal">
@@ -353,30 +355,53 @@
   </div>
 </div>
 
-<div class="modal-overlay" id="candidate-overlay"></div>
-
 <div class="modal" id="candidate-modal">
-  <div class="modal-inner">
-    <button class="modal-close" id="candidate-close">
-      &times;
-    </button>
+  <div class="modal-inner modal-card">
 
-    <div class="section-label">Кандидат</div>
+    <div class="candidate-modal-header">
+      <div>
+        <div class="section-label">Кандидат</div>
+        <h3 class="candidate-modal-title" id="cand-name">Имя Фамилия</h3>
+        <div class="candidate-modal-subtitle" id="cand-test">
+          Тест: Middle QA
+        </div>
+      </div>
 
-    <div class="candidate-main">
-      <div class="candidate-name" id="cand-name"></div>
-      <div class="candidate-test" id="cand-test"></div>
-      <div class="candidate-score" id="cand-score"></div>
+      <button class="modal-close" id="candidate-close">
+        &times;
+      </button>
+    </div>
+
+    <div class="candidate-meta">
+      <div class="meta-card">
+        <div class="meta-label">Общий результат</div>
+        <div class="meta-value" id="cand-score">88%</div>
+      </div>
+
+      <div class="meta-card">
+        <div class="meta-label">Вердикт</div>
+        <div class="meta-value" id="cand-verdict">✓ Пройден</div>
+      </div>
+
+      <div class="meta-card">
+        <div class="meta-label">Дата</div>
+        <div class="meta-value" id="cand-date">17.05.2026</div>
+      </div>
+
+      <div class="meta-card">
+        <div class="meta-label">Тест</div>
+        <div class="meta-value" id="cand-test-short">Middle</div>
+      </div>
     </div>
 
     <div class="candidate-topics">
       <h3>Разбивка по темам</h3>
 
-      <table class="candidate-topics-table">
-        <tbody id="cand-topics-body">
-          <!-- сюда JS подставит темы и проценты -->
-      </tbody>
-    </table>
+      <div class="topics" id="cand-topics-body">
+        <!-- сюда JS подставит темы -->
+      </div>
+    </div>
+
   </div>
 </div>
 

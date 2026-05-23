@@ -33,6 +33,39 @@ RESET & THEME
   --px: clamp(20px, 5vw, 80px);
 }
 
+/* Тёмная тема */
+body[data-theme="dark"] {
+  --bg: #0d0f14;
+  --surface: #14171f;
+  --card: #1a1e29;
+  --border: #252a38;
+  --accent: #4fffb0;
+  --accent2: #00c9ff;
+  --text: #e8ecf5;
+  --muted: #7a849e;
+  --background: rgba(13, 15, 20, 0.9);
+
+  --success: #4fffb0;  /* зелёный для "Пройден" */
+  --fail: #ff5f7e;
+  --review: #ffd166;
+}
+
+/* Светлая тема */
+body[data-theme="light"] {
+  --bg: #f5f7fb;
+  --surface: #ffffff;
+  --card: #ffffff;
+  --border: #d0d4e2;
+  --accent: #2563eb;   /* может быть синим для ссылок/акцентов */
+  --accent2: #22c55e;
+  --text: #14171f;
+  --muted: #6b7280;
+
+  --success: #16a34a;  /* стабильный зелёный для "Пройден" */
+  --fail: #dc2626;
+  --review: #ea580c;
+}
+
 html {
   scroll-behavior: smooth;
 }
@@ -47,6 +80,36 @@ body {
   font-family: var(--font-body);
   font-size: 16px;
   line-height: 1.6;
+}
+
+.nav-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.theme-toggle {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--text);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 16px;
+  transition: background 0.2s, color 0.2s, border-color 0.2s, transform 0.1s;
+}
+
+.theme-toggle:hover {
+  background: rgba(255, 255, 255, 0.04);
+  transform: translateY(-1px);
+}
+
+.theme-toggle:active {
+  transform: translateY(0);
 }
 
 /* =========================
@@ -104,14 +167,11 @@ nav {
   position: sticky;
   top: 0;
   z-index: 100;
-
   width: 100%;
-
-  background: rgba(13, 15, 20, 0.85);
   backdrop-filter: blur(16px);
-
   border-bottom: 1px solid var(--border);
 }
+
 
 .nav-inner {
   max-width: var(--inner);
@@ -249,10 +309,11 @@ SECTION HEADINGS
   font-size: clamp(1.6rem, 4vw, 2.4rem);
   font-weight: 800;
   letter-spacing: -0.025em;
+  color: var(--text); /* добавили */
 }
 
+
 .dashboard-title {
-  color: #ffffff;
   margin-bottom: 4px;
 }
 
@@ -555,15 +616,14 @@ DASHBOARD
 
 /* TEXTS IN DASHBOARD */
 #dashboard p {
-  color: rgba(255, 255, 255, 0.8);
+  color: var(--muted);
 }
 
 .dashboard-hint {
   margin-top: 8px;
-
   max-width: 520px;
 
-  color: #ffffff;
+  color: var(--text); /* ключевая строка */
 
   font-size: 15px;
   line-height: 1.6;
@@ -683,29 +743,124 @@ tbody td {
 }
 
 .verdict--pass {
-  border: 1px solid rgba(79, 255, 176, 0.25);
-
-  background: rgba(79, 255, 176, 0.12);
-  color: var(--accent);
+  border: 1px solid rgba(22, 163, 74, 0.35);  /* под success светлой темы */
+  background: rgba(22, 163, 74, 0.1);
+  color: var(--success);
 }
 
 .verdict--fail {
-  border: 1px solid rgba(255, 95, 126, 0.25);
-
-  background: rgba(255, 95, 126, 0.12);
+  border: 1px solid rgba(255, 95, 126, 0.4);
+  background: rgba(255, 95, 126, 0.16);
   color: var(--danger);
 }
 
 .verdict--review {
-  border: 1px solid rgba(255, 209, 102, 0.25);
-
-  background: rgba(255, 209, 102, 0.1);
+  border: 1px solid rgba(255, 209, 102, 0.4);
+  background: rgba(255, 209, 102, 0.16);
   color: var(--warning);
 }
 
 /* =========================
 CANDIDATE MODAL
 ========================= */
+
+.modal-inner.modal-card {
+  max-width: 520px;
+  padding: 24px 24px 22px;
+}
+
+/* Верх модалки кандидата */
+.candidate-modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 16px;
+  margin-bottom: 18px;
+}
+
+.candidate-modal-title {
+  font-size: 1.4rem;
+  margin-bottom: 4px;
+}
+
+.candidate-modal-subtitle {
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+/* Сетка метаданных */
+.candidate-meta {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  margin-bottom: 18px;
+}
+
+.meta-card {
+  background: var(--surface);
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  padding: 10px 12px;
+}
+
+.meta-label {
+  color: var(--muted);
+  font-size: 0.78rem;
+  margin-bottom: 4px;
+}
+
+.meta-value {
+  font-weight: 600;
+  font-size: 0.95rem;
+}
+
+/* Блок с темами */
+.candidate-topics h3 {
+  font-size: 1rem;
+  margin-bottom: 10px;
+}
+
+.topics {
+  border-radius: 14px;
+  border: 1px solid var(--border);
+  overflow: hidden;
+}
+
+/* Строки тем как в дашборде */
+.topic-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--border);
+}
+
+.topic-row:last-child {
+  border-bottom: none;
+}
+
+.topic-name {
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+.topic-score {
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+/* Адаптив для модалки кандидата */
+@media (max-width: 480px) {
+  .candidate-modal-header {
+    flex-direction: column-reverse;
+    align-items: flex-start;
+  }
+
+  .candidate-meta {
+    grid-template-columns: 1fr;
+  }
+}
+
 #cand-topics-list {
   margin: 8px 0 0;
   padding-left: 0;
@@ -732,7 +887,7 @@ CANDIDATE MODAL
 
 #candidate-modal .candidate-test,
 #candidate-modal .candidate-score {
-  color: #ffffff;
+  color: var(--text);
   font-size: 14px;
 }
 
@@ -749,10 +904,8 @@ CANDIDATE MODAL
 
 .candidate-topics-table td {
   padding: 4px 0;
-
   border: none;
-
-  color: #ffffff;
+  color: var(--text);
   font-size: 14px;
 }
 
@@ -790,9 +943,9 @@ AUTH / GENERIC MODAL
   justify-content: center;
 }
 
+/* Контейнер модалки — базовый */
 .modal-inner {
   position: relative;
-
   width: 100%;
   max-width: 420px;
   padding: 24px 24px 20px;
@@ -801,9 +954,9 @@ AUTH / GENERIC MODAL
   border: 1px solid var(--border);
 
   background: var(--card);
-
   box-shadow: 0 22px 60px rgba(0, 0, 0, 0.6);
-  text-align: center;
+
+  text-align: center; /* центрируем inline-элементы, включая .modal-tabs */
 }
 
 .modal-close {
@@ -815,27 +968,25 @@ AUTH / GENERIC MODAL
   background: transparent;
 
   color: var(--muted);
-
   font-size: 1.4rem;
-
   cursor: pointer;
 }
 
+/* контейнер с табами */
 .modal-tabs {
-  display: inline-flex;
+  display: inline-flex;        /* ширина по содержимому */
   justify-content: center;
+  align-items: center;
 
-  margin-bottom: 18px;
-  padding: 3px;
+  margin: 0 auto 18px;         /* центруем блок внутри .modal-inner */
+  padding: 3px 4px;
 
   border-radius: 999px;
-
   background: var(--surface);
 }
 
 .modal-tab {
-  padding: 6px 16px;
-
+  padding: 6px 14px;
   border: none;
   border-radius: 999px;
 
@@ -843,15 +994,18 @@ AUTH / GENERIC MODAL
   color: var(--muted);
 
   font-size: 0.9rem;
-
   cursor: pointer;
+  white-space: nowrap;
+}
+
+.modal-inner {
+  text-align: center;
 }
 
 .modal-tab.active {
   background: var(--accent);
   color: #0d0f14;
 }
-
 .modal-form {
   display: none;
   flex-direction: column;
@@ -1048,4 +1202,71 @@ RESPONSIVE
   .step-num {
     margin-bottom: 12px;
   }
+}
+
+/* Светлая тема: сделать вердикты более контрастными */
+body[data-theme="light"] .verdict--fail {
+  border-color: color-mix(in srgb, var(--fail) 50%, transparent);
+  background: color-mix(in srgb, var(--fail) 18%, transparent);
+  color: var(--fail);
+}
+
+body[data-theme="light"] .verdict--review {
+  border-color: color-mix(in srgb, var(--review) 50%, transparent);
+  background: color-mix(in srgb, var(--review) 18%, transparent);
+  color: var(--review);
+}
+
+/* Светлая тема: модалки светлые, текст тёмный */
+body[data-theme="light"] .modal-inner {
+  background: #ffffff;
+  border-color: rgba(15, 23, 42, 0.08);
+  box-shadow: 0 20px 40px rgba(15, 23, 42, 0.16);
+}
+
+body[data-theme="light"] .modal-close {
+  color: #6b7280; /* более тёмный серый, чем var(--muted) на тёмном */
+}
+
+body[data-theme="light"] .modal-tabs {
+  background: #f3f4f6;
+}
+
+body[data-theme="light"] .modal-tab {
+  color: #6b7280;
+}
+
+body[data-theme="light"] .modal-tab.active {
+  background: var(--accent);
+  color: #0d0f14;
+}
+
+body[data-theme="light"] .modal-form label {
+  color: #374151; /* тёмный серый для текста лейблов */
+}
+
+body[data-theme="light"] .modal-form input {
+  background: #f9fafb;
+  color: #111827;
+  border-color: #d1d5db;
+}
+
+body[data-theme="light"] .modal-form input:focus {
+  border-color: var(--accent);
+}
+
+body[data-theme="light"] .modal-hint {
+  color: #6b7280;
+}
+
+body[data-theme="light"] #results-table-body tr:hover {
+  background-color: rgba(37, 99, 235, 0.08); /* мягкий синий */
+}
+
+body[data-theme="dark"] #results-table-body tr:hover {
+  background-color: rgba(79, 255, 176, 0.08); /* зелёный подсвет */
+}
+
+body[data-theme="dark"] .modal-inner {
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.5);
 }
