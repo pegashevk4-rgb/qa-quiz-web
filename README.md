@@ -1,6 +1,10 @@
 ## QA Quiz Web
 
-Веб-приложение для тестирования знаний по QA (Junior / Middle / Senior) с онлайн-квизами, автоматическим отчётом по сильным и слабым сторонам и сохранением результатов в базу данных.
+QA Quiz Web — это SaaS‑сервис для быстрой оценки QA‑кандидатов.  
+Сервис включает три компонента:  
+- онлайн‑квиз для кандидатов,  
+- HR‑лендинг и дашборд для рекрутеров,  
+- бэкенд‑API с сохранением результатов в PostgreSQL.
 
 ## Демо
 
@@ -18,6 +22,8 @@
 - Демо: https://pegashevk4-rgb.github.io/qa-quiz-web/hr.html
 - Описание сервиса для быстрой оценки QA-кандидатов
 - Примеры интерфейсов, объяснение ценности и сценариев использования
+
+  В дальнейшем HR Dashboard будет подключён к реальной БД и снабжён авторизацией (логин HR → переход на /hr-dashboard).
 
 **HR Dashboard (прототип):**
 - Отдельный HTML (hr-dashboard.html)
@@ -170,6 +176,6 @@ MIT
 ## Автор
 
 Кирилл Пегашев — QA-инженер и разработчик
-Email: pegashevk4@gmail.com  
-GitHub: [@pegashevk4-rgb](https://github.com/pegashevk4-rgb)
+Email: pegashevk4@gmail.com
+GitHub: @pegashevk4-rgb
 создатель QA Quiz Web и QA Hiring Assistant.
