@@ -27,7 +27,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const tabs = document.querySelectorAll('.modal-tab');
 
   // Кнопки в шапке и hero
-  const btnLogin = document.querySelector('nav .btn-outline'); // "Войти"
+  const btnLogin = document.getElementById('open-auth-btn');   // "Войти"
   const btnCta = document.getElementById('cta-btn');           // "Получить доступ"
   
 
@@ -228,8 +228,17 @@ document.addEventListener('DOMContentLoaded', () => {
 
       if (!valid) return;
 
-      // позже здесь будет реальный запрос/редирект
+      // TODO: здесь будет реальный запрос к бэкенду
+
+      // помечаем, что пользователь "залогинен"
+      localStorage.setItem('qa_is_logged_in', '1');
+
+      // закрываем модалку (по желанию — можно вообще не закрывать, сразу уходить)
       closeAuthModal();
+
+      // редирект на дашборд
+      window.location.href = 'hr-dashboard.html';
+
     });
   }
 

@@ -88,6 +88,20 @@ body {
   gap: 12px;
 }
 
+.btn-link {
+  border: none;
+  background: transparent;
+  color: var(--muted, #94a3b8);
+  font-weight: 500;
+  cursor: pointer;
+  padding: 0 10px;
+  transition: 0.2s ease;
+}
+
+.btn-link:hover {
+  color: #ffffff;
+}
+
 .theme-toggle {
   width: 32px;
   height: 32px;
@@ -219,32 +233,28 @@ nav {
 BUTTONS
 ========================= */
 .btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 18px;
+  border-radius: 999px; /* закруглённые углы */
   border: none;
   cursor: pointer;
-
-  font-family: var(--font-body);
-
-  transition: all 0.2s;
+  font-weight: 600;
+  font-size: 0.9rem;
+  transition: 0.2s ease;
+  text-decoration: none; /* чтобы <a> выглядел как кнопка */
 }
 
 .btn-outline {
-  padding: 8px 22px;
-
-  border: 1.5px solid var(--border);
-  border-radius: 8px;
-
   background: transparent;
+  border: 1px solid var(--border);
   color: var(--text);
-
-  font-size: 0.88rem;
-  font-weight: 500;
 }
 
 .btn-outline:hover {
   border-color: var(--accent);
-  color: var(--accent);
-
-  box-shadow: 0 0 16px rgba(79, 255, 176, 0.15);
+  color: var(--text);
 }
 
 /* CTA */

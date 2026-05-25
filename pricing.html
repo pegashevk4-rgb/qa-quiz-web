@@ -6,609 +6,46 @@
 
   <title>QA Hiring Assistant — Тарифы</title>
 
-  <style>
-    :root {
-      --bg: #0b1120;
-      --surface: #111827;
-      --surface-2: #182235;
-      --border: #243042;
-
-      --text: #e5e7eb;
-      --muted: #94a3b8;
-
-      --accent: #4fffb0;
-      --accent-2: #00c9ff;
-
-      --shadow: 0 20px 50px rgba(0,0,0,0.35);
-
-      --radius: 20px;
-      --transition: 0.25s ease;
-    }
-
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
-
-    html {
-      scroll-behavior: smooth;
-    }
-
-    body {
-      background: var(--bg);
-      color: var(--text);
-      font-family:
-        system-ui,
-        -apple-system,
-        BlinkMacSystemFont,
-        "Segoe UI",
-        sans-serif;
-
-      overflow-x: hidden;
-    }
-
-    body::before {
-      content: "";
-      position: fixed;
-      inset: 0;
-
-      background:
-        radial-gradient(circle at top left,
-        rgba(79,255,176,0.10),
-        transparent 30%),
-
-        radial-gradient(circle at bottom right,
-        rgba(0,201,255,0.08),
-        transparent 35%);
-
-      pointer-events: none;
-      z-index: -1;
-    }
-
-    a {
-      text-decoration: none;
-      color: inherit;
-    }
-
-    .container {
-      width: 100%;
-      max-width: 1240px;
-      margin: 0 auto;
-      padding: 0 24px;
-    }
-
-    /* HEADER */
-
-    header {
-      position: sticky;
-      top: 0;
-      z-index: 100;
-
-      backdrop-filter: blur(14px);
-
-      background: rgba(11,17,32,0.72);
-
-      border-bottom: 1px solid rgba(255,255,255,0.05);
-    }
-
-    .header-inner {
-      height: 80px;
-
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 20px;
-    }
-
-    .logo {
-      display: flex;
-      align-items: center;
-      gap: 14px;
-
-      font-weight: 700;
-      font-size: 1.05rem;
-    }
-
-    .logo-mark {
-      width: 42px;
-      height: 42px;
-
-      border-radius: 14px;
-
-      display: flex;
-      align-items: center;
-      justify-content: center;
-
-      background:
-        linear-gradient(
-          135deg,
-          var(--accent),
-          var(--accent-2)
-        );
-
-      color: #04111f;
-      font-weight: 800;
-    }
-
-    .nav {
-      display: flex;
-      align-items: center;
-      gap: 28px;
-    }
-
-    .nav a {
-      color: var(--muted);
-      transition: var(--transition);
-    }
-
-    .nav a:hover {
-      color: white;
-    }
-
-    .header-actions {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
-
-    /* BUTTONS */
-
-    .btn {
-      border: none;
-      cursor: pointer;
-
-      padding: 14px 22px;
-
-      border-radius: 999px;
-
-      font-weight: 600;
-
-      transition: var(--transition);
-
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .btn:hover {
-      transform: translateY(-2px);
-    }
-
-    .btn-primary {
-      background:
-        linear-gradient(
-          135deg,
-          var(--accent),
-          var(--accent-2)
-        );
-
-      color: #04111f;
-    }
-
-    .btn-secondary {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      color: var(--text);
-    }
-
-    .btn-disabled {
-      opacity: 0.5;
-      cursor: not-allowed;
-    }
-
-    .btn-disabled:hover {
-      transform: none;
-    }
-
-    /* HERO */
-
-    .hero {
-      padding: 110px 0 90px;
-    }
-
-    .hero-badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 10px;
-
-      background: rgba(79,255,176,0.08);
-
-      border: 1px solid rgba(79,255,176,0.15);
-
-      color: var(--accent);
-
-      padding: 10px 16px;
-
-      border-radius: 999px;
-
-      margin-bottom: 24px;
-
-      font-size: 0.9rem;
-      font-weight: 600;
-    }
-
-    .hero h1 {
-      font-size: clamp(2.5rem, 6vw, 4.5rem);
-
-      line-height: 1.05;
-
-      letter-spacing: -0.04em;
-
-      max-width: 860px;
-
-      margin-bottom: 24px;
-    }
-
-    .hero p {
-      max-width: 720px;
-
-      color: var(--muted);
-
-      font-size: 1.1rem;
-      line-height: 1.7;
-
-      margin-bottom: 36px;
-    }
-
-    .hero-features {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 14px;
-    }
-
-    .feature-pill {
-      padding: 12px 18px;
-
-      border-radius: 999px;
-
-      background: var(--surface);
-
-      border: 1px solid var(--border);
-
-      color: var(--muted);
-
-      font-size: 0.95rem;
-    }
-
-    /* PRICING */
-
-    .pricing {
-      padding-bottom: 100px;
-    }
-
-    .section-title {
-      text-align: center;
-      margin-bottom: 18px;
-
-      font-size: 2.5rem;
-      letter-spacing: -0.03em;
-    }
-
-    .section-subtitle {
-      text-align: center;
-
-      color: var(--muted);
-
-      max-width: 760px;
-
-      margin: 0 auto 60px;
-
-      line-height: 1.7;
-    }
-
-    .pricing-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 28px;
-    }
-
-    .pricing-card {
-      background: var(--surface);
-
-      border: 1px solid var(--border);
-
-      border-radius: var(--radius);
-
-      padding: 32px;
-
-      position: relative;
-
-      transition: var(--transition);
-
-      box-shadow: var(--shadow);
-    }
-
-    .pricing-card:hover {
-      transform: translateY(-6px);
-      border-color: rgba(79,255,176,0.35);
-    }
-
-    .pricing-card.popular {
-      border: 1px solid rgba(79,255,176,0.35);
-
-      transform: scale(1.03);
-    }
-
-    .popular-badge {
-      position: absolute;
-      top: -14px;
-      right: 24px;
-
-      background:
-        linear-gradient(
-          135deg,
-          var(--accent),
-          var(--accent-2)
-        );
-
-      color: #04111f;
-
-      padding: 8px 14px;
-
-      border-radius: 999px;
-
-      font-size: 0.8rem;
-      font-weight: 700;
-    }
-
-    .plan-name {
-      font-size: 1.5rem;
-      font-weight: 700;
-
-      margin-bottom: 10px;
-    }
-
-    .plan-desc {
-      color: var(--muted);
-
-      min-height: 52px;
-
-      line-height: 1.6;
-
-      margin-bottom: 28px;
-    }
-
-    .plan-price {
-      font-size: 3rem;
-      font-weight: 800;
-
-      letter-spacing: -0.04em;
-
-      margin-bottom: 28px;
-    }
-
-    .plan-price span {
-      font-size: 1rem;
-      color: var(--muted);
-      font-weight: 500;
-    }
-
-    .plan-features {
-      list-style: none;
-
-      display: flex;
-      flex-direction: column;
-      gap: 14px;
-
-      margin-bottom: 34px;
-    }
-
-    .plan-features li {
-      color: var(--muted);
-
-      display: flex;
-      align-items: flex-start;
-      gap: 12px;
-
-      line-height: 1.5;
-    }
-
-    .plan-features li::before {
-      content: "✓";
-
-      color: var(--accent);
-      font-weight: 700;
-    }
-
-    /* EXPORT */
-
-    .export-section {
-      padding-bottom: 100px;
-    }
-
-    .export-card {
-      background: var(--surface);
-
-      border: 1px solid var(--border);
-
-      border-radius: var(--radius);
-
-      padding: 40px;
-
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 30px;
-
-      box-shadow: var(--shadow);
-    }
-
-    .export-card h2 {
-      font-size: 2rem;
-      margin-bottom: 14px;
-    }
-
-    .export-card p {
-      color: var(--muted);
-      line-height: 1.7;
-      max-width: 680px;
-    }
-
-    .export-badges {
-      display: flex;
-      gap: 14px;
-      flex-wrap: wrap;
-    }
-
-    .export-badge {
-      padding: 18px 24px;
-
-      border-radius: 16px;
-
-      background: var(--surface-2);
-
-      border: 1px solid var(--border);
-
-      font-weight: 700;
-
-      min-width: 100px;
-      text-align: center;
-    }
-
-    /* FAQ */
-
-    .faq {
-      padding-bottom: 100px;
-    }
-
-    .faq-grid {
-      display: grid;
-      gap: 18px;
-    }
-
-    .faq-item {
-      background: var(--surface);
-
-      border: 1px solid var(--border);
-
-      border-radius: 18px;
-
-      padding: 26px;
-    }
-
-    .faq-item h3 {
-      margin-bottom: 12px;
-      font-size: 1.05rem;
-    }
-
-    .faq-item p {
-      color: var(--muted);
-      line-height: 1.7;
-    }
-
-    /* FOOTER */
-
-    footer {
-      border-top: 1px solid rgba(255,255,255,0.05);
-
-      padding: 34px 0;
-    }
-
-    .footer-inner {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 20px;
-
-      flex-wrap: wrap;
-    }
-
-    .footer-links {
-      display: flex;
-      align-items: center;
-      gap: 22px;
-    }
-
-    .footer-links a {
-      color: var(--muted);
-    }
-
-    .footer-links a:hover {
-      color: white;
-    }
-
-    /* MOBILE */
-
-    @media (max-width: 980px) {
-      .pricing-grid {
-        grid-template-columns: 1fr;
-      }
-
-      .pricing-card.popular {
-        transform: none;
-      }
-
-      .export-card {
-        flex-direction: column;
-        align-items: flex-start;
-      }
-    }
-
-    @media (max-width: 760px) {
-      .nav {
-        display: none;
-      }
-
-      .hero {
-        padding-top: 80px;
-      }
-
-      .hero-features {
-        flex-direction: column;
-      }
-
-      .section-title {
-        font-size: 2rem;
-      }
-
-      .plan-price {
-        font-size: 2.4rem;
-      }
-
-      .export-card {
-        padding: 28px;
-      }
-
-      .export-card h2 {
-        font-size: 1.6rem;
-      }
-    }
-  </style>
+  <link rel="stylesheet" href="pricing.css" />
 </head>
 
 <body>
 
   <!-- HEADER -->
-
   <header>
     <div class="container header-inner">
-
       <div class="logo">
         <div class="logo-mark">QA</div>
         <span>QA Hiring Assistant</span>
       </div>
 
-    <nav class="nav">
-        <a href="https://pegashevk4-rgb.github.io/qa-quiz-web/hr-dashboard.html">Дашборд</a>
-        <a href="https://pegashevk4-rgb.github.io/qa-quiz-web/pricing.html">Тарифы</a>
+      <nav class="nav">
+        <a href="hr-dashboard.html">Дашборд</a>
         <a href="#">Документация</a>
-    </nav>
+      </nav>
 
       <div class="header-actions">
-        <button class="btn btn-secondary">
+        <button
+          id="theme-toggle"
+          class="btn btn-secondary"
+          type="button"
+        >
+          ☀
+        </button>
+
+        <button
+          class="btn btn-secondary"
+          onclick="window.location.href='hr.html'"
+        >
           Войти
         </button>
       </div>
-
     </div>
   </header>
 
   <!-- HERO -->
-
   <section class="hero">
     <div class="container">
-
       <div class="hero-badge">
         Бета-версия
       </div>
@@ -625,29 +62,22 @@
       </p>
 
       <div class="hero-features">
-
         <div class="feature-pill">
-          Быстрый технический скрининг
+          ⚡ Быстрый технический скрининг
         </div>
-
         <div class="feature-pill">
           Junior / Middle / Senior тесты
         </div>
-
         <div class="feature-pill">
-          Готовая HR-аналитика
+          📊 Готовая HR-аналитика
         </div>
-
       </div>
-
     </div>
   </section>
 
   <!-- PRICING -->
-
   <section class="pricing">
     <div class="container">
-
       <h2 class="section-title">
         Тарифы
       </h2>
@@ -658,11 +88,8 @@
       </p>
 
       <div class="pricing-grid">
-
         <!-- FREE -->
-
         <div class="pricing-card">
-
           <div class="plan-name">
             Free
           </div>
@@ -672,7 +99,7 @@
           </div>
 
           <div class="plan-price">
-            0 ₽
+            0 ₽ <span>/ мес</span>
           </div>
 
           <ul class="plan-features">
@@ -684,13 +111,10 @@
           <button class="btn btn-primary pricing-btn-free">
             Начать бесплатно
           </button>
-
         </div>
 
         <!-- TEAM -->
-
         <div class="pricing-card popular">
-
           <div class="popular-badge">
             Популярный
           </div>
@@ -719,13 +143,10 @@
           >
             Скоро доступно
           </button>
-
         </div>
 
         <!-- PRO -->
-
         <div class="pricing-card">
-
           <div class="plan-name">
             Pro
           </div>
@@ -749,26 +170,19 @@
           >
             Скоро доступно
           </button>
-
         </div>
-
       </div>
-
     </div>
   </section>
 
   <!-- EXPORT -->
-
   <section class="export-section">
     <div class="container">
-
       <div class="export-card">
-
         <div>
           <h2>
             Экспорт результатов
           </h2>
-
           <p>
             В платных тарифах результаты тестирования можно
             экспортировать в CSV и Excel, чтобы HR-команды
@@ -780,33 +194,26 @@
           <div class="export-badge">
             CSV
           </div>
-
           <div class="export-badge">
             Excel
           </div>
         </div>
-
       </div>
-
     </div>
   </section>
 
   <!-- FAQ -->
-
   <section class="faq">
     <div class="container">
-
       <h2 class="section-title">
         FAQ
       </h2>
 
       <div class="faq-grid">
-
         <div class="faq-item">
           <h3>
             Что такое QA Hiring Assistant?
           </h3>
-
           <p>
             Это SaaS-сервис для автоматизированной оценки
             QA-кандидатов с готовыми тестами и HR-аналитикой.
@@ -817,7 +224,6 @@
           <h3>
             Можно ли начать бесплатно?
           </h3>
-
           <p>
             Да, Free-план позволяет протестировать сервис
             и провести первые оценки кандидатов.
@@ -828,7 +234,6 @@
           <h3>
             Чем отличаются тарифы?
           </h3>
-
           <p>
             Тарифы отличаются лимитами, доступом к уровням
             тестов и дополнительными возможностями аналитики.
@@ -839,46 +244,33 @@
           <h3>
             Будут ли добавлены новые тесты?
           </h3>
-
           <p>
             Да, в будущем планируется расширение базы
             вопросов и новых направлений тестирования.
           </p>
         </div>
-
       </div>
-
     </div>
   </section>
 
   <!-- FOOTER -->
-
   <footer>
     <div class="container footer-inner">
-
       <div>
         © QA Hiring Assistant, 2026
       </div>
-
       <div class="footer-links">
         <a href="#">Политика</a>
         <a href="#">Контакты</a>
       </div>
-
     </div>
   </footer>
 
   <script>
-    // Заготовка под будущие редиректы / checkout
-
     document
       .querySelector(".pricing-btn-free")
       .addEventListener("click", () => {
-
-        // Пример:
-        // window.location.href = "/register";
-
-        console.log("Free plan clicked");
+        window.location.href = "hr.html";
       });
   </script>
 
