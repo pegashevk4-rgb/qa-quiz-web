@@ -31,3 +31,66 @@ class CompanyHRUserPublic(BaseModel):
 
     class Config:
         from_attributes = True
+
+class CompanyCreate(BaseModel):
+    name: str
+
+class CompanyPublic(BaseModel):
+    id: int
+    name: str
+    public_token: str | None = None
+    is_paid: bool
+    trial_tests_limit: int
+    trial_tests_used: int
+
+    class Config:
+        from_attributes = True
+
+class CandidateCreate(BaseModel):
+    first_name: str
+    last_name: str
+    email: EmailStr | None = None
+    company_id: int
+
+
+class CandidatePublic(BaseModel):
+    id: int
+    first_name: str
+    last_name: str
+    email: EmailStr | None = None
+    company_id: int | None = None
+
+    class Config:
+        from_attributes = True
+
+
+class DetailedResultItem(BaseModel):
+    category: str
+    percent: int
+    is_strong: bool = False
+    is_weak: bool = False
+
+
+class ResultCreate(BaseModel):
+    user_id: int
+    test_id: str
+    total_score: float
+    max_score: float
+    percent: int
+    verdict: str | None = None
+    company_id: int | None = None
+    details: list[DetailedResultItem] = []
+
+
+class ResultPublic(BaseModel):
+    id: int
+    user_id: int
+    test_id: str
+    total_score: float
+    max_score: float
+    percent: int
+    verdict: str | None
+    company_id: int | None = None
+    details: list[DetailedResultItem] = []
+    class Config:
+        from_attributes = True
