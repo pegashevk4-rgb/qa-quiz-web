@@ -23,11 +23,12 @@
           <span>Дашборд</span>
         </div>
 
-        <div class="nav-item">
+        <a class="nav-item nav-link" href="pricing.html">
           <div class="nav-badge"></div>
           <span>Тарифы</span>
-        </div>
+        </a>
       </nav>
+
     </aside>
 
     <main class="main">
@@ -43,10 +44,24 @@
             Компания: Demo Company
           </div>
 
-          <button class="theme-toggle" id="themeToggle" aria-label="Переключить тему">
-            <span class="theme-toggle-icon" id="themeIcon">🌙</span>
-            <span class="theme-toggle-label">Тёмная тема</span>
+          <div class="header-actions">
+            <button
+              id="themeToggle"
+              class="theme-toggle"
+              type="button"
+              aria-label="Переключить тему"
+          >
+              <span id="themeIcon">☀</span>
           </button>
+
+            <button
+              class="logout-btn"
+              id="logoutBtn"              
+              type="button"
+            >
+              Выйти
+            </button>
+          </div>
         </div>
       </header>
 
@@ -72,7 +87,7 @@
         </div>
       </section>
 
-      <section class="panel" style="margin-top: 24px;">
+      <section class="panel tests-panel">
         <div class="panel-header">
           <div class="panel-title">
             <h2>Тесты и ссылки для кандидатов</h2>

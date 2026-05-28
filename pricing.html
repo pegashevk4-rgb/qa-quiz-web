@@ -7,73 +7,79 @@
   <title>QA Hiring Assistant — Тарифы</title>
 
   <link rel="stylesheet" href="pricing.css" />
+  <script src="pricing.js" defer></script>
 </head>
 
 <body>
 
   <!-- HEADER -->
   <header>
-    <div class="container header-inner">
-      <div class="logo">
-        <div class="logo-mark">QA</div>
-        <span>QA Hiring Assistant</span>
-      </div>
+  <div class="container header-inner">
+    <!-- ЛОГО, как на hr -->
+    <a href="hr.html" class="nav-logo">
+      <span class="logo-mark">QA</span>
+      <span>QA Hiring Assistant</span>
+    </a>
 
-      <nav class="nav">
-        <a href="hr-dashboard.html">Дашборд</a>
-        <a href="#">Документация</a>
-      </nav>
+    <!-- Навигация: Дашборд / Документация -->
+    <nav class="nav-links">
+      <a href="hr-dashboard.html" class="nav-link">Дашборд</a>
+      <a href="#" class="nav-link">Документация</a>
+    </nav>
 
-      <div class="header-actions">
-        <button
-          id="theme-toggle"
-          class="btn btn-secondary"
-          type="button"
-        >
-          ☀
-        </button>
+    <!-- Действия справа: тема + Войти -->
+    <div class="nav-actions">
+      <button
+        id="theme-toggle"
+        class="theme-toggle"
+        type="button"
+        aria-label="Переключить тему"
+      >
+        ☀
+      </button>
 
-        <button
-          class="btn btn-secondary"
-          onclick="window.location.href='hr.html'"
-        >
-          Войти
-        </button>
-      </div>
+      <button
+        class="nav-link"
+        id="open-auth-btn"
+        type="button"
+      >
+        Войти
+      </button>
     </div>
-  </header>
+  </div>
+</header>
 
   <!-- HERO -->
   <section class="hero">
-    <div class="container">
-      <div class="hero-badge">
-        Бета-версия
+  <div class="container">
+    <div class="hero-badge">
+      Бета-версия
+    </div>
+
+    <h1>
+      Прозрачные тарифы
+      для оценки QA‑кандидатов
+    </h1>
+
+    <p>
+      <span class="hero-key">QA Hiring Assistant</span> заменяет первое техническое интервью:
+      вы отправляете тест, а получаете структурированный отчёт
+      по навыкам кандидата — без лишних созвонов и переписок.
+    </p>
+
+    <div class="hero-features">
+      <div class="feature-pill">
+        ⚡ Быстрый технический скрининг
       </div>
-
-      <h1>
-        Прозрачные тарифы
-        для оценки QA-кандидатов
-      </h1>
-
-      <p>
-        QA Hiring Assistant помогает HR, тимлидам и фаундерам
-        быстро проводить технический скрининг QA-инженеров,
-        экономя часы ручных интервью и проверки навыков.
-      </p>
-
-      <div class="hero-features">
-        <div class="feature-pill">
-          ⚡ Быстрый технический скрининг
-        </div>
-        <div class="feature-pill">
-          Junior / Middle / Senior тесты
-        </div>
-        <div class="feature-pill">
-          📊 Готовая HR-аналитика
-        </div>
+      <div class="feature-pill">
+        Junior / Middle / Senior тесты
+      </div>
+      <div class="feature-pill">
+        📊 Готовая HR‑аналитика
       </div>
     </div>
-  </section>
+  </div>
+</section>
 
   <!-- PRICING -->
   <section class="pricing">
@@ -114,11 +120,7 @@
         </div>
 
         <!-- TEAM -->
-        <div class="pricing-card popular">
-          <div class="popular-badge">
-            Популярный
-          </div>
-
+        <div class="pricing-card">
           <div class="plan-name">
             Team
           </div>
@@ -140,6 +142,7 @@
 
           <button
             class="btn btn-secondary btn-disabled pricing-btn-team"
+            type="button"
           >
             Скоро доступно
           </button>
@@ -167,6 +170,7 @@
 
           <button
             class="btn btn-secondary btn-disabled pricing-btn-pro"
+            type="button"
           >
             Скоро доступно
           </button>
@@ -266,13 +270,91 @@
     </div>
   </footer>
 
-  <script>
-    document
-      .querySelector(".pricing-btn-free")
-      .addEventListener("click", () => {
-        window.location.href = "hr.html";
-      });
-  </script>
+  <!-- AUTH MODAL -->
+<div class="modal-overlay" id="auth-overlay"></div>
+
+<div class="modal" id="auth-modal">
+  <div class="modal-inner">
+    <button class="modal-close" id="auth-close">&times;</button>
+
+    <div class="modal-tabs">
+      <button class="modal-tab active" data-tab="login">Вход</button>
+      <button class="modal-tab" data-tab="register">Регистрация</button>
+    </div>
+
+    <!-- ВХОД -->
+    <form class="modal-form active" id="login-form" novalidate>
+      <label>
+        Email *
+        <input
+          type="email"
+          name="email"
+          required
+        />
+      </label>
+      <label>
+        Пароль *
+        <input
+          type="password"
+          name="password"
+          required
+          minlength="6"
+        />
+      </label>
+      <button type="submit" class="modal-submit">
+        Войти
+      </button>
+      <p class="modal-hint">
+        Поля с * обязательны для заполнения.
+      </p>
+    </form>
+
+    <!-- РЕГИСТРАЦИЯ -->
+    <form class="modal-form" id="register-form" novalidate>
+      <label>
+        Имя *
+        <input
+          type="text"
+          name="name"
+          required
+          minlength="2"
+        />
+      </label>
+      <label>
+        Компания *
+        <input
+          type="text"
+          name="company"
+          required
+          minlength="2"
+        />
+      </label>
+      <label>
+        Email *
+        <input
+          type="email"
+          name="email"
+          required
+        />
+      </label>
+      <label>
+        Пароль *
+        <input
+          type="password"
+          name="password"
+          required
+          minlength="6"
+        />
+      </label>
+      <button type="submit" class="modal-submit">
+        Создать аккаунт
+      </button>
+      <p class="modal-hint">
+        Поля с * обязательны. После регистрации вы попадёте в HR‑дашборд.
+      </p>
+    </form>
+  </div>
+</div>
 
 </body>
 </html>

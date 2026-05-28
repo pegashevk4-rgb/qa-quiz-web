@@ -1,3 +1,21 @@
+const THEME_KEY = "qa_theme";
+
+// --- Проверка авторизации перед показом дашборда ---
+
+(function guardDashboard() {
+  const DEV_BYPASS_AUTH = true; // <-- пока отладка, потом поставишь false или удалишь
+
+  if (DEV_BYPASS_AUTH) {
+    return; // не блокируем дашборд, просто выходим из guard
+  }
+
+  const isLoggedIn = localStorage.getItem("qa_is_logged_in") === "1";
+
+  if (!isLoggedIn) {
+    window.location.href = "hr.html";
+  }
+})();
+
 // --- Демо-кандидаты (пока без БД) ---
 
 const candidates = [
@@ -317,32 +335,48 @@ overlay.addEventListener("click", closeModal);
 // --- Переключатель темы ---
 
 const themeToggle = document.getElementById("themeToggle");
-const themeIcon = document.getElementById("themeIcon");
-const themeLabel = document.querySelector(".theme-toggle-label");
+const themeIcon = document.getElementById("themeIcon"); // может быть null
 
 function applyTheme(theme) {
   document.documentElement.setAttribute("data-theme", theme);
-  localStorage.setItem("qa_hr_theme", theme);
+  localStorage.setItem(THEME_KEY, theme);
+
+  if (!themeIcon) {
+    // На этом дашборде нет отдельного icon-элемента – просто выходим
+    return;
+  }
 
   if (theme === "dark") {
     themeIcon.textContent = "🌙";
-    themeLabel.textContent = "Тёмная тема";
   } else {
     themeIcon.textContent = "☀";
-    themeLabel.textContent = "Светлая тема";
   }
 }
 
-const savedTheme = localStorage.getItem("qa_hr_theme") || "dark";
+const savedTheme = localStorage.getItem(THEME_KEY) || "dark";
 applyTheme(savedTheme);
 
-themeToggle.addEventListener("click", () => {
-  const current = document.documentElement.getAttribute("data-theme");
-  applyTheme(current === "dark" ? "light" : "dark");
-});
+if (themeToggle) {
+  themeToggle.addEventListener("click", () => {
+    const current =
+      document.documentElement.getAttribute("data-theme") || "dark";
+    applyTheme(current === "dark" ? "light" : "dark");
+  });
+}
+
 
 // --- Инициализация ---
 
 updateMetrics();
 setVerdictFilter("All"); // сразу активируем "Все"
 renderTable();
+
+// --- Кнопка "Выйти" ---
+const logoutBtn = document.getElementById("logoutBtn");
+
+if (logoutBtn) {
+  logoutBtn.addEventListener("click", () => {
+    localStorage.removeItem("qa_is_logged_in");
+    window.location.href = "hr.html";
+  });
+}
