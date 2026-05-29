@@ -621,7 +621,7 @@ async function submitResults({
 
   try {
     const response = await fetch(
-      'https://qa-quiz-web.vercel.app/api/results',
+      'http://127.0.0.1:8000/api/results',
       {
         method: 'POST',
 

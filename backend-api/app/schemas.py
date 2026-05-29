@@ -1,4 +1,5 @@
 from pydantic import BaseModel, EmailStr
+from datetime import datetime
 
 class UserCreate(BaseModel):
     email: EmailStr
@@ -11,6 +12,8 @@ class UserPublic(BaseModel):
     email: EmailStr
     name: str
     company: str | None = None
+    created_at: datetime
+    updated_at: datetime
 
     class Config:
         from_attributes = True  # для .model_validate / ORM объектов
@@ -92,5 +95,37 @@ class ResultPublic(BaseModel):
     verdict: str | None
     company_id: int | None = None
     details: list[DetailedResultItem] = []
+    class Config:
+        from_attributes = True
+
+class Category(BaseModel):
+    category: str
+    percent: int
+
+class TestResultIn(BaseModel):
+    company_token: str
+    first_name: str
+    last_name: str
+    email: EmailStr | None = None
+    test_id: str
+    total_score: float
+    max_score: float
+    percent: int
+    verdict: str
+    categories: list[Category]
+    strong_areas: list[Category]
+    weak_areas: list[Category]
+
+class ResultRow(BaseModel):
+    result_id: int
+    user_id: int
+    first_name: str
+    last_name: str
+    email: EmailStr | None
+    test_id: str
+    percent: int
+    verdict: str
+    created_at: datetime
+
     class Config:
         from_attributes = True

@@ -207,3 +207,113 @@ def get_company_by_public_token(
         raise HTTPException(status_code=404, detail="Company not found")
 
     return company
+
+@app.post("/api/results")
+def save_public_result(data: schemas.TestResultIn, db: Session = Depends(get_db)):
+    # 1. Компания по токену
+    company = (
+        db.query(models.Company)
+        .filter(models.Company.public_token == data.company_token)
+        .first()
+    )
+    if not company:
+        raise HTTPException(status_code=400, detail="Unknown company token")
+
+    # 2. Кандидат внутри компании
+    user = None
+    if data.email:
+        user = (
+            db.query(models.User)
+            .filter(
+                models.User.company_id == company.id,
+                models.User.email == data.email,
+            )
+            .first()
+        )
+
+    if not user:
+        user = models.User(
+            company_id=company.id,
+            first_name=data.first_name,
+            last_name=data.last_name,
+            email=data.email or None,
+        )
+        db.add(user)
+        db.commit()
+        db.refresh(user)
+    else:
+        user.first_name = data.first_name
+        user.last_name = data.last_name
+        db.commit()
+        db.refresh(user)
+
+    # 3. Результат теста
+    result = models.Result(
+        user_id=user.id,
+        company_id=company.id,
+        test_id=data.test_id,
+        total_score=data.total_score,
+        max_score=data.max_score,
+        percent=data.percent,
+        verdict=data.verdict,
+    )
+    db.add(result)
+    db.commit()
+    db.refresh(result)
+
+    # 4. Деталка по категориям
+    strong_cats = {cat.category for cat in data.strong_areas}
+    weak_cats = {cat.category for cat in data.weak_areas}
+
+    for cat in data.categories:
+        detail = models.DetailedResult(
+            result_id=result.id,
+            category=cat.category,
+            percent=cat.percent,
+            is_strong=cat.category in strong_cats,
+            is_weak=cat.category in weak_cats,
+        )
+        db.add(detail)
+
+    db.commit()
+    return {"status": "success", "result_id": result.id}
+
+@app.get("/api/company/{company_id}/results", response_model=list[schemas.ResultRow])
+def get_company_results(
+    company_id: int,
+    limit: int = 50,
+    db: Session = Depends(get_db),
+):
+    rows = (
+        db.query(
+            models.Result.id.label("result_id"),
+            models.Result.user_id,
+            models.User.first_name,
+            models.User.last_name,
+            models.User.email,
+            models.Result.test_id,
+            models.Result.percent,
+            models.Result.verdict,
+            models.Result.created_at,
+        )
+        .join(models.User, models.User.id == models.Result.user_id)
+        .filter(models.Result.company_id == company_id)
+        .order_by(models.Result.created_at.desc())
+        .limit(limit)
+        .all()
+    )
+
+    return [
+        schemas.ResultRow(
+            result_id=r.result_id,
+            user_id=r.user_id,
+            first_name=r.first_name,
+            last_name=r.last_name,
+            email=r.email,
+            test_id=r.test_id,
+            percent=r.percent,
+            verdict=r.verdict,
+            created_at=r.created_at,
+        )
+        for r in rows
+    ]
