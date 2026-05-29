@@ -129,3 +129,7 @@ class ResultRow(BaseModel):
 
     class Config:
         from_attributes = True
+
+class HRLoginRequest(BaseModel):
+    email: EmailStr
+    password: str

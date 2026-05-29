@@ -1,7 +1,60 @@
-// ----- КОНСТАНТА ДЛЯ ТЕМЫ -----
+// ----- КОНСТАНТЫ -----
 const THEME_KEY = "qa_theme";
+const API_BASE_URL = "http://127.0.0.1:8000";
 
-// Применить тему
+// ----- API-ФУНКЦИИ -----
+async function apiRegisterHR({ name, company, email, password }) {
+  // 1) создаём компанию
+  const companyResp = await fetch(`${API_BASE_URL}/companies`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ name: company }),
+  });
+
+  if (!companyResp.ok) {
+    const err = await companyResp.json().catch(() => ({}));
+    throw new Error(err.detail || "Ошибка создания компании");
+  }
+
+  const companyData = await companyResp.json(); // ожидаем { id, name, ... }
+
+  // 2) регистрируем HR
+  const hrResp = await fetch(`${API_BASE_URL}/auth/register`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      email,
+      password,
+      name,
+      company_id: companyData.id,
+      role: "hr",
+    }),
+  });
+
+  if (!hrResp.ok) {
+    const err = await hrResp.json().catch(() => ({}));
+    throw new Error(err.detail || "Ошибка регистрации HR");
+  }
+
+  return await hrResp.json();
+}
+
+async function apiLoginHR({ email, password }) {
+  const resp = await fetch(`${API_BASE_URL}/auth/login`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ email, password }),
+  });
+
+  if (!resp.ok) {
+    const err = await resp.json().catch(() => ({}));
+    throw new Error(err.detail || "Неверный email или пароль");
+  }
+
+  return await resp.json(); // здесь можно взять user/id/token, если бек их вернёт
+}
+
+// ----- ТЕМА -----
 function applyTheme(theme) {
   document.documentElement.setAttribute("data-theme", theme);
 
@@ -28,6 +81,7 @@ function applyTheme(theme) {
   applyTheme(initialTheme);
 })();
 
+// ----- ОСНОВНОЙ КОД -----
 document.addEventListener("DOMContentLoaded", () => {
   // ===== ТЕМА =====
   const toggleBtn = document.getElementById("theme-toggle");
@@ -127,7 +181,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   });
 
-  // ===== МОДАЛКА КАНДИДАТА =====
+  // ===== МОДАЛКА КАНДИДАТА (демо) =====
   const candidateOverlay = document.getElementById("candidate-overlay");
   const candidateModal = document.getElementById("candidate-modal");
   const candidateClose = document.getElementById("candidate-close");
@@ -233,41 +287,70 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // ===== ПРОСТАЯ ВАЛИДАЦИЯ ФОРМ АВТОРИЗАЦИИ =====
-  function attachRequiredValidation(form) {
-    if (!form) return;
-
-    form.addEventListener("submit", (e) => {
+  // ===== ОБРАБОТЧИКИ ФОРМ ВХОДА И РЕГИСТРАЦИИ =====
+  if (loginForm) {
+    loginForm.addEventListener("submit", async (e) => {
       e.preventDefault();
 
-      const inputs = form.querySelectorAll("input[required]");
-      let valid = true;
+      const formData = new FormData(loginForm);
+      const email = formData.get("email")?.toString().trim();
+      const password = formData.get("password")?.toString().trim();
 
-      inputs.forEach((input) => {
-        const value = input.value.trim();
+      if (!email || !password) {
+        alert("Введите email и пароль");
+        return;
+      }
 
-        if (!value) {
-          valid = false;
-          input.classList.add("input-error");
-          return;
-        }
+      try {
+        const data = await apiLoginHR({ email, password });
 
-        if (!input.checkValidity()) {
-          valid = false;
-          input.classList.add("input-error");
-        } else {
-          input.classList.remove("input-error");
-        }
-      });
+        // при желании: localStorage.setItem("qa_user_id", data.id);
+        localStorage.setItem("qa_is_logged_in", "1");
 
-      if (!valid) return;
-
-      localStorage.setItem("qa_is_logged_in", "1");
-      closeAuthModal();
-      window.location.href = "hr-dashboard.html";
+        closeAuthModal();
+        window.location.href = "hr-dashboard.html";
+      } catch (err) {
+        console.error(err);
+        alert(err.message || "Ошибка входа");
+      }
     });
   }
 
-  attachRequiredValidation(loginForm);
-  attachRequiredValidation(registerForm);
+  if (registerForm) {
+    registerForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+
+      const formData = new FormData(registerForm);
+      const name = formData.get("name")?.toString().trim();
+      const company = formData.get("company")?.toString().trim();
+      const email = formData.get("email")?.toString().trim();
+      const password = formData.get("password")?.toString().trim();
+
+      if (!name || !company || !email || !password) {
+        alert("Заполните все обязательные поля");
+        return;
+      }
+
+      if (!registerForm.checkValidity()) {
+        alert("Проверьте корректность полей формы");
+        return;
+      }
+
+      try {
+        await apiRegisterHR({ name, company, email, password });
+
+        // после успешной регистрации сразу делаем вход
+        const data = await apiLoginHR({ email, password });
+
+        localStorage.setItem("qa_is_logged_in", "1");
+        // localStorage.setItem("qa_user_id", data.id);
+
+        closeAuthModal();
+        window.location.href = "hr-dashboard.html";
+      } catch (err) {
+        console.error(err);
+        alert(err.message || "Ошибка регистрации");
+      }
+    });
+  }
 });

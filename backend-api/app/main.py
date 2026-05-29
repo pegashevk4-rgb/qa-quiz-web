@@ -57,21 +57,19 @@ def register_hr_user(payload: schemas.CompanyHRUserCreate, db: Session = Depends
 
 
 @app.post("/auth/login", response_model=schemas.CompanyHRUserPublic)
-def login_hr_user(payload: schemas.CompanyHRUserCreate, db: Session = Depends(get_db)):
-    hr_user = db.query(models.CompanyHRUser).filter(
-        models.CompanyHRUser.email == payload.email
-    ).first()
-    if not hr_user:
+def login_hr_user(payload: schemas.HRLoginRequest, db: Session = Depends(get_db)):
+    hr_user = (
+        db.query(models.CompanyHRUser)
+        .filter(models.CompanyHRUser.email == payload.email)
+        .first()
+    )
+    if not hr_user or not verify_password(payload.password, hr_user.password_hash):
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Invalid credentials",
         )
 
-    if not verify_password(payload.password, hr_user.password_hash):
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Invalid credentials",
-        )
+    return hr_user
 
     return hr_user
 
