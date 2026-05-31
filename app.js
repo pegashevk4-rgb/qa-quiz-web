@@ -1,205 +1,123 @@
 // =========================
-// STATE
-// =========================
-
-const state = {
-  questions: [],
-  currentQuestion: null,
-  currentIndex: 0,
-  totalScore: 0,
-  maxScore: 0,
-  categoryStats: {}
-};
-
-// =========================
 // CONFIG
 // =========================
 
-const QUESTIONS_PER_RUN = 30;
-
-const TEST_TITLES = {
-  qa_junior_web: 'QA Junior (Web)',
-  qa_middle_web: 'QA Middle (Web)',
-  qa_senior_web: 'QA Senior (Web)',
-};
-
-const TEST_JSON_MAP = {
-  qa_junior_web: 'questions_junior.json',
-  qa_middle_web: 'questions_middle.json',
-  qa_senior_web: 'questions_senior.json',
-};
+// Базовый URL бэкенда
+const API_BASE_URL = "http://127.0.0.1:8000";
 
 // =========================
 // URL PARAMS
 // =========================
 
 const params = new URLSearchParams(window.location.search);
-const testId = params.get('test_id') || 'qa_middle_web';
+const TEST_ID = params.get("test_id") || "qa_junior_web";
+const COMPANY_TOKEN = params.get("company_token") || null;
 
-// берём company_id из ссылки
-const companyToken = params.get('company_token') || null;
+// =========================
+// STATE
+// =========================
+
+const state = {
+  questions: [],           // [{id, text, options}]
+  currentIndex: 0,
+  answers: {},             // questionId -> selectedIndex[]
+  percentFromServer: null,
+  verdictFromServer: null,
+};
 
 // =========================
 // DOM
 // =========================
 
 const elements = {
-  questionText: document.getElementById('question-text'),
-  optionsContainer: document.getElementById('options'),
-  progress: document.getElementById('progress'),
-  quiz: document.getElementById('quiz'),
-  result: document.getElementById('result'),
-  resultText: document.getElementById('result-text'),
-  restartBtn: document.getElementById('restart-btn'),
-  categoryText: document.getElementById('category-text'),
-  nextBtn: document.getElementById('next-btn'),
-  intro: document.getElementById('intro'),
-  startBtn: document.getElementById('start-btn'),
-  quizQuestions: document.getElementById('quiz-questions'),
-  questionHint: document.getElementById('question-hint'),
-  testTitle: document.getElementById('test-title'),
+  questionText: document.getElementById("question-text"),
+  optionsContainer: document.getElementById("options"),
+  progress: document.getElementById("progress"),
+  quiz: document.getElementById("quiz"),
+  result: document.getElementById("result"),
+  resultText: document.getElementById("result-text"),
+  restartBtn: document.getElementById("restart-btn"),
+  categoryText: document.getElementById("category-text"),
+  nextBtn: document.getElementById("next-btn"),
+  intro: document.getElementById("intro"),
+  startBtn: document.getElementById("start-btn"),
+  quizQuestions: document.getElementById("quiz-questions"),
+  questionHint: document.getElementById("question-hint"),
+  testTitle: document.getElementById("test-title"),
 
-  userForm: document.getElementById('user-form'),
-  dataForm: document.getElementById('data-form'),
+  userForm: document.getElementById("user-form"),
+  dataForm: document.getElementById("data-form"),
 
-  verdictText: document.getElementById('verdict-text'),
-  verdictExplanation: document.getElementById('verdict-explanation'),
+  verdictText: document.getElementById("verdict-text"),
+  verdictExplanation: document.getElementById("verdict-explanation"),
 
-  strongAreas: document.getElementById('strong-areas'),
-  weakAreas: document.getElementById('weak-areas'),
-  categoriesBreakdown: document.getElementById('categories-breakdown')
+  strongAreas: document.getElementById("strong-areas"),
+  weakAreas: document.getElementById("weak-areas"),
+  categoriesBreakdown: document.getElementById("categories-breakdown"),
 };
 
 // =========================
-// HELPERS
-// =========================
-
-function shuffleArray(array) {
-  const arr = [...array];
-
-  for (let i = arr.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [arr[i], arr[j]] = [arr[j], arr[i]];
-  }
-
-  return arr;
-}
-
-function prepareQuestion(question) {
-  const optionsWithIndexes = question.options.map((text, originalIndex) => ({
-    text,
-    originalIndex
-  }));
-
-  const shuffledOptions = shuffleArray(optionsWithIndexes);
-
-  const originalCorrectIndexes = Array.isArray(question.correct_indexes)
-    ? question.correct_indexes
-    : [];
-
-  if (!Array.isArray(question.correct_indexes)) {
-    console.warn(
-      'Вопрос без корректных correct_indexes:',
-      question.id,
-      question.question
-    );
-  }
-
-  const correctIndexesShuffled = shuffledOptions
-    .map((option, newIndex) => ({
-      newIndex,
-      originalIndex: option.originalIndex
-    }))
-    .filter(item =>
-      originalCorrectIndexes.includes(item.originalIndex)
-    )
-    .map(item => item.newIndex);
-
-  return {
-    ...question,
-    shuffledOptions,
-    correctIndexesShuffled
-  };
-}
-
-
-// =========================
-// LOAD QUESTIONS
+// Загрузка вопросов с бэка
 // =========================
 
 async function loadQuestions() {
   try {
-    const jsonPath = TEST_JSON_MAP[testId];
-
-    if (!jsonPath) {
-      throw new Error(`Unknown test_id: ${testId}`);
-    }
-
-    const response = await fetch(jsonPath);
-
+    const response = await fetch(`${API_BASE_URL}/public/tests/${TEST_ID}`);
     if (!response.ok) {
       throw new Error(`HTTP ${response.status}`);
     }
 
-    const data = await response.json();
+    const data = await response.json(); // {test_id, title, questions}
+    state.questions = data.questions || [];
 
-    state.questions = shuffleArray(data).slice(0, QUESTIONS_PER_RUN);
-
-    if (elements.testTitle) {
-      elements.testTitle.textContent =
-        TEST_TITLES[testId] || 'QA Quiz';
+    if (!state.questions.length) {
+      alert("Для этого теста нет вопросов.");
+      return;
     }
 
+    if (elements.testTitle) {
+      elements.testTitle.textContent = data.title || "QA Quiz";
+    }
+
+    elements.intro.style.display = "block";
+    elements.quiz.style.display = "none";
+    elements.result.style.display = "none";
+    if (elements.userForm) elements.userForm.style.display = "none";
   } catch (error) {
-    console.error(error);
-    alert('Не удалось загрузить вопросы');
+    console.error("Ошибка загрузки теста:", error);
+    alert("Не удалось загрузить тест. Попробуйте позже.");
   }
 }
 
 // =========================
-// QUIZ START
+// Старт квиза
 // =========================
-
-function initializeCategoryStats() {
-  state.categoryStats = {};
-
-  state.questions.forEach(question => {
-    if (!state.categoryStats[question.category]) {
-      state.categoryStats[question.category] = {
-        gained: 0,
-        max: 0
-      };
-    }
-  });
-}
 
 function startQuiz() {
   if (!state.questions.length) {
-    alert('Вопросы ещё не загрузились');
+    alert("Вопросы ещё не загрузились");
     return;
   }
 
   state.currentIndex = 0;
-  state.totalScore = 0;
-  state.maxScore = state.questions.length;
+  state.answers = {};
+  state.percentFromServer = null;
+  state.verdictFromServer = null;
 
-  initializeCategoryStats();
-
-  elements.intro.style.display = 'none';
-  elements.quiz.style.display = 'block';
-  elements.result.style.display = 'none';
-
+  elements.intro.style.display = "none";
+  elements.quiz.style.display = "block";
+  elements.result.style.display = "none";
   if (elements.userForm) {
-    elements.userForm.style.display = 'none';
+    elements.userForm.style.display = "none";
   }
 
-  elements.quizQuestions.style.display = 'block';
+  elements.quizQuestions.style.display = "block";
 
-  elements.nextBtn.style.display = 'block';
+  elements.nextBtn.style.display = "block";
   elements.nextBtn.disabled = true;
-  elements.nextBtn.onclick = handleAnswer;
+  elements.nextBtn.onclick = handleNext;
 
-  if (typeof startTimer === 'function') {
+  if (typeof startTimer === "function") {
     startTimer();
   }
 
@@ -207,64 +125,55 @@ function startQuiz() {
 }
 
 // =========================
-// QUESTION RENDER
+// Показ вопроса
 // =========================
 
 function showQuestion() {
-  const rawQuestion = state.questions[state.currentIndex];
+  const question = state.questions[state.currentIndex];
+  if (!question) return;
 
-  const preparedQuestion = prepareQuestion(rawQuestion);
-
-  state.currentQuestion = preparedQuestion;
-
-  renderQuestion(preparedQuestion);
-  renderOptions(preparedQuestion);
-}
-
-function renderQuestion(question) {
   elements.progress.textContent =
     `Вопрос ${state.currentIndex + 1} из ${state.questions.length}`;
 
-  elements.categoryText.textContent =
-    `Категория: ${question.category}`;
+  // Категорий у нас пока нет — оставляем пустым
+  elements.categoryText.textContent = "";
 
-  elements.questionText.textContent =
-    question.question;
+  elements.questionText.textContent = question.text;
 
-  if (question.type === 'multiple') {
-    elements.questionHint.textContent =
-      'Тип вопроса: можно выбрать несколько вариантов ответа.';
-  } else {
-    elements.questionHint.textContent =
-      'Тип вопроса: выберите один вариант ответа.';
-  }
+  // Все вопросы пока с одним вариантом
+  elements.questionHint.textContent =
+    "Тип вопроса: выберите один вариант ответа.";
+
+  renderOptions(question);
 }
 
 function renderOptions(question) {
-  elements.optionsContainer.innerHTML = '';
+  elements.optionsContainer.innerHTML = "";
+  elements.nextBtn.disabled = true;
 
-  const isMultiple = question.type === 'multiple';
+  const optionsList = document.createElement("div");
 
-  const optionsList = document.createElement('div');
+  const selected = state.answers[question.id] || [];
 
-  question.shuffledOptions.forEach((option, index) => {
-    const wrapper = document.createElement('div');
-    wrapper.className = 'option-item';
+  question.options.forEach((text, index) => {
+    const wrapper = document.createElement("div");
+    wrapper.className = "option-item";
 
-    const label = document.createElement('label');
-    label.className = 'option-label';
+    const label = document.createElement("label");
+    label.className = "option-label";
 
-    const input = document.createElement('input');
-
-    input.type = isMultiple ? 'checkbox' : 'radio';
-    input.name = isMultiple
-      ? `answer_${question.id}`
-      : 'answer';
-
+    const input = document.createElement("input");
+    input.type = "radio";
+    input.name = "answer";
     input.value = index;
 
-    const textSpan = document.createElement('span');
-    textSpan.textContent = `${index + 1}. ${option.text}`;
+    if (selected.includes(index)) {
+      input.checked = true;
+      elements.nextBtn.disabled = false;
+    }
+
+    const textSpan = document.createElement("span");
+    textSpan.textContent = `${index + 1}. ${text}`;
 
     label.append(input, textSpan);
     wrapper.appendChild(label);
@@ -273,394 +182,206 @@ function renderOptions(question) {
 
   elements.optionsContainer.appendChild(optionsList);
 
-  elements.nextBtn.disabled = true;
-
-  const inputs = optionsList.querySelectorAll('input');
-
-  inputs.forEach(input => {
-    input.addEventListener('change', () => {
-      const anyChecked = [...inputs].some(i => i.checked);
-      elements.nextBtn.disabled = !anyChecked;
+  const inputs = optionsList.querySelectorAll("input");
+  inputs.forEach((input) => {
+    input.addEventListener("change", () => {
+      const chosenIndex = Number(input.value);
+      state.answers[question.id] = [chosenIndex];
+      elements.nextBtn.disabled = false;
     });
   });
 }
 
 // =========================
-// ANSWERS
+// Переход вперёд
 // =========================
 
-function getUserAnswer(question) {
-  if (question.type === 'single') {
-    const checked = document.querySelector(
-      '#options input[name="answer"]:checked'
-    );
+function handleNext() {
+  const question = state.questions[state.currentIndex];
+  if (!question) return;
 
-    return checked
-      ? Number(checked.value)
-      : null;
+  const selected = state.answers[question.id] || [];
+  if (!selected.length) {
+    return;
   }
 
-  const checkedInputs =
-    document.querySelectorAll(
-      '#options input[type="checkbox"]:checked'
-    );
-
-  return [...checkedInputs].map(input =>
-    Number(input.value)
-  );
-}
-
-// =========================
-// SCORING
-// =========================
-
-function scoreSingle(userIndex, question) {
-  if (userIndex === null) return 0;
-
-  return userIndex === question.correctIndexesShuffled[0]
-    ? 1
-    : 0;
-}
-
-function scoreMultiple(userIndexes, question) {
-  const correctIndexes = question.correctIndexesShuffled;
-
-  const K = correctIndexes.length;
-
-  if (!userIndexes.length) {
-    return 0;
-  }
-
-  const correctSet = new Set(correctIndexes);
-  const userSet = new Set(userIndexes);
-
-  let score = 0;
-
-  for (const idx of userSet) {
-    if (correctSet.has(idx)) {
-      score += 1 / K;
-    } else {
-      score -= 1 / K;
-    }
-  }
-
-  return Math.max(0, Math.min(score, 1));
-}
-
-// =========================
-// CATEGORY ANALYTICS
-// =========================
-
-function updateCategoryStats(category, gained) {
-  if (!state.categoryStats[category]) {
-    state.categoryStats[category] = {
-      gained: 0,
-      max: 0
-    };
-  }
-
-  state.categoryStats[category].gained += gained;
-  state.categoryStats[category].max += 1;
-}
-
-function buildCategoryAnalytics() {
-  const categories = Object.entries(state.categoryStats)
-    .map(([category, stats]) => ({
-      category,
-      percent:
-        stats.max > 0
-          ? Math.round((stats.gained / stats.max) * 100)
-          : 0
-    }))
-    .sort((a, b) => b.percent - a.percent);
-
-  return {
-    categories,
-    strongAreas: categories.slice(0, 2),
-    weakAreas: categories.slice(-2).reverse()
-  };
-}
-
-// =========================
-// HANDLE ANSWER
-// =========================
-
-function handleAnswer() {
-  const question = state.currentQuestion;
-
-  const userAnswer = getUserAnswer(question);
-
-  let gained = 0;
-
-  if (question.type === 'single') {
-    gained = scoreSingle(userAnswer, question);
-  } else {
-    gained = scoreMultiple(userAnswer, question);
-  }
-
-  state.totalScore += gained;
-
-  updateCategoryStats(question.category, gained);
-
-  state.currentIndex++;
-
-  if (state.currentIndex < state.questions.length) {
+  if (state.currentIndex < state.questions.length - 1) {
+    state.currentIndex += 1;
     showQuestion();
   } else {
-    showResult();
+    // вопросы закончились — показываем форму
+    elements.quizQuestions.style.display = "none";
+    elements.quiz.style.display = "none";
+    elements.userForm.style.display = "block";
+
+    if (window.timerInterval) {
+      clearInterval(window.timerInterval);
+    }
+
+    elements.dataForm.onsubmit = async (event) => {
+      event.preventDefault();
+      await handleFormSubmit();
+    };
   }
 }
 
 // =========================
-// VERDICTS
+// showResult для таймера
 // =========================
 
-function getVerdict(percent) {
-  if (percent >= 80) {
-    return 'Recommended (Strong Middle level)';
-  }
-
-  if (percent >= 65) {
-    return 'Recommended (Middle level)';
-  }
-
-  if (percent >= 50) {
-    return 'Potential Junior/Middle';
-  }
-
-  return 'Requires additional evaluation';
-}
-
-function getRecommendationText(percent) {
-  if (percent >= 80) {
-    return 'Кандидат демонстрирует сильные знания уровня Middle.';
-  }
-
-  if (percent >= 65) {
-    return 'Кандидат показывает уверенные знания QA.';
-  }
-
-  if (percent >= 50) {
-    return 'Кандидат обладает базовыми знаниями.';
-  }
-
-  return 'Рекомендуется дополнительная проверка.';
-}
-
-// =========================
-// RESULT RENDER
-// =========================
-
-function renderResultHeader(percent, roundedScore) {
-  elements.resultText.textContent =
-    `Ваш результат: ${roundedScore} из ${state.maxScore} (${percent}%).`;
-
-  elements.verdictText.textContent =
-    getVerdict(percent);
-
-  elements.verdictExplanation.textContent =
-    getRecommendationText(percent);
-}
-
-function renderAreasList(container, items) {
-  container.innerHTML = '';
-
-  items.forEach(item => {
-    const li = document.createElement('li');
-
-    li.textContent =
-      `${item.category}: ${item.percent}%`;
-
-    container.appendChild(li);
-  });
-}
-
-function renderBreakdown(categories) {
-  elements.categoriesBreakdown.innerHTML = '';
-
-  categories.forEach(item => {
-    const li = document.createElement('li');
-
-    li.textContent =
-      `${item.category}: ${item.percent}%`;
-
-    elements.categoriesBreakdown.appendChild(li);
-  });
-}
-
-function renderLowScoreState() {
-  elements.strongAreas.innerHTML =
-    '<li>Сильные стороны не определены</li>';
-
-  elements.weakAreas.innerHTML =
-    '<li>Недостаточно данных</li>';
-
-  elements.categoriesBreakdown.innerHTML = '';
-}
-
+// Эта функция вызывается таймером из index.html, когда время вышло.
 function showResult() {
-  elements.quizQuestions.style.display = 'none';
+  // Если уже на форме или на результате — ничего не делаем
+  if (
+    elements.userForm.style.display === "block" ||
+    elements.result.style.display === "block"
+  ) {
+    return;
+  }
+
+  elements.quizQuestions.style.display = "none";
+  elements.quiz.style.display = "none";
+  elements.userForm.style.display = "block";
 
   if (window.timerInterval) {
     clearInterval(window.timerInterval);
   }
 
-  const percent = Math.round(
-    (state.totalScore / state.maxScore) * 100
-  );
-
-  const roundedScore =
-    Math.round(state.totalScore * 10) / 10;
-
-  renderResultHeader(percent, roundedScore);
-
-  if (percent < 30) {
-    renderLowScoreState();
-  } else {
-    const analytics = buildCategoryAnalytics();
-
-    renderAreasList(
-      elements.strongAreas,
-      analytics.strongAreas
-    );
-
-    renderAreasList(
-      elements.weakAreas,
-      analytics.weakAreas
-    );
-
-    renderBreakdown(analytics.categories);
-  }
-
-  elements.userForm.style.display = 'block';
-
-  elements.dataForm.onsubmit = async event => {
+  elements.dataForm.onsubmit = async (event) => {
     event.preventDefault();
-
-    await handleFormSubmit(percent);
+    await handleFormSubmit();
   };
 }
 
 // =========================
-// FORM SUBMIT
+// Отправка формы
 // =========================
 
-async function handleFormSubmit(percent) {
-  const submitButton =
-    elements.dataForm.querySelector(
-      'button[type="submit"]'
-    );
+async function handleFormSubmit() {
+  const submitButton = elements.dataForm.querySelector(
+    'button[type="submit"]'
+  );
 
-  submitButton.disabled = true;
-  submitButton.textContent = 'Сохраняем...';
+  const firstName = document.getElementById("firstName").value.trim();
+  const lastName = document.getElementById("lastName").value.trim();
+  const email = document.getElementById("email").value.trim() || null;
 
-  const firstName =
-    document.getElementById('firstName').value;
-
-  const lastName =
-    document.getElementById('lastName').value;
-
-  const email =
-    document.getElementById('email').value;
-
-  try {
-    await submitResults({
-      firstName,
-      lastName,
-      email,
-      percent
-    });
-
-    elements.userForm.style.display = 'none';
-    elements.result.style.display = 'block';
-
-  } finally {
-    submitButton.textContent =
-      'Результат сохранён';
-  }
-}
-
-// =========================
-// API
-// =========================
-
-async function submitResults({
-  firstName,
-  lastName,
-  email,
-  percent
-}) {
-  const analytics = buildCategoryAnalytics();
-
-  if (!companyToken) {
-    alert('Не указан токен компании в ссылке');
+  if (!firstName || !lastName) {
+    alert("Пожалуйста, заполните имя и фамилию.");
     return;
   }
 
-  const payload = {
-  company_token: companyToken,   // ← вместо 1
+  if (!COMPANY_TOKEN) {
+    alert("В ссылке нет токена компании. Обратитесь к HR.");
+    return;
+  }
 
-    first_name: firstName,
-    last_name: lastName,
-    email,
-
-    test_id: testId,
-
-    total_score: state.totalScore,
-    max_score: state.maxScore,
-
-    percent,
-
-    verdict: getVerdict(percent),
-
-    categories: analytics.categories,
-    strong_areas: analytics.strongAreas,
-    weak_areas: analytics.weakAreas
-  };
-
+  submitButton.disabled = true;
+  submitButton.textContent = "Сохраняем...";
 
   try {
+    const answersPayload = Object.entries(state.answers).map(
+      ([questionId, selectedIndexes]) => ({
+        question_id: Number(questionId),
+        selected_index: selectedIndexes[0], // одиночный выбор
+      })
+    );
+
+    const payload = {
+      test_id: TEST_ID,
+      answers: answersPayload,
+      candidate: {
+        first_name: firstName,
+        last_name: lastName,
+        email: email,
+      },
+    };
+
     const response = await fetch(
-      'http://127.0.0.1:8000/api/results',
+      `${API_BASE_URL}/public/tests/${TEST_ID}/submit?company_token=${encodeURIComponent(
+        COMPANY_TOKEN
+      )}`,
       {
-        method: 'POST',
-
-        headers: {
-          'Content-Type': 'application/json'
-        },
-
-        body: JSON.stringify(payload)
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
       }
     );
 
     if (!response.ok) {
-      throw new Error(`HTTP ${response.status}`);
+      if (response.status === 403) {
+        alert(
+          "Лимит тестов для вашей компании исчерпан. Обратитесь к HR по поводу тарифа."
+        );
+      } else {
+        alert("Ошибка при сохранении результата. Попробуйте позже.");
+      }
+      console.error("Submit error:", response.status);
+      return;
     }
 
-    const data = await response.json();
+    const data = await response.json(); // {percent, verdict}
+    state.percentFromServer = data.percent;
+    state.verdictFromServer = data.verdict;
 
-    console.log('Saved:', data);
-
+    renderResult();
   } catch (error) {
-    console.error(error);
-
-    alert('Ошибка сохранения результата');
+    console.error("Ошибка сети при отправке результата:", error);
+    alert("Не удалось отправить результат. Проверьте соединение.");
+  } finally {
+    submitButton.textContent = "Результат сохранён";
   }
+}
+
+// =========================
+// Рендер результата
+// =========================
+
+function renderResult() {
+  elements.userForm.style.display = "none";
+  elements.result.style.display = "block";
+
+  const percent = state.percentFromServer ?? 0;
+  const verdict = state.verdictFromServer || "On the edge";
+
+  elements.resultText.textContent = `Ваш результат: ${percent}%.`;
+
+  let verdictText = "";
+  let explanation = "";
+
+  if (verdict === "Passed") {
+    verdictText = "Рекомендуем к следующему этапу.";
+    explanation =
+      "Кандидат показал высокий уровень знаний и может быть рассмотрен на позицию.";
+  } else if (verdict === "On the edge") {
+    verdictText = "На грани.";
+    explanation =
+      "Рекомендуется дополнительно оценить кандидата на собеседовании.";
+  } else {
+    verdictText = "Не прошёл.";
+    explanation =
+      "Кандидат показал недостаточный уровень знаний для этой позиции.";
+  }
+
+  elements.verdictText.textContent = verdictText;
+  elements.verdictExplanation.textContent = explanation;
+
+  // Пока нет детальной аналитики — очищаем блоки
+  elements.strongAreas.innerHTML = "";
+  elements.weakAreas.innerHTML = "";
+  elements.categoriesBreakdown.innerHTML = "";
 }
 
 // =========================
 // EVENTS
 // =========================
 
-elements.startBtn?.addEventListener(
-  'click',
-  startQuiz
-);
+elements.startBtn?.addEventListener("click", startQuiz);
 
-elements.restartBtn?.addEventListener(
-  'click',
-  startQuiz
-);
+elements.restartBtn?.addEventListener("click", () => {
+  // Перезапускаем страницу, чтобы начать сначала
+  window.location.reload();
+});
 
 // =========================
 // INIT

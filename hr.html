@@ -265,9 +265,7 @@
 <div class="modal-overlay" id="auth-overlay"></div>
 
 <div class="modal" id="auth-modal">
-
   <div class="modal-inner">
-
     <button class="modal-close" id="auth-close">
       &times;
     </button>
@@ -282,26 +280,34 @@
       </button>
     </div>
 
+    <!-- Форма входа -->
     <form class="modal-form active" id="login-form" novalidate>
+      <div class="form-field">
+        <label>
+          Email *
+          <input
+            type="email"
+            name="email"
+            required
+          />
+        </label>
+        <div class="field-error-text" data-error-for="login-email"></div>
+      </div>
 
-      <label>
-        Email *
-        <input
-          type="email"
-          name="email"
-          required
-        />
-      </label>
-
-      <label>
-        Пароль *
-        <input
-          type="password"
-          name="password"
-          required
-          minlength="6"
-        />
-      </label>
+      <div class="form-field">
+        <label>
+          Пароль *
+          <input
+            type="password"
+            name="password"
+            required
+            minlength="8"
+            pattern="^(?=.*[A-Za-z])(?=.*\d).{8,}$"
+            title="Минимум 8 символов, хотя бы одна буква и одна цифра"
+          />
+        </label>
+        <div class="field-error-text" data-error-for="login-password"></div>
+      </div>
 
       <button type="submit" class="modal-submit">
         Войти
@@ -310,51 +316,62 @@
       <p class="modal-hint">
         Поля с * обязательны для заполнения.
       </p>
-
     </form>
 
+    <!-- Форма регистрации -->
     <form class="modal-form" id="register-form" novalidate>
+      <div class="form-field">
+        <label>
+          Имя *
+          <input
+            type="text"
+            name="name"
+            required
+            minlength="2"
+          />
+        </label>
+        <div class="field-error-text" data-error-for="name"></div>
+      </div>
 
-      <label>
-        Имя *
-        <input
-          type="text"
-          name="name"
-          required
-          minlength="2"
-        />
-      </label>
+      <div class="form-field">
+        <label>
+          Компания *
+          <input
+            type="text"
+            name="company"
+            required
+            minlength="2"
+          />
+        </label>
+        <div class="field-error-text" data-error-for="company"></div>
+      </div>
 
-      <label>
-        Компания *
-        <input
-          type="text"
-          name="company"
-          required
-          minlength="2"
-        />
-      </label>
+      <div class="form-field">
+        <label>
+          Email *
+          <input
+            type="email"
+            name="email"
+            required
+          />
+        </label>
+        <div class="field-error-text" data-error-for="email"></div>
+      </div>
 
-      <label>
-        Email *
-        <input
-          type="email"
-          name="email"
-          required
-        />
-      </label>
-
-      <label>
-        Пароль *
-        <input
-          type="password"
-          name="password"
-          required
-          minlength="8"
-          pattern="^(?=.*[A-Za-z])(?=.*\d).{8,}$"
-          title="Минимум 8 символов, хотя бы одна буква и одна цифра"
-        />
-      </label>
+      <div class="form-field">
+        <label>
+          Пароль *
+          <input
+            type="password"
+            name="password"
+            required
+            minlength="8"
+            pattern="^(?=.*[A-Za-z])(?=.*\d).{8,}$"
+            title="Минимум 8 символов, хотя бы одна буква и одна цифра"
+          />
+        </label>
+        <div class="field-error-text" data-error-for="password"></div>
+      </div>
 
       <button type="submit" class="modal-submit">
         Создать аккаунт
@@ -363,10 +380,7 @@
       <p class="modal-hint">
         Поля с * обязательны для заполнения.
       </p>
-
     </form>
-
-
   </div>
 </div>
 

@@ -1,11 +1,14 @@
 from pydantic import BaseModel, EmailStr
 from datetime import datetime
+from typing import List
+
 
 class UserCreate(BaseModel):
     email: EmailStr
     password: str
     name: str
     company: str | None = None
+
 
 class UserPublic(BaseModel):
     id: int
@@ -18,6 +21,7 @@ class UserPublic(BaseModel):
     class Config:
         from_attributes = True  # для .model_validate / ORM объектов
 
+
 class CompanyHRUserCreate(BaseModel):
     email: EmailStr
     password: str
@@ -25,18 +29,22 @@ class CompanyHRUserCreate(BaseModel):
     company_id: int
     role: str | None = "manager"
 
+
 class CompanyHRUserPublic(BaseModel):
     id: int
     email: EmailStr
     name: str
     company_id: int
     role: str
+    company_name: str
 
     class Config:
-        from_attributes = True
+        orm_mode = True
+
 
 class CompanyCreate(BaseModel):
     name: str
+
 
 class CompanyPublic(BaseModel):
     id: int
@@ -48,6 +56,7 @@ class CompanyPublic(BaseModel):
 
     class Config:
         from_attributes = True
+
 
 class CandidateCreate(BaseModel):
     first_name: str
@@ -95,12 +104,15 @@ class ResultPublic(BaseModel):
     verdict: str | None
     company_id: int | None = None
     details: list[DetailedResultItem] = []
+
     class Config:
         from_attributes = True
+
 
 class Category(BaseModel):
     category: str
     percent: int
+
 
 class TestResultIn(BaseModel):
     company_token: str
@@ -116,6 +128,7 @@ class TestResultIn(BaseModel):
     strong_areas: list[Category]
     weak_areas: list[Category]
 
+
 class ResultRow(BaseModel):
     result_id: int
     user_id: int
@@ -130,6 +143,46 @@ class ResultRow(BaseModel):
     class Config:
         from_attributes = True
 
+
 class HRLoginRequest(BaseModel):
     email: EmailStr
     password: str
+
+
+# ===== НОВОЕ: схемы для публичных тестов =====
+
+class QuestionPublic(BaseModel):
+    id: int
+    text: str
+    options: List[str]
+
+    class Config:
+        orm_mode = True
+
+
+class TestPublic(BaseModel):
+    test_id: str
+    title: str
+    questions: List[QuestionPublic]
+
+
+class AnswerItem(BaseModel):
+    question_id: int
+    selected_index: int
+
+
+class CandidateInfo(BaseModel):
+    first_name: str
+    last_name: str
+    email: EmailStr | None = None
+
+
+class TestSubmitWithCandidate(BaseModel):
+    test_id: str
+    answers: List[AnswerItem]
+    candidate: CandidateInfo
+
+
+class TestResultResponse(BaseModel):
+    percent: int
+    verdict: str

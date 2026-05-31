@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, DateTime, Numeric, Boolean, ForeignKey, func
+from sqlalchemy import Column, Integer, String, DateTime, Numeric, Boolean, ForeignKey, func, JSON
 from sqlalchemy.orm import relationship
 from .database import Base
 
@@ -69,3 +69,13 @@ class DetailedResult(Base):
     is_weak = Column(Boolean, default=False)
 
     result = relationship("Result", backref="details")
+
+class QuizQuestion(Base):
+    __tablename__ = "quiz_questions"
+
+    id = Column(Integer, primary_key=True, index=True)
+    test_id = Column(String(50), index=True, nullable=False)  # 'qa_junior_web' и т.п.
+    text = Column(String(1000), nullable=False)
+    options = Column(JSON, nullable=False)                     # список строк
+    correct_index = Column(Integer, nullable=False)            # индекс правильного варианта
+    order = Column(Integer, nullable=False, default=0)

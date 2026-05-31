@@ -12,11 +12,21 @@ async function apiRegisterHR({ name, company, email, password }) {
   });
 
   if (!companyResp.ok) {
-    const err = await companyResp.json().catch(() => ({}));
-    throw new Error(err.detail || "Ошибка создания компании");
+    let payload = null;
+    try {
+      payload = await companyResp.json();
+    } catch (_) {}
+
+    const error = new Error(
+      (payload && payload.detail) || "Ошибка создания компании"
+    );
+    if (payload) {
+      error.backendPayload = payload;
+    }
+    throw error;
   }
 
-  const companyData = await companyResp.json(); // ожидаем { id, name, ... }
+  const companyData = await companyResp.json(); // { id, name, ... }
 
   // 2) регистрируем HR
   const hrResp = await fetch(`${API_BASE_URL}/auth/register`, {
@@ -32,8 +42,18 @@ async function apiRegisterHR({ name, company, email, password }) {
   });
 
   if (!hrResp.ok) {
-    const err = await hrResp.json().catch(() => ({}));
-    throw new Error(err.detail || "Ошибка регистрации HR");
+    let payload = null;
+    try {
+      payload = await hrResp.json();
+    } catch (_) {}
+
+    const error = new Error(
+      (payload && payload.detail) || "Ошибка регистрации HR"
+    );
+    if (payload) {
+      error.backendPayload = payload;
+    }
+    throw error;
   }
 
   return await hrResp.json();
@@ -47,11 +67,21 @@ async function apiLoginHR({ email, password }) {
   });
 
   if (!resp.ok) {
-    const err = await resp.json().catch(() => ({}));
-    throw new Error(err.detail || "Неверный email или пароль");
+    let payload = null;
+    try {
+      payload = await resp.json();
+    } catch (_) {}
+
+    const error = new Error(
+      (payload && payload.detail) || "Неверный email или пароль"
+    );
+    if (payload) {
+      error.backendPayload = payload;
+    }
+    throw error;
   }
 
-  return await resp.json(); // здесь можно взять user/id/token, если бек их вернёт
+  return await resp.json(); // ожидаем { id, email, company_id, company_name, ... }
 }
 
 // ----- ТЕМА -----
@@ -181,7 +211,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   });
 
-  // ===== МОДАЛКА КАНДИДАТА (демо) =====
+  // ===== МОДАЛКА КАНДИДАТА (демо в лендинге) =====
   const candidateOverlay = document.getElementById("candidate-overlay");
   const candidateModal = document.getElementById("candidate-modal");
   const candidateClose = document.getElementById("candidate-close");
@@ -288,37 +318,200 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   // ===== ОБРАБОТЧИКИ ФОРМ ВХОДА И РЕГИСТРАЦИИ =====
+
+  // --- Вход ---
   if (loginForm) {
+    const loginEmailInput = loginForm.querySelector('input[name="email"]');
+    const loginPasswordInput = loginForm.querySelector(
+      'input[name="password"]'
+    );
+    const loginEmailError = loginForm.querySelector(
+      '.field-error-text[data-error-for="login-email"]'
+    );
+    const loginPasswordError = loginForm.querySelector(
+      '.field-error-text[data-error-for="login-password"]'
+    );
+
+    function clearLoginErrors() {
+      if (loginEmailInput) loginEmailInput.classList.remove("input-error");
+      if (loginPasswordInput)
+        loginPasswordInput.classList.remove("input-error");
+      if (loginEmailError) loginEmailError.textContent = "";
+      if (loginPasswordError) loginPasswordError.textContent = "";
+    }
+
     loginForm.addEventListener("submit", async (e) => {
       e.preventDefault();
+      clearLoginErrors();
 
       const formData = new FormData(loginForm);
       const email = formData.get("email")?.toString().trim();
       const password = formData.get("password")?.toString().trim();
 
-      if (!email || !password) {
-        alert("Введите email и пароль");
+      let hasClientErrors = false;
+
+      if (!email) {
+        if (loginEmailInput) loginEmailInput.classList.add("input-error");
+        if (loginEmailError) loginEmailError.textContent = "Укажите email";
+        hasClientErrors = true;
+      }
+      if (!password) {
+        if (loginPasswordInput)
+          loginPasswordInput.classList.add("input-error");
+        if (loginPasswordError)
+          loginPasswordError.textContent = "Укажите пароль";
+        hasClientErrors = true;
+      }
+
+      if (hasClientErrors) {
         return;
       }
 
       try {
         const data = await apiLoginHR({ email, password });
 
-        // при желании: localStorage.setItem("qa_user_id", data.id);
         localStorage.setItem("qa_is_logged_in", "1");
+        localStorage.setItem("qa_company_id", data.company_id);
+        localStorage.setItem("qa_company_name", data.company_name);
 
         closeAuthModal();
         window.location.href = "hr-dashboard.html";
       } catch (err) {
         console.error(err);
-        alert(err.message || "Ошибка входа");
+
+        if (err.backendPayload) {
+          const payload = err.backendPayload;
+          const msg =
+            typeof payload.detail === "string"
+              ? payload.detail
+              : err.message || "Ошибка входа";
+
+          const lower = msg.toLowerCase();
+
+          if (loginEmailInput)
+            loginEmailInput.classList.add("input-error");
+          if (loginPasswordInput)
+            loginPasswordInput.classList.add("input-error");
+
+          if (
+            lower.includes("email") &&
+            !lower.includes("парол") &&
+            loginEmailError
+          ) {
+            loginEmailError.textContent = msg;
+          } else if (loginPasswordError) {
+            loginPasswordError.textContent = msg;
+          } else {
+            alert(msg);
+          }
+          return;
+        }
+
+        const msg = err.message || "Ошибка входа";
+        const lower = msg.toLowerCase();
+
+        if (loginEmailInput)
+          loginEmailInput.classList.add("input-error");
+        if (loginPasswordInput)
+          loginPasswordInput.classList.add("input-error");
+
+        if (
+          lower.includes("email") &&
+          !lower.includes("парол") &&
+          loginEmailError
+        ) {
+          loginEmailError.textContent = msg;
+        } else if (loginPasswordError) {
+          loginPasswordError.textContent = msg;
+        } else {
+          alert(msg);
+        }
       }
     });
   }
 
+  // --- Регистрация ---
   if (registerForm) {
+    const registerInputs = registerForm.querySelectorAll("input[name]");
+    const errorBlocks = registerForm.querySelectorAll(".field-error-text");
+
+    function clearRegisterErrors() {
+      registerInputs.forEach((input) => {
+        input.classList.remove("input-error");
+      });
+      errorBlocks.forEach((el) => {
+        el.textContent = "";
+      });
+    }
+
+    function setFieldError(fieldName, message) {
+      const input = registerForm.querySelector(`input[name="${fieldName}"]`);
+      const errorEl = registerForm.querySelector(
+        `.field-error-text[data-error-for="${fieldName}"]`
+      );
+      if (input) {
+        input.classList.add("input-error");
+      }
+      if (errorEl) {
+        errorEl.textContent = message;
+      }
+    }
+
+    // разбор ошибок бэка (HTTPException, 422 и т.п.)
+    function applyBackendErrors(errPayload) {
+      if (!errPayload) return;
+
+      // detail — строка
+      if (typeof errPayload.detail === "string") {
+        const msg = errPayload.detail;
+        const lower = msg.toLowerCase();
+
+        if (lower.includes("email")) {
+          setFieldError("email", msg);
+        } else if (lower.includes("парол")) {
+          setFieldError("password", msg);
+        } else if (lower.includes("компан") || lower.includes("company")) {
+          setFieldError("company", msg);
+        } else if (lower.includes("имя") || lower.includes("name")) {
+          setFieldError("name", msg);
+        } else {
+          alert(msg);
+        }
+        return;
+      }
+
+      // detail — массив ошибок (422 от FastAPI)
+      if (Array.isArray(errPayload.detail)) {
+        let hasFieldErrors = false;
+
+        errPayload.detail.forEach((item) => {
+          if (!item || !item.loc || !item.msg) return;
+
+          const loc = item.loc;
+          const fieldName = loc[loc.length - 1];
+
+          if (["name", "company", "email", "password"].includes(fieldName)) {
+            setFieldError(fieldName, item.msg);
+            hasFieldErrors = true;
+          }
+        });
+
+        if (!hasFieldErrors) {
+          const first = errPayload.detail[0];
+          if (first && first.msg) {
+            alert(first.msg);
+          }
+        }
+
+        return;
+      }
+
+      alert("Ошибка регистрации");
+    }
+
     registerForm.addEventListener("submit", async (e) => {
       e.preventDefault();
+      clearRegisterErrors();
 
       const formData = new FormData(registerForm);
       const name = formData.get("name")?.toString().trim();
@@ -326,30 +519,87 @@ document.addEventListener("DOMContentLoaded", () => {
       const email = formData.get("email")?.toString().trim();
       const password = formData.get("password")?.toString().trim();
 
-      if (!name || !company || !email || !password) {
-        alert("Заполните все обязательные поля");
-        return;
+      let hasClientErrors = false;
+
+      // Простая ручная проверка
+      if (!name) {
+        setFieldError("name", "Укажите имя");
+        hasClientErrors = true;
+      }
+      if (!company) {
+        setFieldError("company", "Укажите компанию");
+        hasClientErrors = true;
+      }
+      if (!email) {
+        setFieldError("email", "Укажите email");
+        hasClientErrors = true;
+      }
+      if (!password) {
+        setFieldError("password", "Укажите пароль");
+        hasClientErrors = true;
       }
 
+      // HTML5-валидация (minlength, pattern и т.п.)
       if (!registerForm.checkValidity()) {
-        alert("Проверьте корректность полей формы");
+        registerInputs.forEach((input) => {
+          if (!input.checkValidity()) {
+            const fieldName = input.name;
+            if (fieldName === "password" && !input.validity.valid) {
+              setFieldError(
+                "password",
+                "Минимум 8 символов, хотя бы одна буква и одна цифра"
+              );
+            } else if (fieldName === "email" && input.validity.typeMismatch) {
+              setFieldError("email", "Некорректный email");
+            } else if (fieldName === "name" && input.validity.tooShort) {
+              setFieldError("name", "Имя слишком короткое");
+            } else if (
+              fieldName === "company" &&
+              input.validity.tooShort
+            ) {
+              setFieldError("company", "Название компании слишком короткое");
+            }
+          }
+        });
+        hasClientErrors = true;
+      }
+
+      if (hasClientErrors) {
         return;
       }
 
       try {
         await apiRegisterHR({ name, company, email, password });
-
-        // после успешной регистрации сразу делаем вход
         const data = await apiLoginHR({ email, password });
 
         localStorage.setItem("qa_is_logged_in", "1");
-        // localStorage.setItem("qa_user_id", data.id);
+        localStorage.setItem("qa_company_id", data.company_id);
+        localStorage.setItem("qa_company_name", data.company_name);
 
         closeAuthModal();
         window.location.href = "hr-dashboard.html";
       } catch (err) {
         console.error(err);
-        alert(err.message || "Ошибка регистрации");
+
+        if (err.backendPayload) {
+          applyBackendErrors(err.backendPayload);
+          return;
+        }
+
+        const msg = err.message || "Ошибка регистрации";
+        const lower = msg.toLowerCase();
+
+        if (lower.includes("email")) {
+          setFieldError("email", msg);
+        } else if (lower.includes("парол")) {
+          setFieldError("password", msg);
+        } else if (lower.includes("компан") || lower.includes("company")) {
+          setFieldError("company", msg);
+        } else if (lower.includes("имя") || lower.includes("name")) {
+          setFieldError("name", msg);
+        } else {
+          alert(msg);
+        }
       }
     });
   }

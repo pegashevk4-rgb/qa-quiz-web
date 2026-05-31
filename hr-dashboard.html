@@ -1,71 +1,49 @@
 <!DOCTYPE html>
-<html lang="ru" data-theme="dark">
+<html lang="ru">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
   <title>QA Hiring Assistant — HR Dashboard</title>
 
   <link rel="stylesheet" href="hr-dashboard.css" />
+  <script src="hr-dashboard.js" defer></script>
 </head>
-
 <body>
-  <div class="app">
-
-    <aside class="sidebar">
-      <div class="logo">
-        <div class="logo-mark">QA</div>
+  <nav class="dashboard-nav">
+    <div class="nav-inner">
+      <a href="hr.html" class="nav-logo">
+        <span class="logo-mark">QA</span>
         <span>QA Hiring Assistant</span>
+      </a>
+
+      <div class="nav-right">
+        <span class="company-pill" id="companyPill">Компания: Demo Company</span>
+
+        <button
+          id="themeToggle"
+          class="theme-toggle"
+          type="button"
+          aria-label="Переключить тему"
+        >
+          <span id="themeIcon">☀</span>
+        </button>
+
+        <button id="logoutBtn" class="logout-btn" type="button">
+          Выйти
+        </button>
       </div>
+    </div>
+  </nav>
 
-      <nav class="nav">
-        <div class="nav-item active">
-          <div class="nav-badge"></div>
-          <span>Дашборд</span>
-        </div>
+  <main class="dashboard-main">
+    <section class="metrics">
+      <h1>HR‑дашборд</h1>
+      <p class="metrics-subtitle">
+        Оценка и аналитика QA‑кандидатов
+      </p>
 
-        <a class="nav-item nav-link" href="pricing.html">
-          <div class="nav-badge"></div>
-          <span>Тарифы</span>
-        </a>
-      </nav>
-
-    </aside>
-
-    <main class="main">
-
-      <header class="topbar">
-        <div>
-          <h1>HR‑дашборд</h1>
-          <p>Оценка и аналитика QA‑кандидатов</p>
-        </div>
-
-        <div class="topbar-right">
-          <div class="company-pill">
-            Компания: Demo Company
-          </div>
-
-          <div class="header-actions">
-            <button
-              id="themeToggle"
-              class="theme-toggle"
-              type="button"
-              aria-label="Переключить тему"
-          >
-              <span id="themeIcon">☀</span>
-          </button>
-
-            <button
-              class="logout-btn"
-              id="logoutBtn"              
-              type="button"
-            >
-              Выйти
-            </button>
-          </div>
-        </div>
-      </header>
-
-      <section class="metrics">
+      <div class="metrics-grid">
         <div class="metric-card">
           <div class="metric-label">Всего кандидатов</div>
           <div class="metric-value" id="metricTotal">0</div>
@@ -73,170 +51,202 @@
 
         <div class="metric-card">
           <div class="metric-label">Прошли</div>
-          <div class="metric-value" id="metricPassed">0</div>
+          <div class="metric-value metric-value--green" id="metricPassed">0</div>
         </div>
 
         <div class="metric-card">
           <div class="metric-label">На грани</div>
-          <div class="metric-value" id="metricEdge">0</div>
+          <div class="metric-value metric-value--yellow" id="metricEdge">0</div>
         </div>
 
         <div class="metric-card">
           <div class="metric-label">Провалили</div>
-          <div class="metric-value" id="metricFailed">0</div>
+          <div class="metric-value metric-value--red" id="metricFailed">0</div>
         </div>
-      </section>
+      </div>
+    </section>
 
-      <section class="panel tests-panel">
-        <div class="panel-header">
-          <div class="panel-title">
-            <h2>Тесты и ссылки для кандидатов</h2>
-            <p>
-              Сгенерируйте ссылку на нужный уровень теста и отправьте кандидату.
-            </p>
+    <section class="tests-section">
+      <h2>Тесты и ссылки для кандидатов</h2>
+      <p class="tests-subtitle">
+        Сгенерируйте ссылку на нужный уровень теста и отправьте кандидату.
+      </p>
+
+      <div class="tests-list">
+        <div class="test-card">
+          <div class="test-title">Junior QA</div>
+          <div class="test-desc">
+            Базовая проверка теории, SQL и API
           </div>
+          <button
+            type="button"
+            class="btn-primary"
+            data-test-id="qa_junior_web"
+          >
+            Скопировать ссылку
+          </button>
         </div>
 
-        <div class="tests-list">
-          <div class="test-row">
-            <div>
-              <div class="test-name">Junior QA</div>
-              <div class="test-desc">Базовая проверка теории, SQL и API</div>
-            </div>
-            <button class="btn btn-primary" data-test-id="qa_junior_web">
-              Скопировать ссылку
+        <div class="test-card">
+          <div class="test-title">Middle QA</div>
+          <div class="test-desc">
+            Продвинутая проверка навыков и практики
+          </div>
+          <button
+            type="button"
+            class="btn-primary"
+            data-test-id="qa_middle_web"
+          >
+            Скопировать ссылку
+          </button>
+        </div>
+
+        <div class="test-card">
+          <div class="test-title">Senior QA</div>
+          <div class="test-desc">
+            Глубокая проверка опыта и архитектурного мышления
+          </div>
+          <button
+            type="button"
+            class="btn-primary"
+            data-test-id="qa_senior_web"
+          >
+            Скопировать ссылку
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <section class="table-section">
+      <div class="table-header">
+        <h2>Кандидаты</h2>
+
+        <div class="table-controls">
+          <div class="filters">
+            <button
+              type="button"
+              class="filter-btn active"
+              data-value="All"
+            >
+              Все
+            </button>
+            <button
+              type="button"
+              class="filter-btn"
+              data-value="Passed"
+            >
+              Прошли
+            </button>
+            <button
+              type="button"
+              class="filter-btn"
+              data-value="On the edge"
+            >
+              На грани
+            </button>
+            <button
+              type="button"
+              class="filter-btn"
+              data-value="Failed"
+            >
+              Провалили
             </button>
           </div>
 
-          <div class="test-row">
-            <div>
-              <div class="test-name">Middle QA</div>
-              <div class="test-desc">Продвинутая проверка навыков и практики</div>
-            </div>
-            <button class="btn btn-primary" data-test-id="qa_middle_web">
-              Скопировать ссылку
-            </button>
-          </div>
-
-          <div class="test-row">
-            <div>
-              <div class="test-name">Senior QA</div>
-              <div class="test-desc">Глубокая проверка архитектуры тестирования</div>
-            </div>
-            <button class="btn btn-primary" data-test-id="qa_senior_web">
-              Скопировать ссылку
-            </button>
-          </div>
-        </div>
-      </section>
-
-      <section class="panel">
-
-        <div class="panel-header">
-          <div class="panel-title">
-            <h2>Кандидаты</h2>
-            <p>
-              Нажмите на строку кандидата, чтобы открыть подробный разбор результатов.
-            </p>
-          </div>
-
-          <div class="filters" role="group">
+          <div class="search-sort">
             <input
               type="text"
               id="searchInput"
+              class="search-input"
               placeholder="Поиск по имени"
             />
 
-            <button class="filter-btn" data-value="All">Все</button>
-            <button class="filter-btn" data-value="Passed">Прошли</button>
-            <button class="filter-btn" data-value="On the edge">На грани</button>
-            <button class="filter-btn" data-value="Failed">Провалили</butto>
+            <button
+              type="button"
+              id="scoreSort"
+              class="sort-btn"
+            >
+              По проценту
+              <span id="sortIndicator">↓</span>
+            </button>
           </div>
         </div>
+      </div>
 
-        <div class="table-wrap">
+      <div class="table-wrap">
+        <table class="candidates-table">
+          <thead>
+            <tr>
+              <th>Имя</th>
+              <th>Тест</th>
+              <th>Процент</th>
+              <th>Вердикт</th>
+              <th>Дата</th>
+            </tr>
+          </thead>
+          <tbody id="tableBody">
+            <!-- строки будут отрисованы через JS -->
+          </tbody>
+        </table>
 
-          <table>
-            <thead>
-              <tr>
-                <th>Имя</th>
-                <th>Тест</th>
-                <th class="sortable" id="scoreSort">
-                  Результат %
-                  <span class="sort-indicator" id="sortIndicator">↓</span>
-                </th>
-                <th>Вердикт</th>
-                <th class="date-cell">Дата</th>
-              </tr>
-            </thead>
-
-            <tbody id="tableBody"></tbody>
-          </table>
-
-          <div class="empty-state" id="emptyState" style="display:none;">
-            Кандидаты не найдены.
-          </div>
-
+        <div class="empty-state" id="emptyState">
+          Пока нет кандидатов. Отправьте первый тест — результаты появятся здесь.
         </div>
+      </div>
+    </section>
+  </main>
 
-      </section>
-
-    </main>
-  </div>
-
+  <!-- МОДАЛКА КАНДИДАТА -->
   <div class="modal-overlay" id="modalOverlay"></div>
 
   <div class="modal" id="candidateModal">
-    <div class="modal-card">
-
+    <div class="modal-inner">
       <div class="modal-header">
         <div>
-          <h3 id="modalName">Candidate</h3>
-          <div class="modal-subtitle" id="modalTest">
-            QA‑тест
-          </div>
+          <div class="section-label">Кандидат</div>
+          <h3 id="modalName">Имя Фамилия</h3>
+          <div class="modal-subtitle" id="modalTest">Тест: Middle QA</div>
         </div>
-
-        <button class="close-btn" id="closeModalBtn">
-          ×
+        <button type="button" class="modal-close" id="closeModalBtn">
+          &times;
         </button>
       </div>
 
       <div class="candidate-meta">
-
         <div class="meta-card">
           <div class="meta-label">Общий результат</div>
-          <div class="meta-value" id="modalScore">0%</div>
+          <div class="meta-value" id="modalScore">88%</div>
         </div>
 
         <div class="meta-card">
           <div class="meta-label">Вердикт</div>
-          <div class="meta-value" id="modalVerdict">Passed</div>
+          <div class="meta-value" id="modalVerdict">Прошёл</div>
         </div>
 
         <div class="meta-card">
           <div class="meta-label">Дата</div>
-          <div class="meta-value" id="modalDate">2026-05-22</div>
+          <div class="meta-value" id="modalDate">17.05.2026</div>
         </div>
 
         <div class="meta-card">
-          <div class="meta-label">ID кандидата</div>
-          <div class="meta-value" id="modalId">#0</div>
+          <div class="meta-label">ID результата</div>
+          <div class="meta-value" id="modalId">#1</div>
         </div>
-
       </div>
 
-      <div class="topics" id="topicsContainer"></div>
+      <div class="candidate-topics">
+        <h3>Разбивка по темам</h3>
+        <div class="topics-list" id="topicsContainer">
+          <!-- сюда JS подставит темы -->
+        </div>
+      </div>
 
       <div class="modal-footer">
-        <button class="btn btn-primary" id="closeFooterBtn">
+        <button type="button" class="btn-secondary" id="closeFooterBtn">
           Закрыть
         </button>
       </div>
-
     </div>
   </div>
-
-  <script src="hr-dashboard.js"></script>
 </body>
 </html>

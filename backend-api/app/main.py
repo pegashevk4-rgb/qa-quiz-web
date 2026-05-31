@@ -1,10 +1,10 @@
-from fastapi import FastAPI, Depends, HTTPException, status
+from fastapi import FastAPI, Depends, HTTPException, status, Path
+from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
 
 from .database import Base, engine, SessionLocal
 from . import models, schemas
 from .auth import get_password_hash, verify_password
-from fastapi import Path
 
 import secrets
 import string
@@ -13,9 +13,25 @@ Base.metadata.create_all(bind=engine)
 
 app = FastAPI()
 
+# Разрешённые источники (origin'ы) для разработки
+origins = [
+    "http://127.0.0.1:8001",
+    "http://localhost:8001",
+]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+
 def generate_public_token(length: int = 32) -> str:
     alphabet = string.ascii_letters + string.digits
     return "".join(secrets.choice(alphabet) for _ in range(length))
+
 
 def get_db():
     db = SessionLocal()
@@ -23,6 +39,16 @@ def get_db():
         yield db
     finally:
         db.close()
+
+
+def map_test_title(test_id: str) -> str:
+    if test_id == "qa_junior_web":
+        return "Junior QA"
+    if test_id == "qa_middle_web":
+        return "Middle QA"
+    if test_id == "qa_senior_web":
+        return "Senior QA"
+    return test_id
 
 
 @app.get("/health")
@@ -35,11 +61,16 @@ def health_check():
     response_model=schemas.CompanyHRUserPublic,
     status_code=status.HTTP_201_CREATED,
 )
-def register_hr_user(payload: schemas.CompanyHRUserCreate, db: Session = Depends(get_db)):
+def register_hr_user(
+    payload: schemas.CompanyHRUserCreate,
+    db: Session = Depends(get_db),
+):
     # Проверяем, что email свободен
-    existing = db.query(models.CompanyHRUser).filter(
-        models.CompanyHRUser.email == payload.email
-    ).first()
+    existing = (
+        db.query(models.CompanyHRUser)
+        .filter(models.CompanyHRUser.email == payload.email)
+        .first()
+    )
     if existing:
         raise HTTPException(status_code=400, detail="Email already registered")
 
@@ -53,11 +84,28 @@ def register_hr_user(payload: schemas.CompanyHRUserCreate, db: Session = Depends
     db.add(hr_user)
     db.commit()
     db.refresh(hr_user)
-    return hr_user
+
+    company = (
+        db.query(models.Company)
+        .filter(models.Company.id == hr_user.company_id)
+        .first()
+    )
+
+    return schemas.CompanyHRUserPublic(
+        id=hr_user.id,
+        email=hr_user.email,
+        name=hr_user.name,
+        company_id=hr_user.company_id,
+        role=hr_user.role,
+        company_name=company.name if company else "",
+    )
 
 
 @app.post("/auth/login", response_model=schemas.CompanyHRUserPublic)
-def login_hr_user(payload: schemas.HRLoginRequest, db: Session = Depends(get_db)):
+def login_hr_user(
+    payload: schemas.HRLoginRequest,
+    db: Session = Depends(get_db),
+):
     hr_user = (
         db.query(models.CompanyHRUser)
         .filter(models.CompanyHRUser.email == payload.email)
@@ -69,15 +117,38 @@ def login_hr_user(payload: schemas.HRLoginRequest, db: Session = Depends(get_db)
             detail="Invalid credentials",
         )
 
-    return hr_user
+    company = (
+        db.query(models.Company)
+        .filter(models.Company.id == hr_user.company_id)
+        .first()
+    )
 
-    return hr_user
+    return schemas.CompanyHRUserPublic(
+        id=hr_user.id,
+        email=hr_user.email,
+        name=hr_user.name,
+        company_id=hr_user.company_id,
+        role=hr_user.role,
+        company_name=company.name if company else "",
+    )
 
-@app.post("/companies", response_model=schemas.CompanyPublic, status_code=status.HTTP_201_CREATED)
+
+@app.post(
+    "/companies",
+    response_model=schemas.CompanyPublic,
+    status_code=status.HTTP_201_CREATED,
+)
 def create_company(payload: schemas.CompanyCreate, db: Session = Depends(get_db)):
-    existing = db.query(models.Company).filter(models.Company.name == payload.name).first()
+    existing = (
+        db.query(models.Company)
+        .filter(models.Company.name == payload.name)
+        .first()
+    )
     if existing:
-        raise HTTPException(status_code=400, detail="Company with this name already exists")
+        raise HTTPException(
+            status_code=400,
+            detail="Company with this name already exists",
+        )
 
     public_token = generate_public_token()
 
@@ -90,9 +161,13 @@ def create_company(payload: schemas.CompanyCreate, db: Session = Depends(get_db)
     db.refresh(company)
     return company
 
-@app.post("/candidates", response_model=schemas.CandidatePublic, status_code=status.HTTP_201_CREATED)
+
+@app.post(
+    "/candidates",
+    response_model=schemas.CandidatePublic,
+    status_code=status.HTTP_201_CREATED,
+)
 def create_candidate(payload: schemas.CandidateCreate, db: Session = Depends(get_db)):
-    # можно добавить проверку существования компании
     candidate = models.User(
         first_name=payload.first_name,
         last_name=payload.last_name,
@@ -107,31 +182,49 @@ def create_candidate(payload: schemas.CandidateCreate, db: Session = Depends(get
 
 @app.get("/candidates/{candidate_id}", response_model=schemas.CandidatePublic)
 def get_candidate(candidate_id: int, db: Session = Depends(get_db)):
-    candidate = db.query(models.User).filter(models.User.id == candidate_id).first()
+    candidate = (
+        db.query(models.User)
+        .filter(models.User.id == candidate_id)
+        .first()
+    )
     if not candidate:
         raise HTTPException(status_code=404, detail="Candidate not found")
     return candidate
 
-@app.post("/results", response_model=schemas.ResultPublic, status_code=status.HTTP_201_CREATED)
+
+@app.post(
+    "/results",
+    response_model=schemas.ResultPublic,
+    status_code=status.HTTP_201_CREATED,
+)
 def create_result(payload: schemas.ResultCreate, db: Session = Depends(get_db)):
-    user = db.query(models.User).filter(models.User.id == payload.user_id).first()
+    user = (
+        db.query(models.User)
+        .filter(models.User.id == payload.user_id)
+        .first()
+    )
     if not user:
         raise HTTPException(status_code=400, detail="User not found")
 
     company = None
     if payload.company_id:
-        company = db.query(models.Company).filter(models.Company.id == payload.company_id).first()
+        company = (
+            db.query(models.Company)
+            .filter(models.Company.id == payload.company_id)
+            .first()
+        )
         if not company:
             raise HTTPException(status_code=400, detail="Company not found")
 
-        # Лимит тестов для бесплатной компании
         if not company.is_paid:
             if company.trial_tests_used >= company.trial_tests_limit:
                 raise HTTPException(
                     status_code=status.HTTP_403_FORBIDDEN,
-                    detail="Trial tests limit reached. Please upgrade to a paid plan.",
+                    detail=(
+                        "Trial tests limit reached. "
+                        "Please upgrade to a paid plan."
+                    ),
                 )
-            # Увеличиваем счётчик использования
             company.trial_tests_used += 1
             db.add(company)
 
@@ -162,33 +255,44 @@ def create_result(payload: schemas.ResultCreate, db: Session = Depends(get_db)):
     db.refresh(result)
     return result
 
+
 @app.get("/results/{result_id}", response_model=schemas.ResultPublic)
 def get_result(result_id: int, db: Session = Depends(get_db)):
-    result = db.query(models.Result).filter(models.Result.id == result_id).first()
+    result = (
+        db.query(models.Result)
+        .filter(models.Result.id == result_id)
+        .first()
+    )
     if not result:
         raise HTTPException(status_code=404, detail="Result not found")
     return result
 
-@app.post("/companies/{company_id}/upgrade", response_model=schemas.CompanyPublic)
+
+@app.post(
+    "/companies/{company_id}/upgrade",
+    response_model=schemas.CompanyPublic,
+)
 def upgrade_company(
     company_id: int = Path(...),
     db: Session = Depends(get_db),
 ):
-    company = db.query(models.Company).filter(models.Company.id == company_id).first()
+    company = (
+        db.query(models.Company)
+        .filter(models.Company.id == company_id)
+        .first()
+    )
     if not company:
         raise HTTPException(status_code=404, detail="Company not found")
 
     if company.is_paid:
-        return company  # уже на подписке
+        return company
 
     company.is_paid = True
-    # Можно сбросить trial_tests_used или оставить как историю
-    # company.trial_tests_used = 0
-
     db.add(company)
     db.commit()
     db.refresh(company)
     return company
+
 
 @app.get(
     "/public/companies/{public_token}",
@@ -198,17 +302,18 @@ def get_company_by_public_token(
     public_token: str,
     db: Session = Depends(get_db),
 ):
-    company = db.query(models.Company).filter(
-        models.Company.public_token == public_token
-    ).first()
+    company = (
+        db.query(models.Company)
+        .filter(models.Company.public_token == public_token)
+        .first()
+    )
     if not company:
         raise HTTPException(status_code=404, detail="Company not found")
-
     return company
+
 
 @app.post("/api/results")
 def save_public_result(data: schemas.TestResultIn, db: Session = Depends(get_db)):
-    # 1. Компания по токену
     company = (
         db.query(models.Company)
         .filter(models.Company.public_token == data.company_token)
@@ -217,7 +322,6 @@ def save_public_result(data: schemas.TestResultIn, db: Session = Depends(get_db)
     if not company:
         raise HTTPException(status_code=400, detail="Unknown company token")
 
-    # 2. Кандидат внутри компании
     user = None
     if data.email:
         user = (
@@ -245,7 +349,6 @@ def save_public_result(data: schemas.TestResultIn, db: Session = Depends(get_db)
         db.commit()
         db.refresh(user)
 
-    # 3. Результат теста
     result = models.Result(
         user_id=user.id,
         company_id=company.id,
@@ -259,7 +362,6 @@ def save_public_result(data: schemas.TestResultIn, db: Session = Depends(get_db)
     db.commit()
     db.refresh(result)
 
-    # 4. Деталка по категориям
     strong_cats = {cat.category for cat in data.strong_areas}
     weak_cats = {cat.category for cat in data.weak_areas}
 
@@ -276,7 +378,11 @@ def save_public_result(data: schemas.TestResultIn, db: Session = Depends(get_db)
     db.commit()
     return {"status": "success", "result_id": result.id}
 
-@app.get("/api/company/{company_id}/results", response_model=list[schemas.ResultRow])
+
+@app.get(
+    "/api/company/{company_id}/results",
+    response_model=list[schemas.ResultRow],
+)
 def get_company_results(
     company_id: int,
     limit: int = 50,
@@ -315,3 +421,199 @@ def get_company_results(
         )
         for r in rows
     ]
+
+
+# ===== НОВОЕ: публичные тесты с защитой вопросов =====
+
+@app.get("/public/tests/{test_id}", response_model=schemas.TestPublic)
+def get_test_public(
+    test_id: str,
+    db: Session = Depends(get_db),
+):
+    questions = (
+        db.query(models.QuizQuestion)
+        .filter(models.QuizQuestion.test_id == test_id)
+        .order_by(models.QuizQuestion.order.asc(), models.QuizQuestion.id.asc())
+        .all()
+    )
+    if not questions:
+        raise HTTPException(status_code=404, detail="Test not found")
+
+    return schemas.TestPublic(
+        test_id=test_id,
+        title=map_test_title(test_id),
+        questions=[
+            schemas.QuestionPublic(
+                id=q.id,
+                text=q.text,
+                options=q.options,
+            )
+            for q in questions
+        ],
+    )
+
+
+@app.post(
+    "/public/tests/{test_id}/submit",
+    response_model=schemas.TestResultResponse,
+    status_code=status.HTTP_201_CREATED,
+)
+def submit_test(
+    test_id: str,
+    payload: schemas.TestSubmitWithCandidate,
+    company_token: str,
+    db: Session = Depends(get_db),
+):
+    # 1. Компания по токену
+    company = (
+        db.query(models.Company)
+        .filter(models.Company.public_token == company_token)
+        .first()
+    )
+    if not company:
+        raise HTTPException(status_code=400, detail="Unknown company token")
+
+    # 2. Лимит триала
+    if not company.is_paid:
+        if company.trial_tests_used >= company.trial_tests_limit:
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail=(
+                    "Trial tests limit reached. "
+                    "Please upgrade to a paid plan."
+                ),
+            )
+
+    # 3. Вопросы
+    db_questions = (
+        db.query(models.QuizQuestion)
+        .filter(models.QuizQuestion.test_id == test_id)
+        .all()
+    )
+    if not db_questions:
+        raise HTTPException(status_code=404, detail="Test not found")
+
+    q_by_id = {q.id: q for q in db_questions}
+
+    total = len(db_questions)
+    correct = 0
+
+    for a in payload.answers:
+        q = q_by_id.get(a.question_id)
+        if not q:
+            continue
+        if a.selected_index == q.correct_index:
+            correct += 1
+
+    percent = int(round(correct * 100 / total)) if total else 0
+
+    if percent >= 80:
+        verdict = "Passed"
+    elif percent >= 50:
+        verdict = "On the edge"
+    else:
+        verdict = "Failed"
+
+    # 4. Кандидат
+    user = None
+    if payload.candidate.email:
+        user = (
+            db.query(models.User)
+            .filter(
+                models.User.company_id == company.id,
+                models.User.email == payload.candidate.email,
+            )
+            .first()
+        )
+
+    if not user:
+        user = models.User(
+            company_id=company.id,
+            first_name=payload.candidate.first_name,
+            last_name=payload.candidate.last_name,
+            email=payload.candidate.email or None,
+        )
+        db.add(user)
+        db.commit()
+        db.refresh(user)
+    else:
+        user.first_name = payload.candidate.first_name
+        user.last_name = payload.candidate.last_name
+        db.commit()
+        db.refresh(user)
+
+    # 5. Result
+    total_score = correct
+    max_score = total
+
+    result = models.Result(
+        user_id=user.id,
+        company_id=company.id,
+        test_id=test_id,
+        total_score=total_score,
+        max_score=max_score,
+        percent=percent,
+        verdict=verdict,
+    )
+    db.add(result)
+    db.commit()
+    db.refresh(result)
+
+    # 6. DetailedResult
+    detail = models.DetailedResult(
+        result_id=result.id,
+        category="Overall",
+        percent=percent,
+        is_strong=percent >= 80,
+        is_weak=percent < 50,
+    )
+    db.add(detail)
+
+    # 7. Обновляем счётчик триала
+    if not company.is_paid:
+        company.trial_tests_used = (company.trial_tests_used or 0) + 1
+        db.add(company)
+
+    db.commit()
+
+    return schemas.TestResultResponse(percent=percent, verdict=verdict)
+
+def seed_questions():
+    db = SessionLocal()
+    try:
+        existing = db.query(models.QuizQuestion).first()
+        if existing:
+            print("Questions already seeded")
+            return
+
+        q1 = models.QuizQuestion(
+            test_id="qa_junior_web",
+            text="Что такое тест-кейс?",
+            options=[
+                "Описание набора действий для проверки функционала",
+                "Описание архитектуры системы",
+                "Описание багов",
+                "Описание требований к системе",
+            ],
+            correct_index=0,
+            order=1,
+        )
+
+        q2 = models.QuizQuestion(
+            test_id="qa_junior_web",
+            text="Что такое баг-репорт?",
+            options=[
+                "Документ, описывающий найденный дефект",
+                "Документ с требованиями",
+                "План тестирования",
+                "Список тест-кейсов",
+            ],
+            correct_index=0,
+            order=2,
+        )
+
+        db.add_all([q1, q2])
+        db.commit()
+        print("Seed done")
+    finally:
+        db.close()

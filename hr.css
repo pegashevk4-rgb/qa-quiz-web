@@ -184,7 +184,18 @@ TOP NAV ACTIONS
   transform: translateY(0);
 }
 
+/* Общая ошибка под полем */
+.field-error-text {
+  color: #ff6b6b;
+  font-size: 12px;
+  margin-top: 4px;
+}
 
+/* Красная рамка у инпута */
+.input-error {
+  border-color: #ff6b6b;
+  outline: none;
+}
 
 .nav-link {
   border: 1px solid var(--border);
@@ -1074,6 +1085,17 @@ AUTH / GENERIC MODAL
 
 .modal-form input.input-error {
   border-color: var(--danger);
+}
+
+.field-error-text {
+  color: #ff6b6b;
+  font-size: 12px;
+  margin-top: 4px;
+}
+
+.input-error {
+  border-color: #ff6b6b;
+  outline: none;
 }
 
 .modal-submit {

@@ -1,126 +1,86 @@
 const THEME_KEY = "qa_theme";
+const API_BASE_URL = "http://127.0.0.1:8000";
 
 // --- Проверка авторизации перед показом дашборда ---
-
 (function guardDashboard() {
-  const DEV_BYPASS_AUTH = true; // <-- пока отладка, потом поставишь false или удалишь
+  const DEV_BYPASS_AUTH = false; // на проде обязательно false
 
   if (DEV_BYPASS_AUTH) {
-    return; // не блокируем дашборд, просто выходим из guard
+    return;
   }
 
   const isLoggedIn = localStorage.getItem("qa_is_logged_in") === "1";
+  const companyId = localStorage.getItem("qa_company_id");
 
-  if (!isLoggedIn) {
+  if (!isLoggedIn || !companyId) {
     window.location.href = "hr.html";
   }
 })();
 
-// --- Демо-кандидаты (пока без БД) ---
+// --- Кандидаты (изначально пусто) ---
+let candidates = [];
 
-const candidates = [
-  {
-    id: 1,
-    name: "Иван Петров",
-    testName: "Middle QA",
-    score: 88,
-    verdict: "Passed",
-    date: "2026-05-20",
-    topicScores: {
-      Theory: 90,
-      SQL: 84,
-      API: 92,
-      Tools: 85
-    }
-  },
-  {
-    id: 2,
-    name: "Екатерина Смирнова",
-    testName: "Senior QA",
-    score: 54,
-    verdict: "On the edge",
-    date: "2026-05-18",
-    topicScores: {
-      Theory: 60,
-      SQL: 52,
-      API: 49,
-      Tools: 58
-    }
-  },
-  {
-    id: 3,
-    name: "Алексей Иванов",
-    testName: "Junior QA",
-    score: 95,
-    verdict: "Passed",
-    date: "2026-05-17",
-    topicScores: {
-      Theory: 97,
-      SQL: 88,
-      API: 94,
-      Tools: 96
-    }
-  },
-  {
-    id: 4,
-    name: "Мария Соколова",
-    testName: "Middle QA",
-    score: 31,
-    verdict: "Failed",
-    date: "2026-05-15",
-    topicScores: {
-      Theory: 40,
-      SQL: 22,
-      API: 35,
-      Tools: 27
-    }
-  },
-  {
-    id: 5,
-    name: "Денис Кузнецов",
-    testName: "Junior QA",
-    score: 72,
-    verdict: "Passed",
-    date: "2026-05-14",
-    topicScores: {
-      Theory: 70,
-      SQL: 66,
-      API: 80,
-      Tools: 72
-    }
-  },
-  {
-    id: 6,
-    name: "Ольга Лебедева",
-    testName: "Senior QA",
-    score: 61,
-    verdict: "On the edge",
-    date: "2026-05-12",
-    topicScores: {
-      Theory: 65,
-      SQL: 58,
-      API: 63,
-      Tools: 59
-    }
-  },
-  {
-    id: 7,
-    name: "Роман Орлов",
-    testName: "Middle QA",
-    score: 82,
-    verdict: "Passed",
-    date: "2026-05-10",
-    topicScores: {
-      Theory: 85,
-      SQL: 79,
-      API: 81,
-      Tools: 84
-    }
+// --- Загрузка результатов компании из API ---
+async function loadCompanyResults() {
+  const companyId = localStorage.getItem("qa_company_id");
+  if (!companyId) {
+    console.warn("Нет company_id в localStorage");
+    return;
   }
-];
+
+  try {
+    const resp = await fetch(
+      `${API_BASE_URL}/api/company/${companyId}/results`,
+      {
+        credentials: "include",
+      }
+    );
+    if (!resp.ok) {
+      console.error("Ошибка загрузки результатов компании", resp.status);
+      return;
+    }
+
+    const data = await resp.json(); // массив ResultRow
+
+    candidates = data.map((row, index) => {
+      const fullName = `${row.first_name} ${row.last_name}`.trim();
+      const dateStr = row.created_at
+        ? row.created_at.slice(0, 10)
+        : "";
+
+      let testName = row.test_id;
+      if (row.test_id === "qa_junior_web") testName = "Junior QA";
+      if (row.test_id === "qa_middle_web") testName = "Middle QA";
+      if (row.test_id === "qa_senior_web") testName = "Senior QA";
+
+      const verdict = row.verdict || "On the edge";
+
+      const topicScores = {
+        Theory: row.percent,
+        SQL: row.percent,
+        API: row.percent,
+        Tools: row.percent,
+      };
+
+      return {
+        id: row.result_id ?? index + 1,
+        name: fullName || "Кандидат",
+        testName,
+        score: row.percent,
+        verdict,
+        date: dateStr,
+        topicScores,
+      };
+    });
+
+    updateMetrics();
+    renderTable();
+  } catch (err) {
+    console.error("Ошибка при запросе результатов компании", err);
+  }
+}
 
 // --- Генерация ссылок на тесты ---
-
 const testButtons = document.querySelectorAll(".tests-list .btn-primary");
 
 function getTestLink(testId) {
@@ -147,7 +107,6 @@ testButtons.forEach((btn) => {
 });
 
 // --- Таблица кандидатов и метрики ---
-
 const tableBody = document.getElementById("tableBody");
 const searchInput = document.getElementById("searchInput");
 const scoreSort = document.getElementById("scoreSort");
@@ -165,7 +124,6 @@ const modalDate = document.getElementById("modalDate");
 const modalId = document.getElementById("modalId");
 const topicsContainer = document.getElementById("topicsContainer");
 
-// Новые кнопки-фильтры вместо select
 const filterButtons = document.querySelectorAll(".filter-btn");
 
 let sortDirection = "desc";
@@ -305,7 +263,6 @@ function closeModal() {
   modal.classList.remove("active");
 }
 
-// Обработчики фильтров
 filterButtons.forEach((btn) => {
   btn.addEventListener("click", () => {
     setVerdictFilter(btn.dataset.value);
@@ -333,24 +290,16 @@ document
 overlay.addEventListener("click", closeModal);
 
 // --- Переключатель темы ---
-
 const themeToggle = document.getElementById("themeToggle");
-const themeIcon = document.getElementById("themeIcon"); // может быть null
+const themeIcon = document.getElementById("themeIcon");
 
 function applyTheme(theme) {
   document.documentElement.setAttribute("data-theme", theme);
   localStorage.setItem(THEME_KEY, theme);
 
-  if (!themeIcon) {
-    // На этом дашборде нет отдельного icon-элемента – просто выходим
-    return;
-  }
+  if (!themeIcon) return;
 
-  if (theme === "dark") {
-    themeIcon.textContent = "🌙";
-  } else {
-    themeIcon.textContent = "☀";
-  }
+  themeIcon.textContent = theme === "dark" ? "🌙" : "☀";
 }
 
 const savedTheme = localStorage.getItem(THEME_KEY) || "dark";
@@ -364,19 +313,30 @@ if (themeToggle) {
   });
 }
 
-
-// --- Инициализация ---
-
-updateMetrics();
-setVerdictFilter("All"); // сразу активируем "Все"
-renderTable();
-
 // --- Кнопка "Выйти" ---
 const logoutBtn = document.getElementById("logoutBtn");
 
 if (logoutBtn) {
   logoutBtn.addEventListener("click", () => {
     localStorage.removeItem("qa_is_logged_in");
+    localStorage.removeItem("qa_company_id");
+    localStorage.removeItem("qa_company_name");
     window.location.href = "hr.html";
   });
 }
+
+// --- Инициализация после загрузки DOM ---
+document.addEventListener("DOMContentLoaded", () => {
+  const companyPill = document.getElementById("companyPill");
+  const companyName = localStorage.getItem("qa_company_name");
+
+  if (companyPill && companyName) {
+    companyPill.textContent = `Компания: ${companyName}`;
+  }
+
+  loadCompanyResults().then(() => {
+    updateMetrics();
+    setVerdictFilter("All");
+    renderTable();
+  });
+});
