@@ -145,27 +145,11 @@
         return;
       }
 
-      const modal = document.getElementById('timeup-modal');
-      const okBtn = document.getElementById('timeup-ok-btn');
-
-      if (modal && okBtn) {
-        modal.style.display = 'flex';
-
-        okBtn.onclick = () => {
-          modal.style.display = 'none';
-
-          if (typeof showResult === 'function') {
-            showResult();
-          }
-
-          localStorage.removeItem(STORAGE_KEY);
-        };
-      } else {
-        if (typeof showResult === 'function') {
-          showResult();
-        }
-        localStorage.removeItem(STORAGE_KEY);
+      // Без модалки — сразу выводим форму
+      if (typeof showResult === 'function') {
+       showResult();
       }
+      localStorage.removeItem(STORAGE_KEY);
     }
 
     function updateTimer() {
