@@ -107,15 +107,16 @@
   <!-- Скрипт таймера -->
   <script>
     // Определяем test_id из URL
-    const TEST_ID = new URLSearchParams(window.location.search).get('test_id') || 'default_test';
+    const TIMER_TEST_ID = new URLSearchParams(window.location.search).get('test_id') || 'default_test';
 
     // Время для разных уровней
     let QUIZ_MINUTES = 15;
-    if (TEST_ID === 'qa_junior_web') QUIZ_MINUTES = 20;
-    if (TEST_ID === 'qa_middle_web') QUIZ_MINUTES = 20;
-    if (TEST_ID === 'qa_senior_web') QUIZ_MINUTES = 25;
+    if (TIMER_TEST_ID === 'qa_junior_web') QUIZ_MINUTES = 20;
+    if (TIMER_TEST_ID === 'qa_middle_web') QUIZ_MINUTES = 20;
+    if (TIMER_TEST_ID === 'qa_senior_web') QUIZ_MINUTES = 25;
 
-    const STORAGE_KEY = 'quiz_end_time_' + TEST_ID;
+    const STORAGE_KEY = 'quiz_end_time_' + TIMER_TEST_ID;
+
 
     let endTime = null;
     const timerEl = document.getElementById('timer');
