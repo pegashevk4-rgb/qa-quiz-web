@@ -84,13 +84,26 @@ async function loadCompanyResults() {
 const testButtons = document.querySelectorAll(".tests-list .btn-primary");
 
 function getTestLink(testId) {
-  return `https://pegashevk4-rgb.github.io/qa-quiz-web/index.html?test_id=${testId}`;
+  const companyToken = localStorage.getItem("qa_company_token");
+  if (!companyToken) {
+    alert("Не найден токен компании. Зайдите в систему заново или обратитесь к разработчику.");
+    return "";
+  }
+
+  const baseUrl = "https://pegashevk4-rgb.github.io/qa-quiz-web/index.html";
+  const params = new URLSearchParams({
+    test_id: testId,
+    company_token: companyToken,
+  });
+
+  return `${baseUrl}?${params.toString()}`;
 }
 
 testButtons.forEach((btn) => {
   btn.addEventListener("click", () => {
     const testId = btn.getAttribute("data-test-id");
     const url = getTestLink(testId);
+    if (!url) return;
 
     navigator.clipboard
       .writeText(url)

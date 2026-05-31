@@ -374,8 +374,14 @@ document.addEventListener("DOMContentLoaded", () => {
         localStorage.setItem("qa_company_id", data.company_id);
         localStorage.setItem("qa_company_name", data.company_name);
 
+        // НОВОЕ:
+        if (data.company_token) {
+          localStorage.setItem("qa_company_token", data.company_token);
+        }
+
         closeAuthModal();
         window.location.href = "hr-dashboard.html";
+
       } catch (err) {
         console.error(err);
 
@@ -575,6 +581,11 @@ document.addEventListener("DOMContentLoaded", () => {
         localStorage.setItem("qa_is_logged_in", "1");
         localStorage.setItem("qa_company_id", data.company_id);
         localStorage.setItem("qa_company_name", data.company_name);
+
+        // НОВОЕ:
+        if (data.company_token) {
+        localStorage.setItem("qa_company_token", data.company_token);
+        }
 
         closeAuthModal();
         window.location.href = "hr-dashboard.html";
