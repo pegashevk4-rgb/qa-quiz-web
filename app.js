@@ -209,27 +209,42 @@ function handleNext() {
     state.currentIndex += 1;
     showQuestion();
   } else {
-    // вопросы закончились — показываем форму
-    elements.quizQuestions.style.display = "none";
-    elements.quiz.style.display = "none";
-    elements.userForm.style.display = "block";
+    // Вопросы закончились ДО окончания времени
+    // Показываем ту же модалку, что и при таймауте
+    const modal = document.getElementById("timeup-modal");
+    const okBtn = document.getElementById("timeup-ok-btn");
 
-    if (window.timerInterval) {
-      clearInterval(window.timerInterval);
+    if (modal && okBtn) {
+      const titleEl = modal.querySelector("h2");
+      const textEl = modal.querySelector("p");
+
+      if (titleEl) titleEl.textContent = "Тест завершён";
+      if (textEl) {
+        textEl.textContent =
+          "Вы ответили на все вопросы. Мы сохраним ваши ответы и покажем результат после ввода данных.";
+      }
+
+      modal.style.display = "flex";
+      okBtn.onclick = () => {
+        modal.style.display = "none";
+        showResult(); // переводим на форму данных
+      };
+    } else {
+      // На всякий случай — без модалки просто идём на форму
+      showResult();
     }
-
-    elements.dataForm.onsubmit = async (event) => {
-      event.preventDefault();
-      await handleFormSubmit();
-    };
   }
 }
 
 // =========================
-// showResult для таймера
+// showResult — общий вход на форму данных
 // =========================
 
-// Эта функция вызывается таймером из index.html, когда время вышло.
+// Вызывается:
+/*
+  - таймером из index.html, когда время вышло (handleTimeIsUp -> showResult)
+  - из handleNext, когда кандидат дошёл до последнего вопроса
+*/
 function showResult() {
   // Если уже на форме или на результате — ничего не делаем
   if (
