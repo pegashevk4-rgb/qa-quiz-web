@@ -186,3 +186,19 @@ class TestSubmitWithCandidate(BaseModel):
 class TestResultResponse(BaseModel):
     percent: int
     verdict: str
+
+class AreaItem(BaseModel):
+    category: str
+
+class CategoryBreakdownItem(BaseModel):
+    category: str
+    correct: int
+    total: int
+    percent: int
+
+class TestResultResponse(BaseModel):
+    percent: int
+    verdict: str
+    strong_areas: list[AreaItem] = []
+    weak_areas: list[AreaItem] = []
+    categories: list[CategoryBreakdownItem] = []

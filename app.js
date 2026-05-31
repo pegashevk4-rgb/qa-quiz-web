@@ -18,11 +18,15 @@ const COMPANY_TOKEN = params.get("company_token") || null;
 // =========================
 
 const state = {
-  questions: [],           // [{id, text, options}]
+  questions: [],            // [{id, text, options}]
   currentIndex: 0,
-  answers: {},             // questionId -> selectedIndex[]
+  answers: {},              // questionId -> selectedIndex[]
+  // данные, которые приходит с бэка в TestResultResponse
   percentFromServer: null,
   verdictFromServer: null,
+  strongAreasFromServer: [],
+  weakAreasFromServer: [],
+  categoriesFromServer: [],
 };
 
 // =========================
@@ -57,7 +61,7 @@ const elements = {
 };
 
 // =========================
-// Загрузка вопросов с бэка
+// Загрузка вопросов (без correct_index)
 // =========================
 
 async function loadQuestions() {
@@ -103,6 +107,9 @@ function startQuiz() {
   state.answers = {};
   state.percentFromServer = null;
   state.verdictFromServer = null;
+  state.strongAreasFromServer = [];
+  state.weakAreasFromServer = [];
+  state.categoriesFromServer = [];
 
   elements.intro.style.display = "none";
   elements.quiz.style.display = "block";
@@ -135,12 +142,11 @@ function showQuestion() {
   elements.progress.textContent =
     `Вопрос ${state.currentIndex + 1} из ${state.questions.length}`;
 
-  // Категорий у нас пока нет — оставляем пустым
+  // категорий в публичном API нет, оставляем пусто
   elements.categoryText.textContent = "";
 
   elements.questionText.textContent = question.text;
 
-  // Все вопросы пока с одним вариантом
   elements.questionHint.textContent =
     "Тип вопроса: выберите один вариант ответа.";
 
@@ -152,7 +158,6 @@ function renderOptions(question) {
   elements.nextBtn.disabled = true;
 
   const optionsList = document.createElement("div");
-
   const selected = state.answers[question.id] || [];
 
   question.options.forEach((text, index) => {
@@ -209,44 +214,16 @@ function handleNext() {
     state.currentIndex += 1;
     showQuestion();
   } else {
-    // Вопросы закончились ДО окончания времени
-    // Показываем ту же модалку, что и при таймауте
-    const modal = document.getElementById("timeup-modal");
-    const okBtn = document.getElementById("timeup-ok-btn");
-
-    if (modal && okBtn) {
-      const titleEl = modal.querySelector("h2");
-      const textEl = modal.querySelector("p");
-
-      if (titleEl) titleEl.textContent = "Тест завершён";
-      if (textEl) {
-        textEl.textContent =
-          "Вы ответили на все вопросы. Мы сохраним ваши ответы и покажем результат после ввода данных.";
-      }
-
-      modal.style.display = "flex";
-      okBtn.onclick = () => {
-        modal.style.display = "none";
-        showResult(); // переводим на форму данных
-      };
-    } else {
-      // На всякий случай — без модалки просто идём на форму
-      showResult();
-    }
+    // вопросы закончились — скрываем вопросы, переходим на форму
+    showForm();
   }
 }
 
 // =========================
-// showResult — общий вход на форму данных
+// Переход к форме данных
 // =========================
 
-// Вызывается:
-/*
-  - таймером из index.html, когда время вышло (handleTimeIsUp -> showResult)
-  - из handleNext, когда кандидат дошёл до последнего вопроса
-*/
-function showResult() {
-  // Если уже на форме или на результате — ничего не делаем
+function showForm() {
   if (
     elements.userForm.style.display === "block" ||
     elements.result.style.display === "block"
@@ -262,21 +239,23 @@ function showResult() {
     clearInterval(window.timerInterval);
   }
 
-  elements.dataForm.onsubmit = async (event) => {
+  elements.dataForm.onsubmit = (event) => {
     event.preventDefault();
-    await handleFormSubmit();
+    handleFormSubmit();
   };
 }
 
+// Эту функцию вызывает таймер из index.html
+function showResult() {
+  // В нашей логике "showResult" = "перейти на форму"
+  showForm();
+}
+
 // =========================
-// Отправка формы
+// Отправка формы (отправляем ответы на бэк)
 // =========================
 
 async function handleFormSubmit() {
-  const submitButton = elements.dataForm.querySelector(
-    'button[type="submit"]'
-  );
-
   const firstName = document.getElementById("firstName").value.trim();
   const lastName = document.getElementById("lastName").value.trim();
   const email = document.getElementById("email").value.trim() || null;
@@ -291,6 +270,9 @@ async function handleFormSubmit() {
     return;
   }
 
+  const submitButton = elements.dataForm.querySelector(
+    'button[type="submit"]'
+  );
   submitButton.disabled = true;
   submitButton.textContent = "Сохраняем...";
 
@@ -298,7 +280,7 @@ async function handleFormSubmit() {
     const answersPayload = Object.entries(state.answers).map(
       ([questionId, selectedIndexes]) => ({
         question_id: Number(questionId),
-        selected_index: selectedIndexes[0], // одиночный выбор
+        selected_index: selectedIndexes[0],
       })
     );
 
@@ -335,9 +317,13 @@ async function handleFormSubmit() {
       return;
     }
 
-    const data = await response.json(); // {percent, verdict}
+    const data = await response.json();
+    // data: {percent, verdict, strong_areas, weak_areas, categories}
     state.percentFromServer = data.percent;
     state.verdictFromServer = data.verdict;
+    state.strongAreasFromServer = data.strong_areas || [];
+    state.weakAreasFromServer = data.weak_areas || [];
+    state.categoriesFromServer = data.categories || [];
 
     renderResult();
   } catch (error) {
@@ -349,7 +335,7 @@ async function handleFormSubmit() {
 }
 
 // =========================
-// Рендер результата
+// Рендер результата с сильными/слабыми сторонами (из ответа бэка)
 // =========================
 
 function renderResult() {
@@ -381,10 +367,31 @@ function renderResult() {
   elements.verdictText.textContent = verdictText;
   elements.verdictExplanation.textContent = explanation;
 
-  // Пока нет детальной аналитики — очищаем блоки
+  // очистка списков
   elements.strongAreas.innerHTML = "";
   elements.weakAreas.innerHTML = "";
   elements.categoriesBreakdown.innerHTML = "";
+
+  // сильные стороны (массив объектов {category})
+  state.strongAreasFromServer.forEach((item) => {
+    const li = document.createElement("li");
+    li.textContent = item.category;
+    elements.strongAreas.appendChild(li);
+  });
+
+  // слабые стороны
+  state.weakAreasFromServer.forEach((item) => {
+    const li = document.createElement("li");
+    li.textContent = item.category;
+    elements.weakAreas.appendChild(li);
+  });
+
+  // разбивка по категориям: {category, correct, total, percent}
+  state.categoriesFromServer.forEach((cat) => {
+    const li = document.createElement("li");
+    li.textContent = `${cat.category}: ${cat.percent}% (${cat.correct} из ${cat.total})`;
+    elements.categoriesBreakdown.appendChild(li);
+  });
 }
 
 // =========================
@@ -394,7 +401,6 @@ function renderResult() {
 elements.startBtn?.addEventListener("click", startQuiz);
 
 elements.restartBtn?.addEventListener("click", () => {
-  // Перезапускаем страницу, чтобы начать сначала
   window.location.reload();
 });
 

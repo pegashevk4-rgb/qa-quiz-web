@@ -1,3 +1,5 @@
+from collections import defaultdict
+
 from fastapi import FastAPI, Depends, HTTPException, status, Path
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
@@ -59,6 +61,10 @@ def health_check():
     return {"status": "ok"}
 
 
+# =========================
+# HR / компании
+# =========================
+
 @app.post(
     "/auth/register",
     response_model=schemas.CompanyHRUserPublic,
@@ -68,7 +74,6 @@ def register_hr_user(
     payload: schemas.CompanyHRUserCreate,
     db: Session = Depends(get_db),
 ):
-    # Проверяем, что email свободен
     existing = (
         db.query(models.CompanyHRUser)
         .filter(models.CompanyHRUser.email == payload.email)
@@ -164,6 +169,54 @@ def create_company(payload: schemas.CompanyCreate, db: Session = Depends(get_db)
     db.refresh(company)
     return company
 
+
+@app.post(
+    "/companies/{company_id}/upgrade",
+    response_model=schemas.CompanyPublic,
+)
+def upgrade_company(
+    company_id: int = Path(...),
+    db: Session = Depends(get_db),
+):
+    company = (
+        db.query(models.Company)
+        .filter(models.Company.id == company_id)
+        .first()
+    )
+    if not company:
+        raise HTTPException(status_code=404, detail="Company not found")
+
+    if company.is_paid:
+        return company
+
+    company.is_paid = True
+    db.add(company)
+    db.commit()
+    db.refresh(company)
+    return company
+
+
+@app.get(
+    "/public/companies/{public_token}",
+    response_model=schemas.CompanyPublic,
+)
+def get_company_by_public_token(
+    public_token: str,
+    db: Session = Depends(get_db),
+):
+    company = (
+        db.query(models.Company)
+        .filter(models.Company.public_token == public_token)
+        .first()
+    )
+    if not company:
+        raise HTTPException(status_code=404, detail="Company not found")
+    return company
+
+
+# =========================
+# Кандидаты и результаты (внутренние)
+# =========================
 
 @app.post(
     "/candidates",
@@ -269,50 +322,6 @@ def get_result(result_id: int, db: Session = Depends(get_db)):
     if not result:
         raise HTTPException(status_code=404, detail="Result not found")
     return result
-
-
-@app.post(
-    "/companies/{company_id}/upgrade",
-    response_model=schemas.CompanyPublic,
-)
-def upgrade_company(
-    company_id: int = Path(...),
-    db: Session = Depends(get_db),
-):
-    company = (
-        db.query(models.Company)
-        .filter(models.Company.id == company_id)
-        .first()
-    )
-    if not company:
-        raise HTTPException(status_code=404, detail="Company not found")
-
-    if company.is_paid:
-        return company
-
-    company.is_paid = True
-    db.add(company)
-    db.commit()
-    db.refresh(company)
-    return company
-
-
-@app.get(
-    "/public/companies/{public_token}",
-    response_model=schemas.CompanyPublic,
-)
-def get_company_by_public_token(
-    public_token: str,
-    db: Session = Depends(get_db),
-):
-    company = (
-        db.query(models.Company)
-        .filter(models.Company.public_token == public_token)
-        .first()
-    )
-    if not company:
-        raise HTTPException(status_code=404, detail="Company not found")
-    return company
 
 
 @app.post("/api/results")
@@ -426,7 +435,9 @@ def get_company_results(
     ]
 
 
-# ===== НОВОЕ: публичные тесты с защитой вопросов =====
+# =========================
+# Публичные тесты
+# =========================
 
 @app.get("/public/tests/{test_id}", response_model=schemas.TestPublic)
 def get_test_public(
@@ -496,17 +507,25 @@ def submit_test(
     if not db_questions:
         raise HTTPException(status_code=404, detail="Test not found")
 
-    q_by_id = {q.id: q for q in db_questions}
+    q_by_id: dict[int, models.QuizQuestion] = {q.id: q for q in db_questions}
 
     total = len(db_questions)
     correct = 0
+
+    # агрегат по категориям
+    cat_stats: dict[str, dict[str, int]] = defaultdict(lambda: {"correct": 0, "total": 0})
 
     for a in payload.answers:
         q = q_by_id.get(a.question_id)
         if not q:
             continue
+
+        cat_name = getattr(q, "category", None) or "Общее"
+        cat_stats[cat_name]["total"] += 1
+
         if a.selected_index == q.correct_index:
             correct += 1
+            cat_stats[cat_name]["correct"] += 1
 
     percent = int(round(correct * 100 / total)) if total else 0
 
@@ -562,15 +581,48 @@ def submit_test(
     db.commit()
     db.refresh(result)
 
-    # 6. DetailedResult
-    detail = models.DetailedResult(
+    # 6. DetailedResult + подготовка данных для фронта
+    detailed_rows: list[schemas.CategoryBreakdownItem] = []
+    strong_areas: list[schemas.AreaItem] = []
+    weak_areas: list[schemas.AreaItem] = []
+
+    for cat_name, stats in cat_stats.items():
+        cat_total = stats["total"]
+        cat_correct = stats["correct"]
+        cat_percent = int(round(cat_correct * 100 / cat_total)) if cat_total else 0
+
+        detailed = models.DetailedResult(
+            result_id=result.id,
+            category=cat_name,
+            percent=cat_percent,
+            is_strong=cat_percent >= 80,
+            is_weak=cat_percent < 50,
+        )
+        db.add(detailed)
+
+        detailed_rows.append(
+            schemas.CategoryBreakdownItem(
+                category=cat_name,
+                correct=cat_correct,
+                total=cat_total,
+                percent=cat_percent,
+            )
+        )
+
+        if cat_percent >= 80:
+            strong_areas.append(schemas.AreaItem(category=cat_name))
+        elif cat_percent < 50:
+            weak_areas.append(schemas.AreaItem(category=cat_name))
+
+    # общий "Overall" как и раньше
+    overall_detail = models.DetailedResult(
         result_id=result.id,
         category="Overall",
         percent=percent,
         is_strong=percent >= 80,
         is_weak=percent < 50,
     )
-    db.add(detail)
+    db.add(overall_detail)
 
     # 7. Обновляем счётчик триала
     if not company.is_paid:
@@ -579,7 +631,14 @@ def submit_test(
 
     db.commit()
 
-    return schemas.TestResultResponse(percent=percent, verdict=verdict)
+    return schemas.TestResultResponse(
+        percent=percent,
+        verdict=verdict,
+        strong_areas=strong_areas,
+        weak_areas=weak_areas,
+        categories=detailed_rows,
+    )
+
 
 def seed_questions():
     db = SessionLocal()
