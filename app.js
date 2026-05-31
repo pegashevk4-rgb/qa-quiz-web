@@ -231,8 +231,9 @@ function showForm() {
     return;
   }
 
+  // скрываем только вопросы, а не весь блок #quiz
   elements.quizQuestions.style.display = "none";
-  elements.quiz.style.display = "none";
+
   elements.userForm.style.display = "block";
 
   if (window.timerInterval) {
@@ -244,6 +245,7 @@ function showForm() {
     handleFormSubmit();
   };
 }
+
 
 // Эту функцию вызывает таймер из index.html
 function showResult() {
