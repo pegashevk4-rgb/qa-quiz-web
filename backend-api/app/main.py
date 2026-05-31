@@ -11,6 +11,9 @@ from .auth import get_password_hash, verify_password
 import secrets
 import string
 
+import json
+from pathlib import Path as FilePath
+
 Base.metadata.create_all(bind=engine)
 
 app = FastAPI()
@@ -100,13 +103,15 @@ def register_hr_user(
     )
 
     return schemas.CompanyHRUserPublic(
-        id=hr_user.id,
-        email=hr_user.email,
-        name=hr_user.name,
-        company_id=hr_user.company_id,
-        role=hr_user.role,
-        company_name=company.name if company else "",
+    id=hr_user.id,
+    email=hr_user.email,
+    name=hr_user.name,
+    company_id=hr_user.company_id,
+    role=hr_user.role,
+    company_name=company.name if company else "",
+    company_token=company.public_token if company else "",  # НОВОЕ
     )
+
 
 
 @app.post("/auth/login", response_model=schemas.CompanyHRUserPublic)
@@ -138,7 +143,9 @@ def login_hr_user(
         company_id=hr_user.company_id,
         role=hr_user.role,
         company_name=company.name if company else "",
+        company_token=company.public_token if company else "",  # НОВОЕ
     )
+
 
 
 @app.post(
@@ -679,3 +686,149 @@ def seed_questions():
         print("Seed done")
     finally:
         db.close()
+
+def import_junior_questions_from_json(json_path: str):
+    db = SessionLocal()
+    try:
+        path = FilePath(json_path)
+        if not path.exists():
+            print(f"JSON file not found: {path}")
+            return
+
+        with path.open("r", encoding="utf-8") as f:
+            data = json.load(f)
+
+        # Очищаем старые junior-вопросы (если нужно)
+        db.query(models.QuizQuestion).filter(
+            models.QuizQuestion.test_id == "qa_junior_web"
+        ).delete()
+        db.commit()
+
+        questions: list[models.QuizQuestion] = []
+
+        order_counter = 1
+        for item in data:
+            # Пропускаем не junior-уровень на всякий случай
+            if item.get("level") != "junior":
+                continue
+
+            # Берём первую правильную опцию (для type=multiple берём просто первый индекс)
+            correct_indexes = item.get("correct_indexes") or []
+            if not correct_indexes:
+                continue
+
+            correct_index = correct_indexes[0]
+
+            q = models.QuizQuestion(
+                test_id="qa_junior_web",
+                text=item["question"],
+                options=item["options"],
+                correct_index=correct_index,
+                order=order_counter,
+                category=item.get("category") or "Общее",
+            )
+            questions.append(q)
+            order_counter += 1
+
+        db.add_all(questions)
+        db.commit()
+        print(f"Imported {len(questions)} junior questions from {path}")
+    finally:
+        db.close()
+
+def import_middle_questions_from_json(json_path: str):
+    db = SessionLocal()
+    try:
+        path = FilePath(json_path)
+        if not path.exists():
+            print(f"JSON file not found: {path}")
+            return
+
+        with path.open("r", encoding="utf-8") as f:
+            data = json.load(f)
+
+        db.query(models.QuizQuestion).filter(
+            models.QuizQuestion.test_id == "qa_middle_web"
+        ).delete()
+        db.commit()
+
+        questions: list[models.QuizQuestion] = []
+        order_counter = 1
+
+        for item in data:
+            if item.get("level") != "middle":
+                continue
+
+            correct_indexes = item.get("correct_indexes") or []
+            if not correct_indexes:
+                continue
+
+            correct_index = correct_indexes[0]
+
+            q = models.QuizQuestion(
+                test_id="qa_middle_web",
+                text=item["question"],
+                options=item["options"],
+                correct_index=correct_index,
+                order=order_counter,
+                category=item.get("category") or "Общее",
+            )
+            questions.append(q)
+            order_counter += 1
+
+        db.add_all(questions)
+        db.commit()
+        print(f"Imported {len(questions)} middle questions from {path}")
+    finally:
+        db.close()
+
+def import_senior_questions_from_json(json_path: str):
+    db = SessionLocal()
+    try:
+        path = FilePath(json_path)
+        if not path.exists():
+            print(f"JSON file not found: {path}")
+            return
+
+        with path.open("r", encoding="utf-8") as f:
+            data = json.load(f)
+
+        db.query(models.QuizQuestion).filter(
+            models.QuizQuestion.test_id == "qa_senior_web"
+        ).delete()
+        db.commit()
+
+        questions: list[models.QuizQuestion] = []
+        order_counter = 1
+
+        for item in data:
+            if item.get("level") != "senior":
+                continue
+
+            correct_indexes = item.get("correct_indexes") or []
+            if not correct_indexes:
+                continue
+
+            correct_index = correct_indexes[0]
+
+            q = models.QuizQuestion(
+                test_id="qa_senior_web",
+                text=item["question"],
+                options=item["options"],
+                correct_index=correct_index,
+                order=order_counter,
+                category=item.get("category") or "Общее",
+            )
+            questions.append(q)
+            order_counter += 1
+
+        db.add_all(questions)
+        db.commit()
+        print(f"Imported {len(questions)} senior questions from {path}")
+    finally:
+        db.close()
+
+#if __name__ == "__main__":
+    #import_junior_questions_from_json("app/data/questions_junior.json")
+    #import_middle_questions_from_json("app/data/questions_middle.json")
+    #import_senior_questions_from_json("app/data/questions_senior.json")

@@ -21,7 +21,7 @@ const state = {
   questions: [],            // [{id, text, options}]
   currentIndex: 0,
   answers: {},              // questionId -> selectedIndex[]
-  // данные, которые приходит с бэка в TestResultResponse
+  // данные, которые приходят с бэка в TestResultResponse
   percentFromServer: null,
   verdictFromServer: null,
   strongAreasFromServer: [],
@@ -61,7 +61,7 @@ const elements = {
 };
 
 // =========================
-// Загрузка вопросов (без correct_index)
+// Загрузка вопросов из бэка
 // =========================
 
 async function loadQuestions() {
@@ -72,12 +72,22 @@ async function loadQuestions() {
     }
 
     const data = await response.json(); // {test_id, title, questions}
-    state.questions = data.questions || [];
+    let questions = data.questions || [];
 
-    if (!state.questions.length) {
+    if (!questions.length) {
       alert("Для этого теста нет вопросов.");
       return;
     }
+
+    // Перемешиваем
+    questions = questions
+      .map(q => ({ q, sort: Math.random() }))
+      .sort((a, b) => a.sort - b.sort)
+      .map(({ q }) => q);
+
+    // Берём первые 30 (или сколько нужно)
+    const MAX_QUESTIONS = 30;
+    state.questions = questions.slice(0, MAX_QUESTIONS);
 
     if (elements.testTitle) {
       elements.testTitle.textContent = data.title || "QA Quiz";
@@ -142,9 +152,7 @@ function showQuestion() {
   elements.progress.textContent =
     `Вопрос ${state.currentIndex + 1} из ${state.questions.length}`;
 
-  // категорий в публичном API нет, оставляем пусто
   elements.categoryText.textContent = "";
-
   elements.questionText.textContent = question.text;
 
   elements.questionHint.textContent =
@@ -158,9 +166,14 @@ function renderOptions(question) {
   elements.nextBtn.disabled = true;
 
   const optionsList = document.createElement("div");
+
+  const shuffledOptions = question.options
+    .map((text, index) => ({ text, originalIndex: index }))
+    .sort(() => Math.random() - 0.5);
+
   const selected = state.answers[question.id] || [];
 
-  question.options.forEach((text, index) => {
+  shuffledOptions.forEach((option) => {
     const wrapper = document.createElement("div");
     wrapper.className = "option-item";
 
@@ -170,15 +183,15 @@ function renderOptions(question) {
     const input = document.createElement("input");
     input.type = "radio";
     input.name = "answer";
-    input.value = index;
+    input.value = option.originalIndex;
 
-    if (selected.includes(index)) {
+    if (selected.includes(option.originalIndex)) {
       input.checked = true;
       elements.nextBtn.disabled = false;
     }
 
     const textSpan = document.createElement("span");
-    textSpan.textContent = `${index + 1}. ${text}`;
+    textSpan.textContent = option.text;
 
     label.append(input, textSpan);
     wrapper.appendChild(label);
@@ -214,7 +227,6 @@ function handleNext() {
     state.currentIndex += 1;
     showQuestion();
   } else {
-    // вопросы закончились — скрываем вопросы, переходим на форму
     showForm();
   }
 }
@@ -231,9 +243,7 @@ function showForm() {
     return;
   }
 
-  // скрываем только вопросы, а не весь блок #quiz
   elements.quizQuestions.style.display = "none";
-
   elements.userForm.style.display = "block";
 
   if (window.timerInterval) {
@@ -246,15 +256,13 @@ function showForm() {
   };
 }
 
-
-// Эту функцию вызывает таймер из index.html
+// Вызывается таймером
 function showResult() {
-  // В нашей логике "showResult" = "перейти на форму"
   showForm();
 }
 
 // =========================
-// Отправка формы (отправляем ответы на бэк)
+// Отправка формы (на бэк)
 // =========================
 
 async function handleFormSubmit() {
@@ -296,16 +304,16 @@ async function handleFormSubmit() {
       },
     };
 
-    const response = await fetch(
-      `${API_BASE_URL}/public/tests/${TEST_ID}/submit?company_token=${encodeURIComponent(
-        COMPANY_TOKEN
-      )}`,
-      {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      }
-    );
+    let submitUrl = `${API_BASE_URL}/public/tests/${TEST_ID}/submit`;
+    const urlParams = new URLSearchParams();
+    urlParams.set("company_token", COMPANY_TOKEN);
+    submitUrl += `?${urlParams.toString()}`;
+
+    const response = await fetch(submitUrl, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    });
 
     if (!response.ok) {
       if (response.status === 403) {
@@ -320,7 +328,6 @@ async function handleFormSubmit() {
     }
 
     const data = await response.json();
-    // data: {percent, verdict, strong_areas, weak_areas, categories}
     state.percentFromServer = data.percent;
     state.verdictFromServer = data.verdict;
     state.strongAreasFromServer = data.strong_areas || [];
@@ -337,7 +344,7 @@ async function handleFormSubmit() {
 }
 
 // =========================
-// Рендер результата с сильными/слабыми сторонами (из ответа бэка)
+// Рендер результата
 // =========================
 
 function renderResult() {
@@ -369,26 +376,22 @@ function renderResult() {
   elements.verdictText.textContent = verdictText;
   elements.verdictExplanation.textContent = explanation;
 
-  // очистка списков
   elements.strongAreas.innerHTML = "";
   elements.weakAreas.innerHTML = "";
   elements.categoriesBreakdown.innerHTML = "";
 
-  // сильные стороны (массив объектов {category})
   state.strongAreasFromServer.forEach((item) => {
     const li = document.createElement("li");
     li.textContent = item.category;
     elements.strongAreas.appendChild(li);
   });
 
-  // слабые стороны
   state.weakAreasFromServer.forEach((item) => {
     const li = document.createElement("li");
     li.textContent = item.category;
     elements.weakAreas.appendChild(li);
   });
 
-  // разбивка по категориям: {category, correct, total, percent}
   state.categoriesFromServer.forEach((cat) => {
     const li = document.createElement("li");
     li.textContent = `${cat.category}: ${cat.percent}% (${cat.correct} из ${cat.total})`;
@@ -410,5 +413,5 @@ elements.restartBtn?.addEventListener("click", () => {
 // INIT
 // =========================
 
-console.log('APP_JS_LOADED');
+console.log("APP_JS_LOADED");
 loadQuestions();

@@ -84,9 +84,11 @@ async function loadCompanyResults() {
 const testButtons = document.querySelectorAll(".tests-list .btn-primary");
 
 function getTestLink(testId) {
+  // Берём только токен компании
   const companyToken = localStorage.getItem("qa_company_token");
+
   if (!companyToken) {
-    alert("Не найден токен компании. Зайдите в систему заново или обратитесь к разработчику.");
+    alert("Не найден токен компании. Зайдите в систему заново.");
     return "";
   }
 
@@ -118,6 +120,7 @@ testButtons.forEach((btn) => {
       });
   });
 });
+
 
 // --- Таблица кандидатов и метрики ---
 const tableBody = document.getElementById("tableBody");

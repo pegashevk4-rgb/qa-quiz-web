@@ -74,8 +74,9 @@ class QuizQuestion(Base):
     __tablename__ = "quiz_questions"
 
     id = Column(Integer, primary_key=True, index=True)
-    test_id = Column(String(50), index=True, nullable=False)  # 'qa_junior_web' и т.п.
-    text = Column(String(1000), nullable=False)
-    options = Column(JSON, nullable=False)                     # список строк
-    correct_index = Column(Integer, nullable=False)            # индекс правильного варианта
-    order = Column(Integer, nullable=False, default=0)
+    test_id = Column(String, index=True)        # qa_junior_web / qa_middle_web / qa_senior_web
+    text = Column(String, nullable=False)
+    options = Column(JSON, nullable=False)
+    correct_index = Column(Integer, nullable=False)
+    order = Column(Integer, nullable=False, default=1)
+    category = Column(String, nullable=True)  

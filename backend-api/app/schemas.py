@@ -32,14 +32,15 @@ class CompanyHRUserCreate(BaseModel):
 
 class CompanyHRUserPublic(BaseModel):
     id: int
-    email: EmailStr
+    email: str
     name: str
     company_id: int
     role: str
     company_name: str
+    company_token: str  # НОВОЕ
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 
 class CompanyCreate(BaseModel):
