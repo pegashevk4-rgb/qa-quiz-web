@@ -408,4 +408,5 @@ elements.restartBtn?.addEventListener("click", () => {
 // INIT
 // =========================
 
+console.log('APP_JS_LOADED');
 loadQuestions();
