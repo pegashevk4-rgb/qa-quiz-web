@@ -3,23 +3,40 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-
   <title>QA Hiring Assistant — HR Dashboard</title>
-
   <link rel="stylesheet" href="hr-dashboard.css" />
   <script src="hr-dashboard.js" defer></script>
 </head>
 <body>
-  <nav class="dashboard-nav">
-    <div class="nav-inner">
-      <a href="hr.html" class="nav-logo">
-        <span class="logo-mark">QA</span>
-        <span>QA Hiring Assistant</span>
+  <!-- БОКОВОЕ МЕНЮ -->
+  <aside class="sidebar">
+    <div class="sidebar-logo">
+      <span class="logo-mark">QA</span>
+      <span class="logo-text">QA Hiring Assistant</span>
+    </div>
+    
+    <nav class="sidebar-nav">
+      <a href="hr-dashboard.html" class="nav-item active">
+        <span>●</span> Дашборд
       </a>
+      <a href="pricing.html" class="nav-item">
+        <span>●</span> Тарифы
+      </a>
+    </nav>
+  </aside>
 
-      <div class="nav-right">
+  <!-- ОСНОВНОЙ КОНТЕНТ -->
+  <div class="main-wrapper">
+    <!-- ХЕДЕР -->
+    <header class="top-header">
+      <div class="header-left">
+        <h1>HR-дашборд</h1>
+        <p class="header-subtitle">Оценка и аналитика QA-кандидатов</p>
+      </div>
+      
+      <div class="header-right">
         <span class="company-pill" id="companyPill">Компания: Demo Company</span>
-
+        
         <button
           id="themeToggle"
           class="theme-toggle"
@@ -28,22 +45,17 @@
         >
           <span id="themeIcon">☀</span>
         </button>
-
-        <button id="logoutBtn" class="logout-btn" type="button">
+        
+        <button class="logout-btn" id="logoutBtn" type="button">
           Выйти
         </button>
       </div>
-    </div>
-  </nav>
+    </header>
 
-  <main class="dashboard-main">
-    <section class="metrics">
-      <h1>HR‑дашборд</h1>
-      <p class="metrics-subtitle">
-        Оценка и аналитика QA‑кандидатов
-      </p>
-
-      <div class="metrics-grid">
+    <!-- ОСНОВНОЙ КОНТЕНТ -->
+    <main class="dashboard-content">
+      <!-- МЕТРИКИ -->
+      <section class="metrics-section">
         <div class="metric-card">
           <div class="metric-label">Всего кандидатов</div>
           <div class="metric-value" id="metricTotal">0</div>
@@ -51,154 +63,139 @@
 
         <div class="metric-card">
           <div class="metric-label">Прошли</div>
-          <div class="metric-value metric-value--green" id="metricPassed">0</div>
+          <div class="metric-value metric-green" id="metricPassed">0</div>
         </div>
 
         <div class="metric-card">
           <div class="metric-label">На грани</div>
-          <div class="metric-value metric-value--yellow" id="metricEdge">0</div>
+          <div class="metric-value metric-yellow" id="metricEdge">0</div>
         </div>
 
         <div class="metric-card">
           <div class="metric-label">Провалили</div>
-          <div class="metric-value metric-value--red" id="metricFailed">0</div>
+          <div class="metric-value metric-red" id="metricFailed">0</div>
         </div>
-      </div>
-    </section>
+      </section>
 
-    <section class="tests-section">
-      <h2>Тесты и ссылки для кандидатов</h2>
-      <p class="tests-subtitle">
-        Сгенерируйте ссылку на нужный уровень теста и отправьте кандидату.
-      </p>
+      <!-- ТЕСТЫ (ТАБЛИЦА) -->
+      <section class="tests-section">
+        <h2>Тесты и ссылки для кандидатов</h2>
+        <p class="section-subtitle">
+          Сгенерируйте ссылку на нужный уровень теста и отправьте кандидату.
+        </p>
 
-      <div class="tests-list">
-        <div class="test-card">
-          <div class="test-title">Junior QA</div>
-          <div class="test-desc">
-            Базовая проверка теории, SQL и API
-          </div>
-          <button
-            type="button"
-            class="btn-primary"
-            data-test-id="qa_junior_web"
-          >
-            Скопировать ссылку
-          </button>
+        <div class="tests-table-container">
+          <table class="tests-table">
+            <tbody>
+              <tr>
+                <td class="test-name">
+                  <div class="test-title">Junior QA</div>
+                  <div class="test-desc">Базовая проверка теории, SQL и API</div>
+                </td>
+                <td class="test-action">
+                  <button
+                    type="button"
+                    class="btn-copy"
+                    data-test-id="qa_junior_web"
+                  >
+                    Скопировать ссылку
+                  </button>
+                </td>
+              </tr>
+
+              <tr>
+                <td class="test-name">
+                  <div class="test-title">Middle QA</div>
+                  <div class="test-desc">Продвинутая проверка навыков и практики</div>
+                </td>
+                <td class="test-action">
+                  <button
+                    type="button"
+                    class="btn-copy"
+                    data-test-id="qa_middle_web"
+                  >
+                    Скопировать ссылку
+                  </button>
+                </td>
+              </tr>
+
+              <tr>
+                <td class="test-name">
+                  <div class="test-title">Senior QA</div>
+                  <div class="test-desc">Глубокая проверка архитектуры тестирования</div>
+                </td>
+                <td class="test-action">
+                  <button
+                    type="button"
+                    class="btn-copy"
+                    data-test-id="qa_senior_web"
+                  >
+                    Скопировать ссылку
+                  </button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
         </div>
+      </section>
 
-        <div class="test-card">
-          <div class="test-title">Middle QA</div>
-          <div class="test-desc">
-            Продвинутая проверка навыков и практики
-          </div>
-          <button
-            type="button"
-            class="btn-primary"
-            data-test-id="qa_middle_web"
-          >
-            Скопировать ссылку
-          </button>
+      <!-- ТАБЛИЦА КАНДИДАТОВ -->
+      <section class="candidates-section">
+        <div class="section-header">
+          <h2>Кандидаты</h2>
+          <p class="section-subtitle">
+            Нажмите на строку кандидата, чтобы открыть подробный разбор результатов.
+          </p>
         </div>
-
-        <div class="test-card">
-          <div class="test-title">Senior QA</div>
-          <div class="test-desc">
-            Глубокая проверка опыта и архитектурного мышления
-          </div>
-          <button
-            type="button"
-            class="btn-primary"
-            data-test-id="qa_senior_web"
-          >
-            Скопировать ссылку
-          </button>
-        </div>
-      </div>
-    </section>
-
-    <section class="table-section">
-      <div class="table-header">
-        <h2>Кандидаты</h2>
 
         <div class="table-controls">
-          <div class="filters">
-            <button
-              type="button"
-              class="filter-btn active"
-              data-value="All"
-            >
-              Все
-            </button>
-            <button
-              type="button"
-              class="filter-btn"
-              data-value="Passed"
-            >
-              Прошли
-            </button>
-            <button
-              type="button"
-              class="filter-btn"
-              data-value="On the edge"
-            >
-              На грани
-            </button>
-            <button
-              type="button"
-              class="filter-btn"
-              data-value="Failed"
-            >
-              Провалили
-            </button>
-          </div>
+          <input
+            type="text"
+            id="searchInput"
+            placeholder="Поиск по имени"
+            class="search-input"
+          />
 
-          <div class="search-sort">
-            <input
-              type="text"
-              id="searchInput"
-              class="search-input"
-              placeholder="Поиск по имени"
-            />
-
-            <button
-              type="button"
-              id="scoreSort"
-              class="sort-btn"
-            >
-              По проценту
-              <span id="sortIndicator">↓</span>
-            </button>
+          <div class="filter-group">
+            <button class="filter-btn active" data-value="All">Все</button>
+            <button class="filter-btn" data-value="Passed">Прошли</button>
+            <button class="filter-btn" data-value="On the edge">На грани</button>
+            <button class="filter-btn" data-value="Failed">Провалили</button>
           </div>
         </div>
-      </div>
 
-      <div class="table-wrap">
-        <table class="candidates-table">
-          <thead>
-            <tr>
-              <th>Имя</th>
-              <th>Тест</th>
-              <th>Процент</th>
-              <th>Вердикт</th>
-              <th>Дата</th>
-            </tr>
-          </thead>
-          <tbody id="tableBody">
-            <!-- строки будут отрисованы через JS -->
-          </tbody>
-        </table>
+        <div class="table-wrapper">
+          <table class="candidates-table">
+            <thead>
+              <tr>
+                <th>Имя</th>
+                <th>Тест</th>
+                <th>
+                  <button class="sort-header" id="scoreSortButton">
+                    Результат %
+                    <span class="sort-indicator" id="sortIndicator">↓</span>
+                  </button>
+                </th>
 
-        <div class="empty-state" id="emptyState">
-          Пока нет кандидатов. Отправьте первый тест — результаты появятся здесь.
+                <th>Вердикт</th>
+                <th>Дата</th>
+              </tr>
+            </thead>
+            <tbody id="tableBody">
+              <!-- JS отрисует строки -->
+            </tbody>
+          </table>
+
+          <div class="empty-state" id="emptyState">
+            Пока нет кандидатов. Отправьте первый тест — результаты появятся здесь.
+          </div>
         </div>
-      </div>
-    </section>
-  </main>
+      </section>
+    </main>
+  </div>
 
-  <!-- МОДАЛКА КАНДИДАТА -->
+  <!-- МОДАЛКА -->
   <div class="modal-overlay" id="modalOverlay"></div>
-
   <div class="modal" id="candidateModal">
     <div class="modal-inner">
       <div class="modal-header">
@@ -237,7 +234,7 @@
       <div class="candidate-topics">
         <h3>Разбивка по темам</h3>
         <div class="topics-list" id="topicsContainer">
-          <!-- сюда JS подставит темы -->
+          <!-- JS подставит темы -->
         </div>
       </div>
 

@@ -81,7 +81,7 @@ async function loadCompanyResults() {
 }
 
 // --- Генерация ссылок на тесты ---
-const testButtons = document.querySelectorAll(".tests-list .btn-primary");
+const testButtons = document.querySelectorAll(".btn-copy");
 
 function getTestLink(testId) {
   // Берём только токен компании
@@ -121,11 +121,10 @@ testButtons.forEach((btn) => {
   });
 });
 
-
 // --- Таблица кандидатов и метрики ---
 const tableBody = document.getElementById("tableBody");
 const searchInput = document.getElementById("searchInput");
-const scoreSort = document.getElementById("scoreSort");
+const scoreSort = document.getElementById("scoreSortButton");
 const sortIndicator = document.getElementById("sortIndicator");
 const emptyState = document.getElementById("emptyState");
 
@@ -347,7 +346,9 @@ document.addEventListener("DOMContentLoaded", () => {
   const companyName = localStorage.getItem("qa_company_name");
 
   if (companyPill && companyName) {
-    companyPill.textContent = `Компания: ${companyName}`;
+  // Убираем экранирование символов
+  const cleanName = companyName.replace(/\\_/g, '_').replace(/\\(.)/g, '$1');
+  companyPill.textContent = `Компания: ${cleanName}`;
   }
 
   loadCompanyResults().then(() => {
