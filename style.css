@@ -39,7 +39,6 @@ body {
 /* Общая карточка: интро, форма, результат, сам квиз */
 #intro,
 #quiz,
-#user-form,
 #result {
   max-width: 640px;
   width: 100%;
@@ -186,6 +185,10 @@ h1 {
 
 /* Форма ввода данных */
 #user-form {
+  max-width: 640px;
+  width: 100%;
+  margin: 24px auto 0 auto; /* чуть ближе к результату */
+  padding: 0;               /* без доп. отступа-«карточки» */
   text-align: center;
 }
 
