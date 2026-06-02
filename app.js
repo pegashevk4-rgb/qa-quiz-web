@@ -91,7 +91,7 @@ async function loadQuestions() {
       elements.testTitle.textContent = data.title || "QA Quiz";
     }
 
-    // состояние по умолчанию
+    // стартовое состояние
     elements.intro.style.display = "block";
     elements.quiz.style.display = "none";
     elements.result.style.display = "none";
@@ -101,6 +101,7 @@ async function loadQuestions() {
     alert("Не удалось загрузить тест. Попробуйте позже.");
   }
 }
+
 
 
 // =========================
@@ -122,13 +123,11 @@ function startQuiz() {
   state.categoriesFromServer = [];
 
   elements.intro.style.display = "none";
-  elements.quiz.style.display = "block";     // показываем карточку квиза
-  elements.result.style.display = "none";    // скрываем результат
-  if (elements.userForm) {
-    elements.userForm.style.display = "none"; // форма пока скрыта
-  }
+  elements.quiz.style.display = "block";
+  elements.result.style.display = "none";
 
   elements.quizQuestions.style.display = "block";
+  if (elements.userForm) elements.userForm.style.display = "none";
 
   elements.nextBtn.style.display = "block";
   elements.nextBtn.disabled = true;
@@ -140,6 +139,7 @@ function startQuiz() {
 
   showQuestion();
 }
+
 
 
 // =========================
@@ -237,6 +237,7 @@ function handleNext() {
 // =========================
 
 function showForm() {
+  // если форма уже показана или уже показан результат — ничего не делаем
   if (
     (elements.userForm && elements.userForm.style.display === "block") ||
     (elements.result && elements.result.style.display === "block")
@@ -244,9 +245,11 @@ function showForm() {
     return;
   }
 
+  // прячем вопросы, показываем форму
   elements.quizQuestions.style.display = "none";
   if (elements.userForm) elements.userForm.style.display = "block";
 
+  // останавливаем таймер, если есть
   if (window.timerInterval) {
     clearInterval(window.timerInterval);
   }
@@ -256,6 +259,7 @@ function showForm() {
     handleFormSubmit();
   };
 }
+
 
 
 // Вызывается таймером
@@ -282,9 +286,7 @@ async function handleFormSubmit() {
     return;
   }
 
-  const submitButton = elements.dataForm.querySelector(
-    'button[type="submit"]'
-  );
+  const submitButton = elements.dataForm.querySelector('button[type="submit"]');
   submitButton.disabled = true;
   submitButton.textContent = "Сохраняем...";
 
@@ -318,28 +320,31 @@ async function handleFormSubmit() {
     });
 
     if (!response.ok) {
-      if (response.status === 403) {
-        alert(
-          "Лимит тестов для вашей компании исчерпан. Обратитесь к HR по поводу тарифа."
-        );
-      } else {
-        alert("Ошибка при сохранении результата. Попробуйте позже.");
-      }
-      console.error("Submit error:", response.status);
+      console.error("Submit error:", response.status, await response.text());
+      alert("Ошибка при сохранении результата. Попробуйте позже.");
       return;
     }
 
-    const data = await response.json();
-    state.percentFromServer = data.percent;
-    state.verdictFromServer = data.verdict;
-    state.strongAreasFromServer = data.strong_areas || [];
-    state.weakAreasFromServer = data.weak_areas || [];
-    state.categoriesFromServer = data.categories || [];
+    let data;
+    try {
+      data = await response.json();
+    } catch (e) {
+      console.error("Не удалось распарсить JSON ответа:", e);
+      data = {};
+    }
+
+    state.percentFromServer = data?.percent ?? null;
+    state.verdictFromServer = data?.verdict ?? null;
+    state.strongAreasFromServer = data?.strong_areas || [];
+    state.weakAreasFromServer = data?.weak_areas || [];
+    state.categoriesFromServer = data?.categories || [];
 
     renderResult();
   } catch (error) {
     console.error("Ошибка сети при отправке результата:", error);
     alert("Не удалось отправить результат. Проверьте соединение.");
+    // даже в случае ошибки всё равно покажем результат как есть (заглушки)
+    renderResult();
   } finally {
     submitButton.textContent = "Результат сохранён";
   }
@@ -364,13 +369,16 @@ function renderResult() {
 
   if (verdict === "Passed") {
     verdictText = "Рекомендуем к следующему этапу.";
-    explanation = "Кандидат показал высокий уровень знаний и может быть рассмотрен на позицию.";
+    explanation =
+      "Кандидат показал высокий уровень знаний и может быть рассмотрен на позицию.";
   } else if (verdict === "On the edge") {
     verdictText = "На грани.";
-    explanation = "Рекомендуется дополнительно оценить кандидата на собеседовании.";
+    explanation =
+      "Рекомендуется дополнительно оценить кандидата на собеседовании.";
   } else {
     verdictText = "Не прошёл.";
-    explanation = "Кандидат показал недостаточный уровень знаний для этой позиции.";
+    explanation =
+      "Кандидат показал недостаточный уровень знаний для этой позиции.";
   }
 
   elements.verdictText.textContent = verdictText;
@@ -398,6 +406,7 @@ function renderResult() {
     elements.categoriesBreakdown.appendChild(li);
   });
 }
+
 
 // =========================
 // EVENTS
