@@ -20,6 +20,68 @@ const API_BASE_URL = "http://127.0.0.1:8000";
 // --- Кандидаты (изначально пусто) ---
 let candidates = [];
 
+
+function renderPlanInfo(planData) {
+  const el = document.getElementById("planInfo");
+  if (!el) return;
+
+  const {
+    plan_name = "Free trial",
+    tests_limit = 10,
+    tests_used = 0,
+    subscription_expires_at = null,
+  } = planData || {};
+
+  const remaining = tests_limit == null ? Infinity : Math.max(0, tests_limit - tests_used);
+  const isOverLimit = tests_limit != null && remaining <= 0;
+
+  const limitText =
+    tests_limit == null
+      ? "Безлимит по тестам"
+      : `Осталось ${remaining} из ${tests_limit} тестов`;
+
+  const expiresText = subscription_expires_at
+    ? `Подписка до ${subscription_expires_at}`
+    : "";
+
+  el.classList.remove("plan-card-okay", "plan-card-danger");
+  el.classList.add(isOverLimit ? "plan-card-danger" : "plan-card-okay");
+
+  el.innerHTML = `
+    <span>
+      Текущий тариф: <strong>${plan_name}</strong>
+      · ${limitText}
+      ${expiresText ? "· " + expiresText : ""}
+    </span>
+    <a href="pricing.html">Перейти к тарифам</a>
+  `;
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+  const companyPill = document.getElementById("companyPill");
+  const companyName = localStorage.getItem("qa_company_name");
+
+  if (companyPill && companyName) {
+    const cleanName = companyName.replace(/\\_/g, "_").replace(/\\(.)/g, "$1");
+    companyPill.textContent = `Компания: ${cleanName}`;
+  }
+
+  // временная заглушка - потом подставишь реальные данные с бэка
+  renderPlanInfo({
+    plan_name: "Free trial",
+    tests_limit: 10,
+    tests_used: 10,
+    subscription_expires_at: "2026-06-30",
+  });
+
+  loadCompanyResults().then(() => {
+    updateMetrics();
+    setVerdictFilter("All");
+    renderTable();
+  });
+});
+
+
 // --- Загрузка результатов компании из API ---
 async function loadCompanyResults() {
   const companyId = localStorage.getItem("qa_company_id");
