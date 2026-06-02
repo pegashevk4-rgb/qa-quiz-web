@@ -108,10 +108,6 @@ TOP NAV ACTIONS
   transition: 0.2s ease;
 }
 
-.btn-link:hover {
-  color: #ffffff;
-}
-
 /* Унифицированная компактная кнопка (тема / войти) */
 .header-icon-btn {
   min-width: 32px;
@@ -419,8 +415,8 @@ SECTION HEADINGS
   color: var(--muted);
 
   font-family: var(--font-head);
-  font-size: 0.72rem;
-  font-weight: 600;
+  font-size: 0.7rem;
+  font-weight: 500;
   letter-spacing: 0.15em;
   text-transform: uppercase;
 }
@@ -485,9 +481,9 @@ HERO
   background: rgba(79, 255, 176, 0.08);
   color: var(--accent);
 
-  font-size: 0.78rem;
+  font-size: 0.82rem;
   font-weight: 500;
-  letter-spacing: 0.12em;
+  letter-spacing: 0.14em;
   text-transform: uppercase;
 }
 
@@ -876,15 +872,21 @@ CANDIDATE MODAL
 }
 
 .candidate-modal-header {
-  display: flex;
-  justify-content: space-between;
+  display: grid;
+  grid-template-columns: 1fr auto; /* текстовый блок + кнопка закрытия */
   align-items: flex-start;
   gap: 16px;
   margin-bottom: 18px;
 }
 
+.candidate-modal-header > div:first-child {
+  text-align: center;
+  width: 100%;
+}
+
 .candidate-modal-title {
-  font-size: 1.4rem;
+  font-size: 1.15rem;   /* было 1.4rem */
+  font-weight: 500;    /* вместо 700/800 по умолчанию */
   margin-bottom: 4px;
 }
 
@@ -914,8 +916,8 @@ CANDIDATE MODAL
 }
 
 .meta-value {
-  font-weight: 600;
-  font-size: 0.95rem;
+  font-weight: 500;
+  font-size: 0.9rem;
 }
 
 .candidate-topics h3 {
@@ -947,8 +949,9 @@ CANDIDATE MODAL
 }
 
 .topic-score {
-  font-weight: 600;
+  font-weight: 500;
   font-size: 0.9rem;
+  color: var(--text);   /* можно оставить как есть, если и так ок */
 }
 
 @media (max-width: 480px) {
@@ -1085,17 +1088,6 @@ AUTH / GENERIC MODAL
 
 .modal-form input.input-error {
   border-color: var(--danger);
-}
-
-.field-error-text {
-  color: #ff6b6b;
-  font-size: 12px;
-  margin-top: 4px;
-}
-
-.input-error {
-  border-color: #ff6b6b;
-  outline: none;
 }
 
 .modal-submit {

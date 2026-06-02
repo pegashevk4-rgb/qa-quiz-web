@@ -223,8 +223,27 @@ header::after {
 }
 
 :root[data-theme="light"] .nav-link {
-  background: rgba(243, 244, 246, 0.9);
-  border-color: rgba(209, 213, 219, 0.9);
+  background: rgba(255, 255, 255, 0.9);
+  border-color: rgba(255, 255, 255, 0.9);
+}
+
+:root[data-theme="light"] .nav-link {
+  background: #ffffff;
+  border-color: #d1d5db;
+  color: #111827;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.08);
+}
+
+:root[data-theme="light"] .nav-link:hover {
+  background: rgba(37, 99, 235, 0.06); /* мягкий синий подсвет */
+  border-color: var(--accent);
+  color: #111827;
+}
+
+.nav-link-disabled {
+  opacity: 0.5;
+  cursor: default;
+  pointer-events: none;
 }
 
 /* Блок с темой и Войти */
