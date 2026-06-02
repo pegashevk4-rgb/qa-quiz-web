@@ -30,53 +30,51 @@
         </div>
       </div>
 
-      <!-- Форма данных пользователя (отдельно от #quiz) -->
-      <div id="user-form" style="display: none;">
-        <h2>Введите ваши данные</h2>
-        <form id="data-form">
-          <input type="text" id="firstName" placeholder="Имя *" required>
-          <input type="text" id="lastName" placeholder="Фамилия *" required>
-          <input type="email" id="email" placeholder="Email (необязательно)">
-          <button type="submit" class="primary-btn">Сохранить результат</button>
-        </form>
-      </div>
-
       <!-- Сам квиз (по умолчанию скрыт, app.js показывает) -->
       <div id="quiz" style="display:none;">
-        <!-- Блок с вопросами -->
         <div id="quiz-questions">
           <div id="progress"></div>
           <div id="category-text"></div>
           <h3 id="question-text"></h3>
-
           <p id="question-hint" class="question-hint"></p>
-
           <div id="options"></div>
           <button id="next-btn" disabled>Далее</button>
         </div>
       </div>
 
-      <!-- Блок результата -->
-      <div id="result" style="display:none;">
-        <h2>Результат</h2>
-        <p id="result-text"></p>
+      <!-- ОДНА карточка: сначала форма, потом результат -->
+      <div id="result-card" style="display:none;">
+        <div id="user-form-section">
+          <h2>Введите ваши данные</h2>
+          <form id="data-form">
+            <input type="text" id="firstName" placeholder="Имя *" required>
+            <input type="text" id="lastName" placeholder="Фамилия *" required>
+            <input type="email" id="email" placeholder="Email (необязательно)">
+            <button type="submit" class="primary-btn">Сохранить результат</button>
+          </form>
+        </div>
 
-        <h3>Предварительная оценка</h3>
-        <p id="verdict-text"></p>
+        <div id="result" style="display:none;">
+          <h2>Результат</h2>
+          <p id="result-text"></p>
 
-        <p id="verdict-explanation" class="verdict-explanation"></p>
+          <h3>Предварительная оценка</h3>
+          <p id="verdict-text"></p>
+          <p id="verdict-explanation" class="verdict-explanation"></p>
 
-        <h3>Сильные стороны</h3>
-        <ul id="strong-areas"></ul>
+          <h3>Сильные стороны</h3>
+          <ul id="strong-areas"></ul>
 
-        <h3>Слабые зоны</h3>
-        <ul id="weak-areas"></ul>
+          <h3>Слабые зоны</h3>
+          <ul id="weak-areas"></ul>
 
-        <h3>Результаты по категориям</h3>
-        <ul id="categories-breakdown"></ul>
+          <h3>Результаты по категориям</h3>
+          <ul id="categories-breakdown"></ul>
 
-        <button id="restart-btn" class="secondary-btn">Пройти ещё раз</button>
+          <button id="restart-btn" class="secondary-btn">Пройти ещё раз</button>
+        </div>
       </div>
+
     </div>
   </div>
 
@@ -103,10 +101,8 @@
 
   <!-- Скрипт таймера -->
   <script>
-    // Определяем test_id из URL
     const TIMER_TEST_ID = new URLSearchParams(window.location.search).get('test_id') || 'default_test';
 
-    // Время для разных уровней
     let QUIZ_MINUTES = 15;
     if (TIMER_TEST_ID === 'qa_junior_web') QUIZ_MINUTES = 20;
     if (TIMER_TEST_ID === 'qa_middle_web') QUIZ_MINUTES = 20;
@@ -129,21 +125,19 @@
     }
 
     function handleTimeIsUp() {
-      const userFormEl = document.getElementById('user-form');
+      const resultCardEl = document.getElementById('result-card');
       const resultEl = document.getElementById('result');
 
-      // Если уже на форме или на результате — ничего не делаем
       if (
-        (userFormEl && userFormEl.style.display === 'block') ||
+        (resultCardEl && resultCardEl.style.display === 'block') ||
         (resultEl && resultEl.style.display === 'block')
       ) {
         localStorage.removeItem(STORAGE_KEY);
         return;
       }
 
-      // Без модалки — сразу выводим форму
       if (typeof showResult === 'function') {
-       showResult();
+        showResult();
       }
       localStorage.removeItem(STORAGE_KEY);
     }
@@ -166,7 +160,6 @@
       timerEl.textContent = 'Осталось: ' + formatTimeLeft(msLeft);
     }
 
-    // Запуск таймера только после старта теста (вызывается из startQuiz в app.js)
     function startTimer() {
       const now = Date.now();
       endTime = now + QUIZ_MINUTES * 60 * 1000;

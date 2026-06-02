@@ -58,6 +58,8 @@ const elements = {
   strongAreas: document.getElementById("strong-areas"),
   weakAreas: document.getElementById("weak-areas"),
   categoriesBreakdown: document.getElementById("categories-breakdown"),
+  resultCard: document.getElementById("result-card"),
+  userFormSection: document.getElementById("user-form-section"),
 };
 
 // =========================
@@ -95,6 +97,7 @@ async function loadQuestions() {
 
     elements.intro.style.display = "block";
     elements.quiz.style.display = "none";
+    elements.resultCard.style.display = "none";
     elements.result.style.display = "none";
     if (elements.userForm) elements.userForm.style.display = "none";
   } catch (error) {
@@ -123,10 +126,9 @@ function startQuiz() {
 
   elements.intro.style.display = "none";
   elements.quiz.style.display = "block";
+  elements.resultCard.style.display = "none";
   elements.result.style.display = "none";
-  if (elements.userForm) {
-    elements.userForm.style.display = "none";
-  }
+  elements.userFormSection.style.display = "none";
 
   elements.quizQuestions.style.display = "block";
 
@@ -237,14 +239,17 @@ function handleNext() {
 
 function showForm() {
   if (
-    elements.userForm.style.display === "block" ||
-    elements.result.style.display === "block"
+    elements.resultCard.style.display === "block" &&
+    elements.userFormSection.style.display === "block"
   ) {
     return;
   }
 
   elements.quizQuestions.style.display = "none";
-  elements.userForm.style.display = "block";
+
+  elements.resultCard.style.display = "block";
+  elements.userFormSection.style.display = "block";
+  elements.result.style.display = "none";
 
   if (window.timerInterval) {
     clearInterval(window.timerInterval);
@@ -348,8 +353,9 @@ async function handleFormSubmit() {
 // =========================
 
 function renderResult() {
-  elements.userForm.style.display = "none";
+  elements.userFormSection.style.display = "none";
   elements.result.style.display = "block";
+  elements.resultCard.style.display = "block";
 
   const percent = state.percentFromServer ?? 0;
   const verdict = state.verdictFromServer || "On the edge";
