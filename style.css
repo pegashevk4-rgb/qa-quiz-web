@@ -184,6 +184,7 @@ h1 {
 
 /* Форма ввода данных */
 #user-form {
+  display: none;
   max-width: 640px;
   width: 100%;
   margin: 16px auto 0 auto;
@@ -308,4 +309,8 @@ h1 {
   user-select: none;
   -webkit-user-select: none;
   -ms-user-select: none;
+}
+
+#user-form:empty {
+  display: none;
 }
