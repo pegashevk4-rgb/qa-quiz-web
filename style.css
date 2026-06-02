@@ -51,6 +51,7 @@ body {
   box-sizing: border-box;
 }
 
+
 /* Заголовки в карточках */
 #intro h2,
 #user-form h2,
@@ -184,10 +185,9 @@ h1 {
 
 /* Форма ввода данных */
 #user-form {
-  display: none;
   max-width: 640px;
   width: 100%;
-  margin: 16px auto 0 auto;
+  margin: 24px auto 0 auto;
   padding: 0;
   text-align: center;
   border: none;
@@ -267,6 +267,7 @@ h1 {
 /* Центровка текста результата */
 #result {
   text-align: center;
+  margin-top: 24px; /* чтобы результат шёл ниже формы, но в той же карточке */
 }
 
 /* Мягкий цвет для radio и checkbox */

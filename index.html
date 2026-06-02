@@ -10,17 +10,17 @@
   <div class="container">
     <div id="app-root">
       
-        <!-- Шапка с таймером -->
+      <!-- Шапка с таймером -->
       <div class="page-header">
         <h1>QA Quiz</h1>
         <div id="timer" class="timer">Осталось: --:--</div>
       </div>
 
-        <!-- Заголовок теста, который мы обновляем из app.js по testId -->
-        <h2 id="test-title"></h2>
+      <!-- Заголовок теста, который мы обновляем из app.js по testId -->
+      <h2 id="test-title"></h2>
 
-
-       <div id="intro">
+      <!-- Интро -->
+      <div id="intro">
         <p>
           В тесте 30 вопросов: часть с одним правильным вариантом, часть — с несколькими.
           Читайте подсказку под вопросом, чтобы понять, сколько ответов можно выбрать.
@@ -43,7 +43,6 @@
 
       <!-- Сам квиз (по умолчанию скрыт, app.js показывает) -->
       <div id="quiz" style="display:none;">
-
         <!-- Блок с вопросами -->
         <div id="quiz-questions">
           <div id="progress"></div>
@@ -78,7 +77,8 @@
 
         <button id="restart-btn" class="secondary-btn">Пройти ещё раз</button>
       </div>
-</div>
+    </div>
+  </div>
 
   <!-- Модальное окно "Время вышло" -->
   <div id="timeup-modal" style="display:none;
@@ -113,7 +113,6 @@
     if (TIMER_TEST_ID === 'qa_senior_web') QUIZ_MINUTES = 25;
 
     const STORAGE_KEY = 'quiz_end_time_' + TIMER_TEST_ID;
-
 
     let endTime = null;
     const timerEl = document.getElementById('timer');
