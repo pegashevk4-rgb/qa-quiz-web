@@ -11,12 +11,15 @@ body {
   max-width: 600px;
   margin: 20px auto 0 auto;
   display: flex;
-  justify-content: space-between;
+  justify-content: space-between; /* уже есть, оставляем */
   align-items: center;
+  gap: 16px; /* добавь эту строку, чтобы было расстояние между h1 и таймером */
 }
 
 .page-header h1 {
   margin: 0;
+  font-size: 24px;
+  white-space: nowrap; /* чтобы QA Quiz не переносился на две строки */
 }
 
 /* Контейнер страницы */
@@ -278,7 +281,8 @@ h1 {
 
 .timer {
   font-weight: 600;
-  color: #4b5563; /* спокойный серый */
+  color: #4b5563;
+  white-space: nowrap; /* чтобы \"Осталось: 19:25\" не ломалось на 2 строки */
 }
 
 #next-btn:disabled {
