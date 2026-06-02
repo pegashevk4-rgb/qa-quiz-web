@@ -1,126 +1,271 @@
+```html
 <!DOCTYPE html>
 <html lang="ru">
 <head>
   <meta charset="UTF-8">
   <title>QA Quiz</title>
+
   <link rel="stylesheet" href="style.css">
+
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 </head>
+
 <body>
+
   <div class="container">
+
     <div id="app-root">
-      
-      <!-- Шапка с таймером -->
+
+      <!-- HEADER -->
       <div class="page-header">
         <h1>QA Quiz</h1>
-        <div id="timer" class="timer">Осталось: --:--</div>
-      </div>
 
-      <!-- Заголовок теста, который мы обновляем из app.js по testId -->
-      <h2 id="test-title"></h2>
-
-      <!-- Интро -->
-      <div id="intro">
-        <p>
-          В тесте 30 вопросов: часть с одним правильным вариантом, часть — с несколькими.
-          Читайте подсказку под вопросом, чтобы понять, сколько ответов можно выбрать.
-        </p>
-        <div id="start-container">
-          <button id="start-btn">Начать тест</button>
+        <div id="timer" class="timer">
+          Осталось: --:--
         </div>
       </div>
 
-      <!-- Сам квиз (по умолчанию скрыт, app.js показывает) -->
+      <!-- TITLE -->
+      <h2 id="test-title"></h2>
+
+      <!-- INTRO -->
+      <div id="intro">
+
+        <p>
+          В тесте 30 вопросов: часть с одним правильным вариантом,
+          часть — с несколькими.
+          Читайте подсказку под вопросом, чтобы понять,
+          сколько ответов можно выбрать.
+        </p>
+
+        <div id="start-container">
+          <button id="start-btn">
+            Начать тест
+          </button>
+        </div>
+
+      </div>
+
+      <!-- QUIZ -->
       <div id="quiz" style="display:none;">
 
-        <!-- Блок с вопросами -->
         <div id="quiz-questions">
+
           <div id="progress"></div>
+
           <div id="category-text"></div>
+
           <h3 id="question-text"></h3>
 
           <p id="question-hint" class="question-hint"></p>
 
           <div id="options"></div>
-          <button id="next-btn" disabled>Далее</button>
+
+          <button id="next-btn" disabled>
+            Далее
+          </button>
+
         </div>
 
-        <!-- Форма данных пользователя -->
-        <div id="user-form" style="display: none;">
+        <!-- USER FORM -->
+        <div id="user-form" style="display:none;">
+
           <div class="card">
-          <h2>Введите ваши данные</h2>
-          <form id="data-form">
-            <input type="text" id="firstName" placeholder="Имя *" required>
-            <input type="text" id="lastName" placeholder="Фамилия *" required>
-            <input type="email" id="email" placeholder="Email (необязательно)">
-            <button type="submit" class="primary-btn">Сохранить результат</button>
-          </form>
-        </div>
-      </div>
 
-      <!-- Блок результата -->
+            <h2>Введите ваши данные</h2>
+
+            <form id="data-form">
+
+              <input
+                type="text"
+                id="firstName"
+                placeholder="Имя *"
+                required
+              >
+
+              <input
+                type="text"
+                id="lastName"
+                placeholder="Фамилия *"
+                required
+              >
+
+              <input
+                type="email"
+                id="email"
+                placeholder="Email (необязательно)"
+              >
+
+              <button
+                type="submit"
+                class="primary-btn"
+              >
+                Сохранить результат
+              </button>
+
+            </form>
+
+          </div>
+
+        </div>
+
+      </div>
+      <!-- END QUIZ -->
+
+      <!-- RESULT -->
       <div id="result" style="display:none;">
+
         <h2>Результат</h2>
+
         <p id="result-text"></p>
 
         <h3>Предварительная оценка</h3>
+
         <p id="verdict-text"></p>
 
-        <p id="verdict-explanation" class="verdict-explanation"></p>
+        <p
+          id="verdict-explanation"
+          class="verdict-explanation"
+        ></p>
 
         <h3>Сильные стороны</h3>
+
         <ul id="strong-areas"></ul>
 
         <h3>Слабые зоны</h3>
+
         <ul id="weak-areas"></ul>
 
         <h3>Результаты по категориям</h3>
+
         <ul id="categories-breakdown"></ul>
 
-        <button id="restart-btn" class="secondary-btn">Пройти ещё раз</button>
+        <button
+          id="restart-btn"
+          class="secondary-btn"
+        >
+          Пройти ещё раз
+        </button>
+
       </div>
+      <!-- END RESULT -->
 
     </div>
+    <!-- END APP ROOT -->
 
-  <!-- Модальное окно "Время вышло" -->
-  <div id="timeup-modal" style="display:none;
-    position: fixed; inset: 0;
-    background: rgba(0,0,0,0.5);
-    justify-content: center; align-items: center;
-    z-index: 9999;">
-    <div style="background: #fff; padding: 20px 24px; border-radius: 8px;
-      max-width: 400px; width: 90%; text-align: center; box-shadow: 0 4px 16px rgba(0,0,0,0.2);">
-      <h2 style="margin-top:0; margin-bottom: 10px;">Время вышло</h2>
-      <p style="margin-bottom: 16px;">
-        Время на прохождение теста закончилось. Мы сохраним ваши ответы и покажем результат после ввода данных.
+  </div>
+  <!-- END CONTAINER -->
+
+
+
+  <!-- TIME UP MODAL -->
+  <div
+    id="timeup-modal"
+    style="
+      display:none;
+      position:fixed;
+      inset:0;
+      background:rgba(0,0,0,0.5);
+      justify-content:center;
+      align-items:center;
+      z-index:9999;
+    "
+  >
+
+    <div
+      style="
+        background:#fff;
+        padding:20px 24px;
+        border-radius:8px;
+        max-width:400px;
+        width:90%;
+        text-align:center;
+        box-shadow:0 4px 16px rgba(0,0,0,0.2);
+      "
+    >
+
+      <h2
+        style="
+          margin-top:0;
+          margin-bottom:10px;
+        "
+      >
+        Время вышло
+      </h2>
+
+      <p style="margin-bottom:16px;">
+        Время на прохождение теста закончилось.
+        Мы сохраним ваши ответы и покажем результат
+        после ввода данных.
       </p>
-      <button id="timeup-ok-btn" style="padding: 8px 16px; border: none;
-        background: #1976d2; color: #fff; border-radius: 4px; cursor: pointer;">
+
+      <button
+        id="timeup-ok-btn"
+        style="
+          padding:8px 16px;
+          border:none;
+          background:#1976d2;
+          color:#fff;
+          border-radius:4px;
+          cursor:pointer;
+        "
+      >
         Ок
       </button>
+
     </div>
+
   </div>
 
+
+
+  <!-- APP -->
   <script src="app.js"></script>
 
-  <!-- Скрипт таймера -->
+
+
+  <!-- TIMER -->
   <script>
-    const TIMER_TEST_ID = new URLSearchParams(window.location.search).get('test_id') || 'default_test';
+
+    const TIMER_TEST_ID =
+      new URLSearchParams(window.location.search)
+        .get('test_id') || 'default_test';
 
     let QUIZ_MINUTES = 15;
-    if (TIMER_TEST_ID === 'qa_junior_web') QUIZ_MINUTES = 20;
-    if (TIMER_TEST_ID === 'qa_middle_web') QUIZ_MINUTES = 20;
-    if (TIMER_TEST_ID === 'qa_senior_web') QUIZ_MINUTES = 25;
 
-    const STORAGE_KEY = 'quiz_end_time_' + TIMER_TEST_ID;
+    if (TIMER_TEST_ID === 'qa_junior_web') {
+      QUIZ_MINUTES = 20;
+    }
+
+    if (TIMER_TEST_ID === 'qa_middle_web') {
+      QUIZ_MINUTES = 20;
+    }
+
+    if (TIMER_TEST_ID === 'qa_senior_web') {
+      QUIZ_MINUTES = 25;
+    }
+
+    const STORAGE_KEY =
+      'quiz_end_time_' + TIMER_TEST_ID;
 
     let endTime = null;
-    const timerEl = document.getElementById('timer');
+
+    const timerEl =
+      document.getElementById('timer');
+
+
 
     function formatTimeLeft(msLeft) {
-      const totalSeconds = Math.max(0, Math.floor(msLeft / 1000));
-      const minutes = Math.floor(totalSeconds / 60);
-      const seconds = totalSeconds % 60;
+
+      const totalSeconds =
+        Math.max(0, Math.floor(msLeft / 1000));
+
+      const minutes =
+        Math.floor(totalSeconds / 60);
+
+      const seconds =
+        totalSeconds % 60;
+
       return (
         String(minutes).padStart(2, '0') +
         ':' +
@@ -128,13 +273,22 @@
       );
     }
 
+
+
     function handleTimeIsUp() {
-      const resultCardEl = document.getElementById('result-card');
-      const resultEl = document.getElementById('result');
+
+      const userFormEl =
+        document.getElementById('user-form');
+
+      const resultEl =
+        document.getElementById('result');
 
       if (
-        (resultCardEl && resultCardEl.style.display === 'block') ||
-        (resultEl && resultEl.style.display === 'block')
+        (userFormEl &&
+          userFormEl.style.display === 'block') ||
+
+        (resultEl &&
+          resultEl.style.display === 'block')
       ) {
         localStorage.removeItem(STORAGE_KEY);
         return;
@@ -143,38 +297,63 @@
       if (typeof showResult === 'function') {
         showResult();
       }
+
       localStorage.removeItem(STORAGE_KEY);
     }
 
+
+
     function updateTimer() {
+
       if (!endTime) return;
 
       const now = Date.now();
+
       const msLeft = endTime - now;
 
       if (msLeft <= 0) {
+
         timerEl.textContent = 'Время вышло';
+
         handleTimeIsUp();
+
         if (window.timerInterval) {
           clearInterval(window.timerInterval);
         }
+
         return;
       }
 
-      timerEl.textContent = 'Осталось: ' + formatTimeLeft(msLeft);
+      timerEl.textContent =
+        'Осталось: ' + formatTimeLeft(msLeft);
     }
 
+
+
     function startTimer() {
+
       const now = Date.now();
-      endTime = now + QUIZ_MINUTES * 60 * 1000;
-      localStorage.setItem(STORAGE_KEY, endTime);
+
+      endTime =
+        now + QUIZ_MINUTES * 60 * 1000;
+
+      localStorage.setItem(
+        STORAGE_KEY,
+        endTime
+      );
 
       if (window.timerInterval) {
         clearInterval(window.timerInterval);
       }
-      window.timerInterval = setInterval(updateTimer, 1000);
+
+      window.timerInterval =
+        setInterval(updateTimer, 1000);
+
       updateTimer();
     }
+
   </script>
+
 </body>
 </html>
+```
