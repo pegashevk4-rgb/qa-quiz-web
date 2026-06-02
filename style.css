@@ -283,6 +283,7 @@ h1 {
   font-weight: 600;
   color: #4b5563;
   white-space: nowrap; /* чтобы \"Осталось: 19:25\" не ломалось на 2 строки */
+  margin-left: 16px;
 }
 
 #next-btn:disabled {
