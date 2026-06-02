@@ -237,7 +237,6 @@ function handleNext() {
 // =========================
 
 function showForm() {
-  // если форма уже показана или уже показываем результат — не дёргаем
   if (
     (elements.userForm && elements.userForm.style.display === "block") ||
     (elements.result && elements.result.style.display === "block")
@@ -245,7 +244,6 @@ function showForm() {
     return;
   }
 
-  // прячем вопросы, показываем форму внутри той же карточки
   elements.quizQuestions.style.display = "none";
   if (elements.userForm) elements.userForm.style.display = "block";
 
@@ -352,7 +350,6 @@ async function handleFormSubmit() {
 // =========================
 
 function renderResult() {
-  // прячем форму, прячем квиз, показываем отдельную карточку результата
   if (elements.userForm) elements.userForm.style.display = "none";
   elements.quiz.style.display = "none";
   elements.result.style.display = "block";
@@ -367,16 +364,13 @@ function renderResult() {
 
   if (verdict === "Passed") {
     verdictText = "Рекомендуем к следующему этапу.";
-    explanation =
-      "Кандидат показал высокий уровень знаний и может быть рассмотрен на позицию.";
+    explanation = "Кандидат показал высокий уровень знаний и может быть рассмотрен на позицию.";
   } else if (verdict === "On the edge") {
     verdictText = "На грани.";
-    explanation =
-      "Рекомендуется дополнительно оценить кандидата на собеседовании.";
+    explanation = "Рекомендуется дополнительно оценить кандидата на собеседовании.";
   } else {
     verdictText = "Не прошёл.";
-    explanation =
-      "Кандидат показал недостаточный уровень знаний для этой позиции.";
+    explanation = "Кандидат показал недостаточный уровень знаний для этой позиции.";
   }
 
   elements.verdictText.textContent = verdictText;
@@ -404,7 +398,6 @@ function renderResult() {
     elements.categoriesBreakdown.appendChild(li);
   });
 }
-
 
 // =========================
 // EVENTS
