@@ -58,8 +58,6 @@ const elements = {
   strongAreas: document.getElementById("strong-areas"),
   weakAreas: document.getElementById("weak-areas"),
   categoriesBreakdown: document.getElementById("categories-breakdown"),
-  resultCard: document.getElementById("result-card"),
-  userFormSection: document.getElementById("user-form-section"),
 };
 
 // =========================
@@ -73,7 +71,7 @@ async function loadQuestions() {
       throw new Error(`HTTP ${response.status}`);
     }
 
-    const data = await response.json(); // {test_id, title, questions}
+    const data = await response.json();
     let questions = data.questions || [];
 
     if (!questions.length) {
@@ -81,13 +79,11 @@ async function loadQuestions() {
       return;
     }
 
-    // Перемешиваем
     questions = questions
       .map(q => ({ q, sort: Math.random() }))
       .sort((a, b) => a.sort - b.sort)
       .map(({ q }) => q);
 
-    // Берём первые 30 (или сколько нужно)
     const MAX_QUESTIONS = 30;
     state.questions = questions.slice(0, MAX_QUESTIONS);
 
@@ -95,9 +91,9 @@ async function loadQuestions() {
       elements.testTitle.textContent = data.title || "QA Quiz";
     }
 
+    // состояние по умолчанию
     elements.intro.style.display = "block";
     elements.quiz.style.display = "none";
-    elements.resultCard.style.display = "none";
     elements.result.style.display = "none";
     if (elements.userForm) elements.userForm.style.display = "none";
   } catch (error) {
@@ -105,6 +101,7 @@ async function loadQuestions() {
     alert("Не удалось загрузить тест. Попробуйте позже.");
   }
 }
+
 
 // =========================
 // Старт квиза
@@ -125,10 +122,11 @@ function startQuiz() {
   state.categoriesFromServer = [];
 
   elements.intro.style.display = "none";
-  elements.quiz.style.display = "block";
-  elements.resultCard.style.display = "none";
-  elements.result.style.display = "none";
-  elements.userFormSection.style.display = "none";
+  elements.quiz.style.display = "block";     // показываем карточку квиза
+  elements.result.style.display = "none";    // скрываем результат
+  if (elements.userForm) {
+    elements.userForm.style.display = "none"; // форма пока скрыта
+  }
 
   elements.quizQuestions.style.display = "block";
 
@@ -142,6 +140,7 @@ function startQuiz() {
 
   showQuestion();
 }
+
 
 // =========================
 // Показ вопроса
@@ -238,18 +237,17 @@ function handleNext() {
 // =========================
 
 function showForm() {
+  // если форма уже показана или уже показываем результат — не дёргаем
   if (
-    elements.resultCard.style.display === "block" &&
-    elements.userFormSection.style.display === "block"
+    (elements.userForm && elements.userForm.style.display === "block") ||
+    (elements.result && elements.result.style.display === "block")
   ) {
     return;
   }
 
+  // прячем вопросы, показываем форму внутри той же карточки
   elements.quizQuestions.style.display = "none";
-
-  elements.resultCard.style.display = "block";
-  elements.userFormSection.style.display = "block";
-  elements.result.style.display = "none";
+  if (elements.userForm) elements.userForm.style.display = "block";
 
   if (window.timerInterval) {
     clearInterval(window.timerInterval);
@@ -260,6 +258,7 @@ function showForm() {
     handleFormSubmit();
   };
 }
+
 
 // Вызывается таймером
 function showResult() {
@@ -353,9 +352,10 @@ async function handleFormSubmit() {
 // =========================
 
 function renderResult() {
-  elements.userFormSection.style.display = "none";
+  // прячем форму, прячем квиз, показываем отдельную карточку результата
+  if (elements.userForm) elements.userForm.style.display = "none";
+  elements.quiz.style.display = "none";
   elements.result.style.display = "block";
-  elements.resultCard.style.display = "block";
 
   const percent = state.percentFromServer ?? 0;
   const verdict = state.verdictFromServer || "On the edge";
@@ -404,6 +404,7 @@ function renderResult() {
     elements.categoriesBreakdown.appendChild(li);
   });
 }
+
 
 // =========================
 // EVENTS
