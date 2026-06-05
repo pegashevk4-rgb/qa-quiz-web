@@ -1,6 +1,6 @@
 // ----- КОНСТАНТЫ -----
 const THEME_KEY = "qa_theme";
-const API_BASE_URL = "http://api.qa-quiz-test.ru";
+const API_BASE_URL = "https://api.qa-quiz-test.ru";
 
 // ----- API-ФУНКЦИИ -----
 async function apiRegisterHR({ name, company, email, password }) {
