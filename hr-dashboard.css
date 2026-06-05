@@ -353,6 +353,20 @@ body {
   justify-content: space-between;
 }
 
+.plan-card-warning {
+  border-color: #f6c453;
+  background: rgba(246, 196, 83, 0.06);
+  color: #f6c453;
+}
+
+.btn-copy:disabled,
+.btn-copy.btn-disabled {
+  background: #9ca3af;
+  cursor: not-allowed;
+  box-shadow: none;
+  transform: none;
+}
+
 .plan-card-okay {
   background: #ecfdf3;
   color: #166534;

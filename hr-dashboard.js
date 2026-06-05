@@ -20,7 +20,7 @@ const API_BASE_URL = "http://127.0.0.1:8000";
 // --- Кандидаты (изначально пусто) ---
 let candidates = [];
 
-
+// --- Рендер инфо о тарифе ---
 function renderPlanInfo(planData) {
   const el = document.getElementById("planInfo");
   if (!el) return;
@@ -30,57 +30,201 @@ function renderPlanInfo(planData) {
     tests_limit = 10,
     tests_used = 0,
     subscription_expires_at = null,
+    is_trial = plan_name === "Free trial",
   } = planData || {};
 
-  const remaining = tests_limit == null ? Infinity : Math.max(0, tests_limit - tests_used);
-  const isOverLimit = tests_limit != null && remaining <= 0;
+  const remaining =
+    tests_limit == null ? Infinity : Math.max(0, tests_limit - tests_used);
 
-  const limitText =
-    tests_limit == null
-      ? "Безлимит по тестам"
-      : `Осталось ${remaining} из ${tests_limit} тестов`;
+  // Считаем дни до окончания, если есть дата
+  let daysLeft = null;
+  if (subscription_expires_at) {
+    const today = new Date();
+    const exp = new Date(subscription_expires_at);
+    const diffMs = exp.setHours(0, 0, 0, 0) - today.setHours(0, 0, 0, 0);
+    daysLeft = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+  }
 
-  const expiresText = subscription_expires_at
-    ? `Подписка до ${subscription_expires_at}`
-    : "";
+  el.classList.remove("plan-card-okay", "plan-card-danger", "plan-card-warning");
 
-  el.classList.remove("plan-card-okay", "plan-card-danger");
-  el.classList.add(isOverLimit ? "plan-card-danger" : "plan-card-okay");
+  let textHtml = "";
 
-  el.innerHTML = `
-    <span>
+  if (is_trial) {
+    // --- ВЕТКА ПРОБНИКА ---
+    const limitText =
+      tests_limit == null
+        ? "Безлимит по тестам"
+        : `Осталось ${remaining} из ${tests_limit} тестов`;
+
+    const isOverLimit = tests_limit != null && remaining <= 0;
+
+    el.classList.add(isOverLimit ? "plan-card-danger" : "plan-card-okay");
+
+    textHtml = `
       Текущий тариф: <strong>${plan_name}</strong>
       · ${limitText}
-      ${expiresText ? "· " + expiresText : ""}
-    </span>
+    `;
+  } else {
+    // --- ВЕТКА ПОДПИСКИ ---
+    let expiresText = "";
+    if (subscription_expires_at) {
+      expiresText = `Подписка до ${subscription_expires_at}`;
+      if (daysLeft !== null && daysLeft <= 3) {
+        el.classList.add("plan-card-warning");
+        expiresText += ` · Осталось ${daysLeft} дн.`;
+      } else {
+        el.classList.add("plan-card-okay");
+      }
+    } else {
+      el.classList.add("plan-card-okay");
+      expiresText = "Подписка активна";
+    }
+
+    textHtml = `
+      Текущий тариф: <strong>${plan_name}</strong>
+      · ${expiresText}
+    `;
+  }
+
+  el.innerHTML = `
+    <span>${textHtml}</span>
     <a href="pricing.html">Перейти к тарифам</a>
   `;
 }
 
-document.addEventListener("DOMContentLoaded", () => {
-  const companyPill = document.getElementById("companyPill");
-  const companyName = localStorage.getItem("qa_company_name");
+// --- Применение лимита к кнопкам тестов ---
+function applyPlanLimitToButtons(planData) {
+  const {
+    plan_name = "Free trial",
+    tests_limit = 10,
+    tests_used = 0,
+    subscription_expires_at = null,
+    is_trial = plan_name === "Free trial",
+  } = planData || {};
 
-  if (companyPill && companyName) {
-    const cleanName = companyName.replace(/\\_/g, "_").replace(/\\(.)/g, "$1");
-    companyPill.textContent = `Компания: ${cleanName}`;
+  const remaining =
+    tests_limit == null ? Infinity : Math.max(0, tests_limit - tests_used);
+
+  // Считаем дни до окончания, если есть дата
+  let daysLeft = null;
+  if (subscription_expires_at) {
+    const today = new Date();
+    const exp = new Date(subscription_expires_at);
+    const diffMs = exp.setHours(0, 0, 0, 0) - today.setHours(0, 0, 0, 0);
+    daysLeft = Math.floor(diffMs / (1000 * 60 * 60 * 24));
   }
 
-  // временная заглушка - потом подставишь реальные данные с бэка
-  renderPlanInfo({
-    plan_name: "Free trial",
-    tests_limit: 10,
-    tests_used: 10,
-    subscription_expires_at: "2026-06-30",
-  });
+  const testButtons = document.querySelectorAll(".btn-copy");
 
-  loadCompanyResults().then(() => {
-    updateMetrics();
-    setVerdictFilter("All");
-    renderTable();
-  });
-});
+  const disableAll = (label) => {
+    testButtons.forEach((btn) => {
+      btn.disabled = true;
+      btn.classList.add("btn-disabled");
+      btn.textContent = label;
+    });
+  };
 
+  const enableAll = () => {
+    testButtons.forEach((btn) => {
+      btn.disabled = false;
+      btn.classList.remove("btn-disabled");
+      btn.textContent = "Скопировать ссылку";
+    });
+  };
+
+  // --- ЛОГИКА ---
+
+  // 1) TRIAL: ограничиваем чисто по лимиту
+  if (is_trial) {
+    if (tests_limit != null && remaining <= 0) {
+      disableAll("Лимит тестов пробной версии исчерпан");
+    } else {
+      enableAll();
+    }
+    return;
+  }
+
+  // 2) ПЛАТНАЯ ПОДПИСКА
+
+  // 2.1. Если есть лимит и он выбит — блокируем независимо от даты
+  if (tests_limit != null && remaining <= 0) {
+    if (daysLeft !== null && daysLeft < 0) {
+      disableAll("Подписка завершена и лимит тестов исчерпан");
+    } else {
+      disableAll("Лимит тестов по тарифу исчерпан");
+    }
+    return;
+  }
+
+  // 2.2. Лимит ещё есть
+  // Если подписка истекла (daysLeft < 0), но remaining > 0 — разрешаем использовать
+  if (daysLeft !== null && daysLeft < 0 && remaining > 0) {
+    enableAll();
+    return;
+  }
+
+  // 2.3. Во всех остальных случаях (активная подписка, лимит не выбит)
+  enableAll();
+}
+
+// --- Загрузка плана компании (пока заглушка) ---
+async function loadCompanyPlan() {
+  const companyId = localStorage.getItem("qa_company_id");
+  if (!companyId) {
+    console.warn("Нет company_id в localStorage для плана");
+    renderPlanInfo({
+      plan_name: "Free trial",
+      tests_limit: 10,
+      tests_used: 0,
+      subscription_expires_at: null,
+      is_trial: true,
+    });
+    applyPlanLimitToButtons({
+      plan_name: "Free trial",
+      tests_limit: 10,
+      tests_used: 0,
+      is_trial: true,
+    });
+    return;
+  }
+
+  try {
+    // TODO: заменить на реальный API
+    // const resp = await fetch(`${API_BASE_URL}/api/company/${companyId}/plan`, {
+    //   credentials: "include",
+    // });
+    // if (!resp.ok) {
+    //   throw new Error("Ошибка ответа плана " + resp.status);
+    // }
+    // const planData = await resp.json();
+
+    const planData = {
+      plan_name: "Free trial",        // или "Pro / Team / Enterprise"
+      tests_limit: 10,                // null для безлимита
+      tests_used: 10,                 // подставь разные числа для проверки
+      subscription_expires_at: "2026-06-30",
+      is_trial: true,                 // false для платного тарифа
+    };
+
+    renderPlanInfo(planData);
+    applyPlanLimitToButtons(planData);
+  } catch (err) {
+    console.error("Ошибка загрузки плана компании", err);
+    renderPlanInfo({
+      plan_name: "Free trial",
+      tests_limit: 10,
+      tests_used: 0,
+      subscription_expires_at: null,
+      is_trial: true,
+    });
+    applyPlanLimitToButtons({
+      plan_name: "Free trial",
+      tests_limit: 10,
+      tests_used: 0,
+      is_trial: true,
+    });
+  }
+}
 
 // --- Загрузка результатов компании из API ---
 async function loadCompanyResults() {
@@ -106,9 +250,7 @@ async function loadCompanyResults() {
 
     candidates = data.map((row, index) => {
       const fullName = `${row.first_name} ${row.last_name}`.trim();
-      const dateStr = row.created_at
-        ? row.created_at.slice(0, 10)
-        : "";
+      const dateStr = row.created_at ? row.created_at.slice(0, 10) : "";
 
       let testName = row.test_id;
       if (row.test_id === "qa_junior_web") testName = "Junior QA";
@@ -146,7 +288,6 @@ async function loadCompanyResults() {
 const testButtons = document.querySelectorAll(".btn-copy");
 
 function getTestLink(testId) {
-  // Берём только токен компании
   const companyToken = localStorage.getItem("qa_company_token");
 
   if (!companyToken) {
@@ -208,15 +349,12 @@ let activeVerdict = "All";
 
 function updateMetrics() {
   document.getElementById("metricTotal").textContent = candidates.length;
-
   document.getElementById("metricPassed").textContent = candidates.filter(
     (c) => c.verdict === "Passed"
   ).length;
-
   document.getElementById("metricEdge").textContent = candidates.filter(
     (c) => c.verdict === "On the edge"
   ).length;
-
   document.getElementById("metricFailed").textContent = candidates.filter(
     (c) => c.verdict === "Failed"
   ).length;
@@ -251,9 +389,7 @@ function getFilteredCandidates() {
   let filtered = [...candidates];
 
   if (activeVerdict !== "All") {
-    filtered = filtered.filter(
-      (candidate) => candidate.verdict === activeVerdict
-    );
+    filtered = filtered.filter((candidate) => candidate.verdict === activeVerdict);
   }
 
   if (searchValue) {
@@ -320,14 +456,11 @@ function openCandidateModal(candidate) {
 
   Object.entries(candidate.topicScores).forEach(([topic, score]) => {
     const row = document.createElement("div");
-
     row.className = "topic-row";
-
     row.innerHTML = `
       <div class="topic-name">${topic}</div>
       <div class="topic-score">${score}%</div>
     `;
-
     topicsContainer.appendChild(row);
   });
 
@@ -350,20 +483,12 @@ searchInput.addEventListener("input", renderTable);
 
 scoreSort.addEventListener("click", () => {
   sortDirection = sortDirection === "desc" ? "asc" : "desc";
-
   sortIndicator.textContent = sortDirection === "desc" ? "↓" : "↑";
-
   renderTable();
 });
 
-document
-  .getElementById("closeModalBtn")
-  .addEventListener("click", closeModal);
-
-document
-  .getElementById("closeFooterBtn")
-  .addEventListener("click", closeModal);
-
+document.getElementById("closeModalBtn").addEventListener("click", closeModal);
+document.getElementById("closeFooterBtn").addEventListener("click", closeModal);
 overlay.addEventListener("click", closeModal);
 
 // --- Переключатель темы ---
@@ -375,7 +500,6 @@ function applyTheme(theme) {
   localStorage.setItem(THEME_KEY, theme);
 
   if (!themeIcon) return;
-
   themeIcon.textContent = theme === "dark" ? "🌙" : "☀";
 }
 
@@ -402,20 +526,21 @@ if (logoutBtn) {
   });
 }
 
-// --- Инициализация после загрузки DOM ---
+// --- ЕДИНСТВЕННЫЙ DOMContentLoaded ---
 document.addEventListener("DOMContentLoaded", () => {
   const companyPill = document.getElementById("companyPill");
   const companyName = localStorage.getItem("qa_company_name");
 
   if (companyPill && companyName) {
-  // Убираем экранирование символов
-  const cleanName = companyName.replace(/\\_/g, '_').replace(/\\(.)/g, '$1');
-  companyPill.textContent = `Компания: ${cleanName}`;
+    const cleanName = companyName.replace(/\\_/g, "_").replace(/\\(.)/g, "$1");
+    companyPill.textContent = `Компания: ${cleanName}`;
   }
 
-  loadCompanyResults().then(() => {
-    updateMetrics();
-    setVerdictFilter("All");
-    renderTable();
+  loadCompanyPlan().then(() => {
+    loadCompanyResults().then(() => {
+      updateMetrics();
+      setVerdictFilter("All");
+      renderTable();
+    });
   });
 });
