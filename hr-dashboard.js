@@ -20,7 +20,7 @@ const API_BASE_URL = "http://127.0.0.1:8000";
 // --- Кандидаты (изначально пусто) ---
 let candidates = [];
 
-// --- Рендер инфо о тарифе ---
+// --- Информация о тарифе ---
 function renderPlanInfo(planData) {
   const el = document.getElementById("planInfo");
   if (!el) return;
@@ -92,7 +92,7 @@ function renderPlanInfo(planData) {
   `;
 }
 
-// --- Применение лимита к кнопкам тестов ---
+// --- Блокировка/разблокировка кнопок тестов по тарифу ---
 function applyPlanLimitToButtons(planData) {
   const {
     plan_name = "Free trial",
@@ -167,7 +167,7 @@ function applyPlanLimitToButtons(planData) {
   enableAll();
 }
 
-// --- Загрузка плана компании (пока заглушка) ---
+// --- Загрузка тарифа компании (с заглушкой, как у тебя) ---
 async function loadCompanyPlan() {
   const companyId = localStorage.getItem("qa_company_id");
   if (!companyId) {
@@ -189,7 +189,7 @@ async function loadCompanyPlan() {
   }
 
   try {
-    // TODO: заменить на реальный API
+    // TODO: потом заменишь на реальный API-запрос
     // const resp = await fetch(`${API_BASE_URL}/api/company/${companyId}/plan`, {
     //   credentials: "include",
     // });
@@ -199,11 +199,11 @@ async function loadCompanyPlan() {
     // const planData = await resp.json();
 
     const planData = {
-      plan_name: "Free trial",        // или "Pro / Team / Enterprise"
-      tests_limit: 10,                // null для безлимита
-      tests_used: 10,                 // подставь разные числа для проверки
+      plan_name: "Free trial",          // или "Pro / Team / Enterprise"
+      tests_limit: 10,                  // null для безлимита
+      tests_used: 10,                   // подставь разные числа для проверки
       subscription_expires_at: "2026-06-30",
-      is_trial: true,                 // false для платного тарифа
+      is_trial: true,                   // false для платного тарифа
     };
 
     renderPlanInfo(planData);
@@ -250,7 +250,9 @@ async function loadCompanyResults() {
 
     candidates = data.map((row, index) => {
       const fullName = `${row.first_name} ${row.last_name}`.trim();
-      const dateStr = row.created_at ? row.created_at.slice(0, 10) : "";
+      const dateStr = row.created_at
+        ? row.created_at.slice(0, 10)
+        : "";
 
       let testName = row.test_id;
       if (row.test_id === "qa_junior_web") testName = "Junior QA";
@@ -259,6 +261,8 @@ async function loadCompanyResults() {
 
       const verdict = row.verdict || "On the edge";
 
+      // TODO: когда на бэке будут отдельные проценты по темам,
+      // здесь подставим реальные поля (например, row.theory_percent и т.д.)
       const topicScores = {
         Theory: row.percent,
         SQL: row.percent,
@@ -349,12 +353,15 @@ let activeVerdict = "All";
 
 function updateMetrics() {
   document.getElementById("metricTotal").textContent = candidates.length;
+
   document.getElementById("metricPassed").textContent = candidates.filter(
     (c) => c.verdict === "Passed"
   ).length;
+
   document.getElementById("metricEdge").textContent = candidates.filter(
     (c) => c.verdict === "On the edge"
   ).length;
+
   document.getElementById("metricFailed").textContent = candidates.filter(
     (c) => c.verdict === "Failed"
   ).length;
@@ -389,7 +396,9 @@ function getFilteredCandidates() {
   let filtered = [...candidates];
 
   if (activeVerdict !== "All") {
-    filtered = filtered.filter((candidate) => candidate.verdict === activeVerdict);
+    filtered = filtered.filter(
+      (candidate) => candidate.verdict === activeVerdict
+    );
   }
 
   if (searchValue) {
@@ -487,8 +496,14 @@ scoreSort.addEventListener("click", () => {
   renderTable();
 });
 
-document.getElementById("closeModalBtn").addEventListener("click", closeModal);
-document.getElementById("closeFooterBtn").addEventListener("click", closeModal);
+document
+  .getElementById("closeModalBtn")
+  .addEventListener("click", closeModal);
+
+document
+  .getElementById("closeFooterBtn")
+  .addEventListener("click", closeModal);
+
 overlay.addEventListener("click", closeModal);
 
 // --- Переключатель темы ---
@@ -500,6 +515,7 @@ function applyTheme(theme) {
   localStorage.setItem(THEME_KEY, theme);
 
   if (!themeIcon) return;
+
   themeIcon.textContent = theme === "dark" ? "🌙" : "☀";
 }
 
@@ -528,6 +544,7 @@ if (logoutBtn) {
 
 // --- ЕДИНСТВЕННЫЙ DOMContentLoaded ---
 document.addEventListener("DOMContentLoaded", () => {
+  // Company pill
   const companyPill = document.getElementById("companyPill");
   const companyName = localStorage.getItem("qa_company_name");
 
@@ -536,7 +553,9 @@ document.addEventListener("DOMContentLoaded", () => {
     companyPill.textContent = `Компания: ${cleanName}`;
   }
 
+  // 1) Загружаем тариф и рендерим план
   loadCompanyPlan().then(() => {
+    // 2) Загружаем результаты
     loadCompanyResults().then(() => {
       updateMetrics();
       setVerdictFilter("All");
