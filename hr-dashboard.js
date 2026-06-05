@@ -1,5 +1,5 @@
 const THEME_KEY = "qa_theme";
-const API_BASE_URL = "http://127.0.0.1:8000";
+const API_BASE_URL = "http://api.qa-quiz-test.ru";
 
 // --- Проверка авторизации перед показом дашборда ---
 (function guardDashboard() {
