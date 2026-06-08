@@ -6,39 +6,41 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
   <title>QA Hiring Assistant — Главная</title>
-  <link rel="shortcut icon" type="image/x-icon" href="favicon.ico" />
 
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet" />
 
-  <link rel="stylesheet" href="hr.css" />
+  <link rel="stylesheet" href="/assets/css/hr.css" />
 
   <link rel="icon" type="image/x-icon" href="/favicon.ico">
-<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
 
 </head>
 <body>
 
 <nav>
   <div class="nav-inner">
-    <a href="hr.html" class="nav-logo">
+    <!-- Логотип ведёт на /hr -->
+    <a href="/hr" class="nav-logo">
       <span class="logo-mark">QA</span>
       <span>QA Hiring Assistant</span>
     </a>
 
     <div class="nav-actions">
-      <!-- 1. Переключатель темы -->
       <button id="theme-toggle" class="theme-toggle" aria-label="Переключить тему">
         ☀
       </button>
 
-      <!-- 2. Тарифы -->
-      <a href="https://pegashevk4-rgb.github.io/qa-quiz-web/pricing.html" class="nav-link">
+      <!-- Тарифы ведут на /pricing -->
+      <a href="/pricing" class="nav-link">
         Тарифы
       </a>
 
-      <!-- 3. Войти -->
+      <a href="/hr-dashboard" class="nav-link">
+        Дашборд
+      </a>
+
       <button id="open-auth-btn" class="nav-link">
         Войти
       </button>
@@ -439,7 +441,7 @@
 </div>
 
 
-<script src="hr.js"></script>
+<script src="/assets/js/hr.js"></script>
 
 </body>
 </html>
