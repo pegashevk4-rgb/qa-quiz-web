@@ -173,7 +173,7 @@ document.addEventListener("DOMContentLoaded", () => {
       if (!isLoggedIn()) {
         openAuthModal("login");
       } else {
-        window.location.href = "hr-dashboard.html";
+        window.location.href = "/hr-dashboard/";
       }
     });
   }
@@ -185,7 +185,7 @@ document.addEventListener("DOMContentLoaded", () => {
       if (!isLoggedIn()) {
         openAuthModal("login");
       } else {
-        window.location.href = "hr-dashboard.html";
+        window.location.href = "/hr-dashboard/";
       }
     });
   }
@@ -380,7 +380,7 @@ document.addEventListener("DOMContentLoaded", () => {
         }
 
         closeAuthModal();
-        window.location.href = "hr-dashboard.html";
+        window.location.href = "/hr-dashboard/";
 
       } catch (err) {
         console.error(err);
@@ -588,7 +588,7 @@ document.addEventListener("DOMContentLoaded", () => {
         }
 
         closeAuthModal();
-        window.location.href = "hr-dashboard.html";
+        window.location.href = "/hr-dashboard/";
       } catch (err) {
         console.error(err);
 
