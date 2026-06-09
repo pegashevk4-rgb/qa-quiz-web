@@ -25,6 +25,8 @@ origins = [
     "http://localhost:8000",
     "http://127.0.0.1:8000",
     "https://pegashevk4-rgb.github.io",
+    "https://qa-quiz-test.ru",
+    "https://api.qa-quiz-test.ru",
 ]
 
 app.add_middleware(
