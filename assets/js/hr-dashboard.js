@@ -172,59 +172,41 @@ async function loadCompanyPlan() {
   const companyId = localStorage.getItem("qa_company_id");
   if (!companyId) {
     console.warn("Нет company_id в localStorage для плана");
-    renderPlanInfo({
+    const fallback = {
       plan_name: "Free trial",
       tests_limit: 10,
       tests_used: 0,
       subscription_expires_at: null,
       is_trial: true,
-    });
-    applyPlanLimitToButtons({
-      plan_name: "Free trial",
-      tests_limit: 10,
-      tests_used: 0,
-      is_trial: true,
-    });
+    };
+    renderPlanInfo(fallback);
+    applyPlanLimitToButtons(fallback);
     return;
   }
 
   try {
-    // TODO: потом заменишь на реальный API-запрос
-    // const resp = await fetch(`${API_BASE_URL}/api/company/${companyId}/plan`, {
-    //   credentials: "include",
-    // });
-    // if (!resp.ok) {
-    //   throw new Error("Ошибка ответа плана " + resp.status);
-    // }
-    // const planData = await resp.json();
-
-    const planData = {
-      plan_name: "Free trial",          // или "Pro / Team / Enterprise"
-      tests_limit: 10,                  // null для безлимита
-      tests_used: 10,                   // подставь разные числа для проверки
-      subscription_expires_at: "2026-06-30",
-      is_trial: true,                   // false для платного тарифа
-    };
+    const resp = await fetch(`${API_BASE_URL}/api/company/${companyId}/plan`);
+    if (!resp.ok) {
+      throw new Error("Ошибка ответа плана " + resp.status);
+    }
+    const planData = await resp.json();
 
     renderPlanInfo(planData);
     applyPlanLimitToButtons(planData);
   } catch (err) {
     console.error("Ошибка загрузки плана компании", err);
-    renderPlanInfo({
+    const fallback = {
       plan_name: "Free trial",
       tests_limit: 10,
       tests_used: 0,
       subscription_expires_at: null,
       is_trial: true,
-    });
-    applyPlanLimitToButtons({
-      plan_name: "Free trial",
-      tests_limit: 10,
-      tests_used: 0,
-      is_trial: true,
-    });
+    };
+    renderPlanInfo(fallback);
+    applyPlanLimitToButtons(fallback);
   }
 }
+
 
 // --- Загрузка результатов компании из API ---
 async function loadCompanyResults() {

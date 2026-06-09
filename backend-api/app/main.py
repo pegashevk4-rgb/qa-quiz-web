@@ -7,6 +7,8 @@ from sqlalchemy.orm import Session
 from .database import Base, engine, SessionLocal
 from . import models, schemas
 from .auth import get_password_hash, verify_password
+from datetime import datetime
+
 
 import secrets
 import string
@@ -222,6 +224,46 @@ def get_company_by_public_token(
         raise HTTPException(status_code=404, detail="Company not found")
     return company
 
+
+@app.get(
+    "/api/company/{company_id}/plan",
+    response_model=schemas.CompanyPlan,
+)
+def get_company_plan(
+    company_id: int,
+    db: Session = Depends(get_db),
+):
+    company = (
+        db.query(models.Company)
+        .filter(models.Company.id == company_id)
+        .first()
+    )
+    if not company:
+        raise HTTPException(status_code=404, detail="Company not found")
+
+    # Логика на основе твоих полей
+    if not company.is_paid:
+        # Триал
+        plan_name = "Free trial"
+        tests_limit = company.trial_tests_limit
+        tests_used = company.trial_tests_used
+        subscription_expires_at = None
+        is_trial = True
+    else:
+        # Простая платная версия: безлимит
+        plan_name = "Paid"
+        tests_limit = None          # None = безлимит
+        tests_used = company.trial_tests_used or 0
+        subscription_expires_at = None
+        is_trial = False
+
+    return schemas.CompanyPlan(
+        plan_name=plan_name,
+        tests_limit=tests_limit,
+        tests_used=tests_used,
+        subscription_expires_at=subscription_expires_at,
+        is_trial=is_trial,
+    )
 
 # =========================
 # Кандидаты и результаты (внутренние)

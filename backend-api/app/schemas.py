@@ -203,3 +203,13 @@ class TestResultResponse(BaseModel):
     strong_areas: list[AreaItem] = []
     weak_areas: list[AreaItem] = []
     categories: list[CategoryBreakdownItem] = []
+
+class CompanyPlan(BaseModel):
+    plan_name: str
+    tests_limit: int | None = None
+    tests_used: int
+    subscription_expires_at: datetime | None = None
+    is_trial: bool
+
+    class Config:
+        orm_mode = True
