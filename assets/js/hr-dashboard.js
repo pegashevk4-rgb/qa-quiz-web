@@ -172,6 +172,7 @@ async function loadCompanyPlan() {
   const companyId = localStorage.getItem("qa_company_id");
   if (!companyId) {
     console.warn("Нет company_id в localStorage для плана");
+    // Мягкий дефолт, если что-то пошло не так
     const fallback = {
       plan_name: "Free trial",
       tests_limit: 10,
@@ -206,7 +207,6 @@ async function loadCompanyPlan() {
     applyPlanLimitToButtons(fallback);
   }
 }
-
 
 // --- Загрузка результатов компании из API ---
 async function loadCompanyResults() {
