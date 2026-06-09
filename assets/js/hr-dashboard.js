@@ -281,14 +281,17 @@ function getTestLink(testId) {
     return "";
   }
 
-  const baseUrl = "https://pegashevk4-rgb.github.io/qa-quiz-web/index.html";
+  // ТОЛЬКО базовый URL, без query
+  const baseUrl = "https://qa-quiz-test.ru/index.html";
+
   const params = new URLSearchParams({
-    test_id: testId,
+    test_id: testId,           // qa_junior_web / qa_middle_web / qa_senior_web
     company_token: companyToken,
   });
 
   return `${baseUrl}?${params.toString()}`;
 }
+
 
 testButtons.forEach((btn) => {
   btn.addEventListener("click", () => {
