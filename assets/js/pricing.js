@@ -78,7 +78,7 @@ document.addEventListener("DOMContentLoaded", () => {
       if (!isLoggedIn()) {
         openAuthModal("login");
       } else {
-        window.location.href = "hr-dashboard.html";
+        window.location.href = "/hr-dashboard/";
       }
     });
   }
@@ -90,7 +90,7 @@ document.addEventListener("DOMContentLoaded", () => {
       if (!isLoggedIn()) {
         openAuthModal("login");
       } else {
-        window.location.href = "hr-dashboard.html";
+        window.location.href = "/hr-dashboard/";
       }
     });
   }
@@ -118,19 +118,15 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   // ===== ПЕРЕХОД В ДАШБОРД ПО ССЫЛКЕ В НАВИГАЦИИ =====
-  const dashboardLink = document.querySelector(
-    '.nav a[href="hr-dashboard.html"]'
-  );
+  const dashboardLink = document.getElementById("dashboard-link");
 
   if (dashboardLink) {
     dashboardLink.addEventListener("click", (e) => {
-      const logged = isLoggedIn();
-
-      if (!logged) {
+      if (!isLoggedIn()) {
         e.preventDefault();
         openAuthModal("login");
       }
-      // если logged === true — переход по href происходит как обычно
+      // если залогинен — обычный переход на /hr-dashboard/ по href
     });
   }
 
@@ -159,7 +155,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
       localStorage.setItem("qa_is_logged_in", "1");
       closeAuthModal();
-      window.location.href = "hr-dashboard.html";
+      window.location.href = "/hr-dashboard/";
     });
   }
 
