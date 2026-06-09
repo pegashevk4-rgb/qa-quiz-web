@@ -1,361 +1,447 @@
+<!-- hr.html -->
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-  <meta charset="UTF-8">
-  <title>QA Quiz</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-  <link rel="stylesheet" href="style.css">
+  <title>QA Hiring Assistant — Главная</title>
 
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet" />
+
+  <link rel="stylesheet" href="/assets/css/hr.css" />
 
   <link rel="icon" type="image/x-icon" href="/favicon.ico">
   <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
 
 </head>
-
 <body>
 
-  <div class="container">
+<nav>
+  <div class="nav-inner">
+    <!-- Логотип ведёт на /hr -->
+    <a href="/hr" class="nav-logo">
+      <span class="logo-mark">QA</span>
+      <span>QA Hiring Assistant</span>
+    </a>
 
-    <div id="app-root">
+    <div class="nav-actions">
+      <button id="theme-toggle" class="theme-toggle" aria-label="Переключить тему">
+        ☀
+      </button>
 
-      <!-- HEADER -->
-      <div class="page-header">
-        <h1>QA Quiz</h1>
+      <!-- Тарифы ведут на /pricing -->
+      <a href="/pricing" class="nav-link">
+        Тарифы
+      </a>
 
-        <div id="timer" class="timer">
-          Осталось: --:--
-        </div>
-      </div>
+      <a href="/hr-dashboard" class="nav-link">
+        Дашборд
+      </a>
 
-      <!-- TITLE -->
-      <h2 id="test-title"></h2>
-
-      <!-- INTRO -->
-      <div id="intro">
-
-        <p>
-          В тесте 30 вопросов: часть с одним правильным вариантом,
-          часть — с несколькими.
-          Читайте подсказку под вопросом, чтобы понять,
-          сколько ответов можно выбрать.
-        </p>
-
-        <div id="start-container">
-          <button id="start-btn">
-            Начать тест
-          </button>
-        </div>
-
-      </div>
-
-      <!-- QUIZ -->
-      <div id="quiz" style="display:none;">
-
-        <div id="quiz-questions">
-
-          <div id="progress"></div>
-
-          <div id="category-text"></div>
-
-          <h3 id="question-text"></h3>
-
-          <p id="question-hint" class="question-hint"></p>
-
-          <div id="options"></div>
-
-          <button id="next-btn" disabled>
-            Далее
-          </button>
-
-        </div>
-
-        <!-- USER FORM -->
-        <div id="user-form" style="display:none;">
-
-          <div class="card">
-
-            <h2>Введите ваши данные</h2>
-
-            <form id="data-form">
-
-              <input
-                type="text"
-                id="firstName"
-                placeholder="Имя *"
-                required
-              >
-
-              <input
-                type="text"
-                id="lastName"
-                placeholder="Фамилия *"
-                required
-              >
-
-              <input
-                type="email"
-                id="email"
-                placeholder="Email (необязательно)"
-              >
-
-              <button
-                type="submit"
-                class="primary-btn"
-              >
-                Сохранить результат
-              </button>
-
-            </form>
-
-          </div>
-
-        </div>
-
-      </div>
-      <!-- END QUIZ -->
-
-      <!-- RESULT -->
-      <div id="result" style="display:none;">
-
-        <h2>Результат</h2>
-
-        <p id="result-text"></p>
-
-        <h3>Предварительная оценка</h3>
-
-        <p id="verdict-text"></p>
-
-        <p
-          id="verdict-explanation"
-          class="verdict-explanation"
-        ></p>
-
-        <h3>Сильные стороны</h3>
-
-        <ul id="strong-areas"></ul>
-
-        <h3>Слабые зоны</h3>
-
-        <ul id="weak-areas"></ul>
-
-        <h3>Результаты по категориям</h3>
-
-        <ul id="categories-breakdown"></ul>
-
-        <button
-          id="restart-btn"
-          class="secondary-btn"
-        >
-          Пройти ещё раз
-        </button>
-
-      </div>
-      <!-- END RESULT -->
-
+      <button id="open-auth-btn" class="nav-link">
+        Войти
+      </button>
     </div>
-    <!-- END APP ROOT -->
-
   </div>
-  <!-- END CONTAINER -->
+</nav>
 
 
+<div id="hero-wrapper">
+  <div class="glow-blob glow-blob--green"></div>
+  <div class="glow-blob glow-blob--blue"></div>
 
-  <!-- TIME UP MODAL -->
-  <div
-    id="timeup-modal"
-    style="
-      display:none;
-      position:fixed;
-      inset:0;
-      background:rgba(0,0,0,0.5);
-      justify-content:center;
-      align-items:center;
-      z-index:9999;
-    "
-  >
+  <div class="inner">
+    <div id="hero">
 
-    <div
-      style="
-        background:#fff;
-        padding:20px 24px;
-        border-radius:8px;
-        max-width:400px;
-        width:90%;
-        text-align:center;
-        box-shadow:0 4px 16px rgba(0,0,0,0.2);
-      "
-    >
+      <div class="eyebrow fade-up">
+        <span class="eyebrow-dot"></span>
+        Для HR, тимлидов и фаундеров
+      </div>
 
-      <h2
-        style="
-          margin-top:0;
-          margin-bottom:10px;
-        "
-      >
-        Время вышло
-      </h2>
+      <h1 class="fade-up delay-1">
+        Тестируйте<br />
+        QA-кандидатов<br />
+        <span class="highlight">за 20 минут</span>
+      </h1>
 
-      <p style="margin-bottom:16px;">
-        Время на прохождение теста закончилось.
-        Мы сохраним ваши ответы и покажем результат
-        после ввода данных.
+      <p class="hero-sub fade-up delay-2">
+        Забудьте о ручном скрининге резюме и субъективных оценках.
+        Отправьте ссылку — и получите объективный отчёт по уровню кандидата.
       </p>
 
-      <button
-        id="timeup-ok-btn"
-        style="
-          padding:8px 16px;
-          border:none;
-          background:#1976d2;
-          color:#fff;
-          border-radius:4px;
-          cursor:pointer;
-        "
-      >
-        Ок
+      <div class="cards fade-up delay-3">
+
+        <div class="card">
+          <div class="card-icon">📋</div>
+
+          <h3>Стандартизированные тесты</h3>
+
+          <p>
+            Профессиональные задания по теории тестирования,
+            SQL, API и инструментам QA. Один стандартизированный тест вместо десятков разрозненных вопросов.
+          </p>
+        </div>
+
+        <div class="card">
+          <div class="card-icon">📊</div>
+
+          <h3>Подробная аналитика по категориям</h3>
+
+          <p>
+            Результаты разбиты по навыкам: ручное тестирование,
+            работа с базами, API и понимание процессов. 
+            Сразу видно, в чём кандидат силён, а где пробелы.
+          </p>
+        </div>
+
+        <div class="card">
+          <div class="card-icon">⚡</div>
+
+          <h3>Экономия времени на скрининг</h3>
+
+          <p>
+            Первичный отбор без технических интервью и созвонов. 
+            Вы видите уже отфильтрованных кандидатов с понятным отчётом по навыкам.
+          </p>
+        </div>
+
+      </div>
+
+      <!-- Кнопка, которая тоже открывает модалку -->
+      <button class="btn-cta fade-up delay-4" id="cta-btn">
+        Получить доступ
+        
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+          <path
+            d="M3 8h10M9 4l4 4-4 4"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          />
+        </svg>
       </button>
 
     </div>
+  </div>
+</div>
+
+<div id="how-wrapper">
+  <div id="how-inner">
+
+    <div class="section-label">Процесс</div>
+
+    <div class="section-title">
+      Как это работает
+    </div>
+
+    <div class="steps">
+
+      <div class="step">
+        <div class="step-num">1</div>
+
+        <h3>Отправляете ссылку</h3>
+
+        <p>
+          Вы просто отправляете кандидату 
+          ссылку на тест. Всё остальное сервис делает за вас.
+        </p>
+      </div>
+
+      <div class="step">
+        <div class="step-num">2</div>
+
+        <h3>Кандидат проходит тест</h3>
+
+        <p>
+          Онлайн, без установки ПО,
+          в удобное время.
+        </p>
+      </div>
+
+      <div class="step">
+        <div class="step-num">3</div>
+
+        <h3>Вы видите результаты</h3>
+
+        <p>
+          Отчёт с процентом правильных ответов,
+          разбивкой по категориям и рекомендацией.
+        </p>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<div id="dashboard">
+  <div id="dashboard-inner">
+    <div class="dashboard-header">
+      <div>
+        <div class="section-label">HR-панель</div>
+        <div class="section-title dashboard-title">Панель кандидатов</div>
+        <p class="dashboard-hint">
+          Нажмите на кандидата, чтобы увидеть,
+          из каких тем складывается его результат.
+        </p>
+      </div>
+    </div>
+
+    <div class="table-wrap-outer">
+      <div class="table-wrap">
+        <table>
+
+
+        <thead>
+          <tr>
+            <th>Имя</th>
+            <th>Фамилия</th>
+            <th>Email</th>
+            <th>Тест</th>
+            <th>Процент</th>
+            <th>Вердикт</th>
+            <th>Дата</th>
+          </tr>
+        </thead>
+
+        <tbody id="results-table-body">
+          <tr>
+            <td>Анна</td><td>Смирнова</td><td>a.smirnova@mail.ru</td><td>Middle</td>
+            <td><div class="pct-bar"><div class="pct-track"><div class="pct-fill" style="width:88%"></div></div>88%</div></td>
+            <td><span class="verdict verdict--pass">✓ Пройден</span></td><td>17.05.2026</td>
+          </tr>
+          <tr>
+            <td>Дмитрий</td><td>Козлов</td><td>d.kozlov@example.com</td><td>Senior</td>
+            <td><div class="pct-bar"><div class="pct-track"><div class="pct-fill" style="width:54%"></div></div>54%</div></td>
+            <td><span class="verdict verdict--review">⚠ На ревью</span></td><td>16.05.2026</td>
+          </tr>
+          <tr>
+            <td>Мария</td><td>Иванова</td><td>m.ivanova@work.io</td><td>Junior QA</td>
+            <td><div class="pct-bar"><div class="pct-track"><div class="pct-fill" style="width:95%"></div></div>95%</div></td>
+            <td><span class="verdict verdict--pass">✓ Пройден</span></td><td>15.05.2026</td>
+          </tr>
+          <tr>
+            <td>Игорь</td><td>Петров</td><td>i.petrov@corp.ru</td><td>Middle</td>
+            <td><div class="pct-bar"><div class="pct-track"><div class="pct-fill" style="width:31%"></div></div>31%</div></td>
+            <td><span class="verdict verdict--fail">✕ Не пройден</span></td><td>14.05.2026</td>
+          </tr>
+          <tr>
+            <td>Ольга</td><td>Сидорова</td><td>o.sidorova@dev.com</td><td>Junior QA</td>
+            <td><div class="pct-bar"><div class="pct-track"><div class="pct-fill" style="width:72%"></div></div>72%</div></td>
+            <td><span class="verdict verdict--pass">✓ Пройден</span></td><td>13.05.2026</td>
+          </tr>
+        </tbody>
+
+      </table>
+    </div>
+
+    <p class="dashboard-note">
+      На примере показаны демо‑данные. В реальной панели вы увидите своих кандидатов и их результаты.
+    </p>
+    
+    </div>
+  </div>
+</div>
+
+<footer>
+  <div class="footer-inner">
+
+    <span>
+      © 2026 QA Hiring Assistant —
+      объективный скрининг QA-специалистов
+    </span>
+
+    <a href="https://github.com" target="_blank" rel="noopener">
+
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+        <path d="M12 2C6.477 2 2 6.484 2 12.021c0 4.428 2.865 8.185 6.839 9.51.5.092.682-.217.682-.483 0-.237-.009-.868-.013-1.703-2.782.605-3.369-1.342-3.369-1.342-.454-1.154-1.11-1.462-1.11-1.462-.908-.62.069-.608.069-.608 1.003.07 1.531 1.031 1.531 1.031.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844a9.59 9.59 0 012.504.337c1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.942.359.31.678.921.678 1.856 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482C19.138 20.2 22 16.447 22 12.021 22 6.484 17.522 2 12 2z"/>
+      </svg>
+
+      GitHub
+    </a>
 
   </div>
+</footer>
+
+<div class="modal-overlay" id="candidate-overlay"></div>
+
+<div class="modal-overlay" id="auth-overlay"></div>
+
+<div class="modal" id="auth-modal">
+  <div class="modal-inner">
+    <button class="modal-close" id="auth-close">
+      &times;
+    </button>
+
+    <div class="modal-tabs">
+      <button class="modal-tab active" data-tab="login">
+        Вход
+      </button>
+
+      <button class="modal-tab" data-tab="register">
+        Регистрация
+      </button>
+    </div>
+
+    <!-- Форма входа -->
+    <form class="modal-form active" id="login-form" novalidate>
+      <div class="form-field">
+        <label>
+          Email *
+          <input
+            type="email"
+            name="email"
+            required
+          />
+        </label>
+        <div class="field-error-text" data-error-for="login-email"></div>
+      </div>
+
+      <div class="form-field">
+        <label>
+          Пароль *
+          <input
+            type="password"
+            name="password"
+            required
+            minlength="8"
+            pattern="^(?=.*[A-Za-z])(?=.*\d).{8,}$"
+            title="Минимум 8 символов, хотя бы одна буква и одна цифра"
+          />
+        </label>
+        <div class="field-error-text" data-error-for="login-password"></div>
+      </div>
+
+      <button type="submit" class="modal-submit">
+        Войти
+      </button>
+
+      <p class="modal-hint">
+        Поля с * обязательны для заполнения.
+      </p>
+    </form>
+
+    <!-- Форма регистрации -->
+    <form class="modal-form" id="register-form" novalidate>
+      <div class="form-field">
+        <label>
+          Имя *
+          <input
+            type="text"
+            name="name"
+            required
+            minlength="2"
+          />
+        </label>
+        <div class="field-error-text" data-error-for="name"></div>
+      </div>
+
+      <div class="form-field">
+        <label>
+          Компания *
+          <input
+            type="text"
+            name="company"
+            required
+            minlength="2"
+          />
+        </label>
+        <div class="field-error-text" data-error-for="company"></div>
+      </div>
+
+      <div class="form-field">
+        <label>
+          Email *
+          <input
+            type="email"
+            name="email"
+            required
+          />
+        </label>
+        <div class="field-error-text" data-error-for="email"></div>
+      </div>
+
+      <div class="form-field">
+        <label>
+          Пароль *
+          <input
+            type="password"
+            name="password"
+            required
+            minlength="8"
+            pattern="^(?=.*[A-Za-z])(?=.*\d).{8,}$"
+            title="Минимум 8 символов, хотя бы одна буква и одна цифра"
+          />
+        </label>
+        <div class="field-error-text" data-error-for="password"></div>
+      </div>
+
+      <button type="submit" class="modal-submit">
+        Создать аккаунт
+      </button>
+
+      <p class="modal-hint">
+        Поля с * обязательны для заполнения.
+      </p>
+    </form>
+  </div>
+</div>
+
+<div class="modal" id="candidate-modal">
+  <div class="modal-inner modal-card">
+
+    <div class="candidate-modal-header">
+      <div>
+        <div class="section-label">Кандидат</div>
+        <h3 class="candidate-modal-title" id="cand-name">Имя Фамилия</h3>
+        <div class="candidate-modal-subtitle" id="cand-test">
+          Тест: Middle QA
+        </div>
+      </div>
+
+      <button class="modal-close" id="candidate-close">
+        &times;
+      </button>
+    </div>
+
+    <div class="candidate-meta">
+      <div class="meta-card">
+        <div class="meta-label">Общий результат</div>
+        <div class="meta-value" id="cand-score">88%</div>
+      </div>
+
+      <div class="meta-card">
+        <div class="meta-label">Вердикт</div>
+        <div class="meta-value" id="cand-verdict">✓ Пройден</div>
+      </div>
+
+      <div class="meta-card">
+        <div class="meta-label">Дата</div>
+        <div class="meta-value" id="cand-date">17.05.2026</div>
+      </div>
+
+      <div class="meta-card">
+        <div class="meta-label">Тест</div>
+        <div class="meta-value" id="cand-test-short">Middle</div>
+      </div>
+    </div>
+
+    <div class="candidate-topics">
+      <h3>Разбивка по темам</h3>
+
+      <div class="topics" id="cand-topics-body">
+        <!-- сюда JS подставит темы -->
+      </div>
+    </div>
+
+  </div>
+</div>
 
 
-
-  <!-- APP -->
-  <script src="app.js"></script>
-
-
-
-  <!-- TIMER -->
-  <script>
-
-    const TIMER_TEST_ID =
-      new URLSearchParams(window.location.search)
-        .get('test_id') || 'default_test';
-
-    let QUIZ_MINUTES = 15;
-
-    if (TIMER_TEST_ID === 'qa_junior_web') {
-      QUIZ_MINUTES = 20;
-    }
-
-    if (TIMER_TEST_ID === 'qa_middle_web') {
-      QUIZ_MINUTES = 20;
-    }
-
-    if (TIMER_TEST_ID === 'qa_senior_web') {
-      QUIZ_MINUTES = 25;
-    }
-
-    const STORAGE_KEY =
-      'quiz_end_time_' + TIMER_TEST_ID;
-
-    let endTime = null;
-
-    const timerEl =
-      document.getElementById('timer');
-
-
-
-    function formatTimeLeft(msLeft) {
-
-      const totalSeconds =
-        Math.max(0, Math.floor(msLeft / 1000));
-
-      const minutes =
-        Math.floor(totalSeconds / 60);
-
-      const seconds =
-        totalSeconds % 60;
-
-      return (
-        String(minutes).padStart(2, '0') +
-        ':' +
-        String(seconds).padStart(2, '0')
-      );
-    }
-
-
-
-    function handleTimeIsUp() {
-
-      const userFormEl =
-        document.getElementById('user-form');
-
-      const resultEl =
-        document.getElementById('result');
-
-      if (
-        (userFormEl &&
-          userFormEl.style.display === 'block') ||
-
-        (resultEl &&
-          resultEl.style.display === 'block')
-      ) {
-        localStorage.removeItem(STORAGE_KEY);
-        return;
-      }
-
-      if (typeof showResult === 'function') {
-        showResult();
-      }
-
-      localStorage.removeItem(STORAGE_KEY);
-    }
-
-
-
-    function updateTimer() {
-
-      if (!endTime) return;
-
-      const now = Date.now();
-
-      const msLeft = endTime - now;
-
-      if (msLeft <= 0) {
-
-        timerEl.textContent = 'Время вышло';
-
-        handleTimeIsUp();
-
-        if (window.timerInterval) {
-          clearInterval(window.timerInterval);
-        }
-
-        return;
-      }
-
-      timerEl.textContent =
-        'Осталось: ' + formatTimeLeft(msLeft);
-    }
-
-
-
-    function startTimer() {
-
-      const now = Date.now();
-
-      endTime =
-        now + QUIZ_MINUTES * 60 * 1000;
-
-      localStorage.setItem(
-        STORAGE_KEY,
-        endTime
-      );
-
-      if (window.timerInterval) {
-        clearInterval(window.timerInterval);
-      }
-
-      window.timerInterval =
-        setInterval(updateTimer, 1000);
-
-      updateTimer();
-    }
-
-  </script>
+<script src="/assets/js/hr.js"></script>
 
 </body>
 </html>
