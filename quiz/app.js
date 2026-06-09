@@ -3,7 +3,7 @@
 // =========================
 
 // Базовый URL бэкенда
-const API_BASE_URL = "http://93.183.72.130:8000";
+const API_BASE_URL = "https://api.qa-quiz-test.ru";
 
 // =========================
 // URL PARAMS
