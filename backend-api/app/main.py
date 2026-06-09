@@ -63,7 +63,7 @@ def map_test_title(test_id: str) -> str:
 
 @app.get("/health")
 def health_check():
-    return {"status": "ok"}
+    return {"status": "ok", "cors_test": "v3"}
 
 
 # =========================
