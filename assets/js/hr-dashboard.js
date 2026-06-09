@@ -281,8 +281,8 @@ function getTestLink(testId) {
     return "";
   }
 
-  // ТОЛЬКО базовый URL, без query
-  const baseUrl = "https://qa-quiz-test.ru/index.html";
+  // Квиз живёт в папке quiz
+  const baseUrl = "https://qa-quiz-test.ru/quiz/index.html";
 
   const params = new URLSearchParams({
     test_id: testId,           // qa_junior_web / qa_middle_web / qa_senior_web
@@ -291,6 +291,7 @@ function getTestLink(testId) {
 
   return `${baseUrl}?${params.toString()}`;
 }
+
 
 
 testButtons.forEach((btn) => {
