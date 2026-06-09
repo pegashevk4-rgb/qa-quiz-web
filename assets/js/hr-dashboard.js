@@ -520,7 +520,7 @@ if (logoutBtn) {
     localStorage.removeItem("qa_is_logged_in");
     localStorage.removeItem("qa_company_id");
     localStorage.removeItem("qa_company_name");
-    window.location.href = "hr.html";
+    window.location.href = "/";
   });
 }
 
