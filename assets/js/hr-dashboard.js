@@ -399,7 +399,6 @@ const modalId = document.getElementById("modalId");
 const topicsContainer = document.getElementById("topicsContainer");
 const questionsContainer = document.getElementById("questionsContainer");
 const filterButtons = document.querySelectorAll(".filter-btn");
-const filterButtons = document.querySelectorAll(".filter-btn");
 const testFilterButtons = document.querySelectorAll(".test-filter-btn");
 
 
