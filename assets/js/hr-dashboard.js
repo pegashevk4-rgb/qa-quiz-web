@@ -17,7 +17,7 @@ const API_BASE_URL = "https://api.qa-quiz-test.ru";
 
 
   if (!isLoggedIn || !companyId) {
-    window.location.href = "hr.html";
+    window.location.href = "/";
   }
 })();
 
@@ -105,7 +105,7 @@ function renderPlanInfo(planData) {
 
   el.innerHTML = `
     <span>${textHtml}</span>
-    <a href="pricing.html">Перейти к тарифам</a>
+    <a href="/pricing">Перейти к тарифам</a>
   `;
 }
 
