@@ -346,11 +346,14 @@ const modalId = document.getElementById("modalId");
 const topicsContainer = document.getElementById("topicsContainer");
 const questionsContainer = document.getElementById("questionsContainer");
 const filterButtons = document.querySelectorAll(".filter-btn");
+const testFilterButtons = document.querySelectorAll(".test-filter-btn");
 
 const exportCsvBtn = document.getElementById("exportCsvBtn");
 
 let sortDirection = "desc";
 let activeVerdict = "All";
+let activeTestFilter = "All";
+let currentCandidate = null;
 
 function updateMetrics() {
   document.getElementById("metricTotal").textContent = candidates.length;
@@ -396,24 +399,50 @@ function getFilteredCandidates() {
 
   let filtered = [...candidates];
 
+  // Фильтр по вердикту
   if (activeVerdict !== "All") {
     filtered = filtered.filter(
       (candidate) => candidate.verdict === activeVerdict
     );
   }
 
+  // Фильтр по тесту
+  if (activeTestFilter !== "All") {
+    filtered = filtered.filter(
+      (candidate) => candidate.testName === activeTestFilter
+    );
+  }
+
+  // Поиск по имени
   if (searchValue) {
     filtered = filtered.filter((candidate) =>
       candidate.name.toLowerCase().includes(searchValue)
     );
   }
 
+  // Сортировка по результату
   filtered.sort((a, b) => {
     return sortDirection === "desc" ? b.score - a.score : a.score - b.score;
   });
 
   return filtered;
 }
+
+function setTestFilter(value) {
+  activeTestFilter = value;
+
+  testFilterButtons.forEach((btn) => {
+    btn.classList.toggle("active", btn.dataset.test === value);
+  });
+
+  renderTable();
+}
+
+testFilterButtons.forEach((btn) => {
+  btn.addEventListener("click", () => {
+    setTestFilter(btn.dataset.test);
+  });
+});
 
 function renderTable() {
   const data = getFilteredCandidates();
@@ -455,6 +484,7 @@ function renderTable() {
 }
 
 function openCandidateModal(candidate) {
+  currentCandidate = candidate; // сохраняем для экспорта
   modalName.textContent = candidate.name;
   modalTest.textContent = candidate.testName;
   modalScore.textContent = `${candidate.score}%`;
@@ -487,6 +517,108 @@ function openCandidateModal(candidate) {
   overlay.classList.add("active");
   modal.classList.add("active");
 }
+
+const exportCandidateBtn = document.getElementById("exportCandidateBtn");
+
+function exportCurrentCandidateToCsv() {
+  if (!currentCandidate) {
+    alert("Нет данных для экспорта.");
+    return;
+  }
+
+  const c = currentCandidate;
+
+  const headers = [
+    "Result ID",
+    "Имя",
+    "Тест",
+    "Результат %",
+    "Вердикт",
+    "Дата",
+    "Тема",
+    "Процент",
+    "Правильных",
+    "Всего"
+  ];
+
+  const rows = [];
+
+  const topicScores = c.topicScores || {};
+
+  const entries = Object.entries(topicScores);
+
+  if (!entries.length) {
+    // хотя бы одна строка без тем
+    rows.push([
+      c.id,
+      c.name,
+      c.testName,
+      c.score,
+      translateVerdict(c.verdict),
+      c.date,
+      "",
+      "",
+      "",
+      ""
+    ]);
+  } else {
+    entries.forEach(([topicName, topicData]) => {
+      const percent = topicData.percent ?? 0;
+      const correct =
+        typeof topicData.correct === "number" ? topicData.correct : "";
+      const total =
+        typeof topicData.total === "number" ? topicData.total : "";
+
+      rows.push([
+        c.id,
+        c.name,
+        c.testName,
+        c.score,
+        translateVerdict(c.verdict),
+        c.date,
+        topicName,
+        percent,
+        correct,
+        total
+      ]);
+    });
+  }
+
+  const lines = [];
+  lines.push(headers.join(";"));
+
+  rows.forEach((row) => {
+    const safeRow = row.map((value) => {
+      if (value == null) return "";
+      const str = String(value).replace(/"/g, '""');
+      return `"${str}"`;
+    });
+    lines.push(safeRow.join(";"));
+  });
+
+  const csvContent = lines.join("\r\n");
+
+  const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+  const url = URL.createObjectURL(blob);
+
+  const today = new Date().toISOString().slice(0, 10);
+  const safeName = c.name.replace(/\s+/g, "_");
+
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = `qa_result_${safeName}_${today}.csv`;
+
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+
+  URL.revokeObjectURL(url);
+}
+
+if (exportCandidateBtn) {
+  exportCandidateBtn.addEventListener("click", exportCurrentCandidateToCsv);
+}
+
 
 
 function closeModal() {

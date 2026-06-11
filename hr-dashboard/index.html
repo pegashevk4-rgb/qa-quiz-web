@@ -180,11 +180,20 @@
             class="search-input"
           />
 
-          <div class="filter-group">
-            <button class="filter-btn active" data-value="All">Все</button>
-            <button class="filter-btn" data-value="Passed">Прошли</button>
-            <button class="filter-btn" data-value="On the edge">На грани</button>
-            <button class="filter-btn" data-value="Failed">Провалили</button>
+          <div class="filter-block">
+            <div class="filter-group">
+              <button class="filter-btn active" data-value="All">Все</button>
+              <button class="filter-btn" data-value="Passed">Прошли</button>
+              <button class="filter-btn" data-value="On the edge">На грани</button>
+              <button class="filter-btn" data-value="Failed">Провалили</button>
+            </div>
+
+            <div class="test-filter-group">
+              <button class="test-filter-btn active" data-test="All">Все тесты</button>
+              <button class="test-filter-btn" data-test="Junior QA">Junior</button>
+              <button class="test-filter-btn" data-test="Middle QA">Middle</button>
+              <button class="test-filter-btn" data-test="Senior QA">Senior</button>
+            </div>
           </div>
 
           <button
@@ -271,6 +280,9 @@
       </div>
 
       <div class="modal-footer">
+        <button type="button" class="btn-secondary" id="exportCandidateBtn">
+          Экспорт результата
+        </button>
         <button type="button" class="btn-secondary" id="closeFooterBtn">
           Закрыть
         </button>
