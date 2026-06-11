@@ -4,29 +4,34 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
+
   <title>QA Hiring Assistant — HR Dashboard</title>
+
 
   <!-- Те же шрифты, что и на hr.html -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet" />
 
+
   <link rel="stylesheet" href="/assets/css/hr-dashboard.css" />
   <script src="/assets/js/hr-dashboard.js" defer></script>
+
 
   <link rel="icon" type="image/x-icon" href="/favicon.ico">
   <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
 
+
 </head>
 <body>
-  
+ 
   <!-- БОКОВОЕ МЕНЮ -->
   <aside class="sidebar">
     <div class="sidebar-logo">
       <span class="logo-mark">QA</span>
       <span class="logo-text">QA Hiring Assistant</span>
     </div>
-    
+   
     <nav class="sidebar-nav">
       <a href="/hr-dashboard" class="nav-item active">
         <span>●</span> Дашборд
@@ -38,8 +43,10 @@
         <span>●</span> Главная
       </a>
 
+
     </nav>
   </aside>
+
 
   <!-- ОСНОВНОЙ КОНТЕНТ -->
   <div class="main-wrapper">
@@ -49,10 +56,10 @@
         <h1>HR-дашборд</h1>
         <p class="header-subtitle">Оценка и аналитика QA-кандидатов</p>
       </div>
-      
+     
       <div class="header-right">
         <span class="company-pill" id="companyPill">Компания: Demo Company</span>
-        
+       
         <button
           id="themeToggle"
           class="theme-toggle"
@@ -61,12 +68,13 @@
         >
           <span id="themeIcon">☀</span>
         </button>
-        
+       
         <button class="logout-btn" id="logoutBtn" type="button">
           Выйти
         </button>
       </div>
     </header>
+
 
     <!-- ОСНОВНОЙ КОНТЕНТ -->
     <main class="dashboard-content">
@@ -77,21 +85,25 @@
           <div class="metric-value" id="metricTotal">0</div>
         </div>
 
+
         <div class="metric-card">
           <div class="metric-label">Прошли</div>
           <div class="metric-value metric-green" id="metricPassed">0</div>
         </div>
+
 
         <div class="metric-card">
           <div class="metric-label">На грани</div>
           <div class="metric-value metric-yellow" id="metricEdge">0</div>
         </div>
 
+
         <div class="metric-card">
           <div class="metric-label">Провалили</div>
           <div class="metric-value metric-red" id="metricFailed">0</div>
         </div>
       </section>
+
 
       <!-- ИНФО О ТАРИФЕ -->
       <section class="plan-section">
@@ -101,12 +113,14 @@
         </div>
       </section>
 
+
       <!-- ТЕСТЫ (ТАБЛИЦА) -->
       <section class="tests-section">
         <h2>Тесты и ссылки для кандидатов</h2>
         <p class="section-subtitle">
           Сгенерируйте ссылку на нужный уровень теста и отправьте кандидату.
         </p>
+
 
         <div class="tests-table-container">
           <table class="tests-table">
@@ -127,6 +141,7 @@
                 </td>
               </tr>
 
+
               <tr>
                 <td class="test-name">
                   <div class="test-title">Middle QA</div>
@@ -142,6 +157,7 @@
                   </button>
                 </td>
               </tr>
+
 
               <tr>
                 <td class="test-name">
@@ -163,6 +179,7 @@
         </div>
       </section>
 
+
       <!-- ТАБЛИЦА КАНДИДАТОВ -->
       <section class="candidates-section">
         <div class="section-header">
@@ -172,6 +189,7 @@
           </p>
         </div>
 
+
         <div class="table-controls">
           <input
             type="text"
@@ -179,6 +197,7 @@
             placeholder="Поиск по имени"
             class="search-input"
           />
+
 
           <div class="filter-block">
             <div class="filter-group">
@@ -188,6 +207,7 @@
               <button class="filter-btn" data-value="Failed">Провалили</button>
             </div>
 
+
             <div class="test-filter-group">
               <button class="test-filter-btn active" data-test="All">Все тесты</button>
               <button class="test-filter-btn" data-test="Junior QA">Junior</button>
@@ -195,6 +215,7 @@
               <button class="test-filter-btn" data-test="Senior QA">Senior</button>
             </div>
           </div>
+
 
           <div class="table-exports">
             <button
@@ -210,6 +231,7 @@
         </div>
 
 
+
         <div class="table-wrapper">
           <table class="candidates-table">
             <thead>
@@ -223,6 +245,7 @@
                   </button>
                 </th>
 
+
                 <th>Вердикт</th>
                 <th>Дата</th>
               </tr>
@@ -232,6 +255,7 @@
             </tbody>
           </table>
 
+
           <div class="empty-state" id="emptyState">
             Пока нет кандидатов. Отправьте первый тест — результаты появятся здесь.
           </div>
@@ -239,6 +263,7 @@
       </section>
     </main>
   </div>
+
 
   <!-- МОДАЛКА -->
   <div class="modal-overlay" id="modalOverlay"></div>
@@ -255,21 +280,25 @@
         </button>
       </div>
 
+
       <div class="candidate-meta">
         <div class="meta-card">
           <div class="meta-label">Общий результат</div>
           <div class="meta-value" id="modalScore">88%</div>
         </div>
 
+
         <div class="meta-card">
           <div class="meta-label">Вердикт</div>
           <div class="meta-value" id="modalVerdict">Прошёл</div>
         </div>
 
+
         <div class="meta-card">
           <div class="meta-label">Дата</div>
           <div class="meta-value" id="modalDate">17.05.2026</div>
         </div>
+
 
         <div class="meta-card">
           <div class="meta-label">ID результата</div>
@@ -277,30 +306,20 @@
         </div>
       </div>
 
+
       <div class="candidate-topics">
         <h3>Разбивка по темам</h3>
-
-        <div class="topics" id="cand-topics-body">
-          <!-- сюда JS подставит темы -->
+        <div class="topics-list" id="topicsContainer">
+          <!-- JS подставит темы -->
         </div>
       </div>
 
-      <div class="modal-footer">
-        <button
-          type="button"
-          class="btn-secondary"
-          id="demo-export-btn"
-          disabled
-          title="Демо: экспорт доступен в HR-дашборде"
-        >
-          Экспорт результата (демо)
-        </button>
 
-        <button
-          type="button"
-          class="btn-secondary"
-          id="candidate-close-footer"
-        >
+      <div class="modal-footer">
+        <button type="button" class="btn-secondary" id="exportCandidateBtn">
+          Экспорт результата
+        </button>
+        <button type="button" class="btn-secondary" id="closeFooterBtn">
           Закрыть
         </button>
       </div>
