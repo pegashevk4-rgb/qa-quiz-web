@@ -2,7 +2,6 @@ from pydantic import BaseModel, EmailStr
 from datetime import datetime
 from typing import List
 
-
 class UserCreate(BaseModel):
     email: EmailStr
     password: str
@@ -143,6 +142,27 @@ class ResultRow(BaseModel):
 
     class Config:
         from_attributes = True
+
+class CategorySummary(BaseModel):
+    category: str
+    percent: int
+    # если хочешь сразу передавать correct/total, можно добавить позже
+
+class ResultRow(BaseModel):
+    result_id: int
+    user_id: int
+    first_name: str
+    last_name: str
+    email: EmailStr | None
+    test_id: str
+    percent: int
+    verdict: str
+    created_at: datetime
+    categories: list[CategorySummary] = []  # НОВОЕ
+
+    class Config:
+        from_attributes = True
+
 
 
 class HRLoginRequest(BaseModel):

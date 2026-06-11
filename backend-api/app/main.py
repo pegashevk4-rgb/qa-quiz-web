@@ -470,20 +470,50 @@ def get_company_results(
         .all()
     )
 
-    return [
-        schemas.ResultRow(
-            result_id=r.result_id,
-            user_id=r.user_id,
-            first_name=r.first_name,
-            last_name=r.last_name,
-            email=r.email,
-            test_id=r.test_id,
-            percent=r.percent,
-            verdict=r.verdict,
-            created_at=r.created_at,
+    result_ids = [r.result_id for r in rows]
+
+    # тянем все детали разом
+    details = (
+        db.query(models.DetailedResult)
+        .filter(models.DetailedResult.result_id.in_(result_ids))
+        .all()
+    )
+
+    details_by_result: dict[int, list[models.DetailedResult]] = defaultdict(list)
+    for d in details:
+        details_by_result[d.result_id].append(d)
+
+    output: list[schemas.ResultRow] = []
+
+    for r in rows:
+        categories: list[schemas.CategorySummary] = []
+        for d in details_by_result.get(r.result_id, []):
+            if d.category == "Overall":
+                continue  # общий результат уже есть в r.percent
+            categories.append(
+                schemas.CategorySummary(
+                    category=d.category,
+                    percent=d.percent,
+                )
+            )
+
+        output.append(
+            schemas.ResultRow(
+                result_id=r.result_id,
+                user_id=r.user_id,
+                first_name=r.first_name,
+                last_name=r.last_name,
+                email=r.email,
+                test_id=r.test_id,
+                percent=r.percent,
+                verdict=r.verdict,
+                created_at=r.created_at,
+                categories=categories,
+            )
         )
-        for r in rows
-    ]
+
+    return output
+
 
 
 # =========================
