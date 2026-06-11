@@ -243,14 +243,24 @@ async function loadCompanyResults() {
 
       const verdict = row.verdict || "On the edge";
 
-      // TODO: когда на бэке будут отдельные проценты по темам,
-      // здесь подставим реальные поля (например, row.theory_percent и т.д.)
-      const topicScores = {
-        Theory: row.percent,
-        SQL: row.percent,
-        API: row.percent,
-        Tools: row.percent,
-      };
+      // Детальная разбивка по темам
+      const topicScores = {};
+
+      if (Array.isArray(row.categories)) {
+        row.categories.forEach((cat) => {
+          topicScores[cat.category] = {
+            percent: cat.percent ?? 0,
+            correct: cat.correct ?? null,
+            total: cat.total ?? null,
+          };
+        });
+      } else {
+        topicScores["Общий результат"] = {
+          percent: row.percent ?? 0,
+          correct: null,
+          total: null,
+        };
+      }
 
       return {
         id: row.result_id ?? index + 1,
@@ -260,6 +270,8 @@ async function loadCompanyResults() {
         verdict,
         date: dateStr,
         topicScores,
+        weakAreas: row.weak_areas || [],
+        strongAreas: row.strong_areas || [],
       };
     });
 
@@ -269,6 +281,7 @@ async function loadCompanyResults() {
     console.error("Ошибка при запросе результатов компании", err);
   }
 }
+
 
 // --- Генерация ссылок на тесты ---
 const testButtons = document.querySelectorAll(".btn-copy");
@@ -447,17 +460,49 @@ function openCandidateModal(candidate) {
   modalDate.textContent = candidate.date;
   modalId.textContent = `#${candidate.id}`;
 
+  // Темы
   topicsContainer.innerHTML = "";
 
-  Object.entries(candidate.topicScores).forEach(([topic, score]) => {
+  Object.entries(candidate.topicScores).forEach(([topic, info]) => {
+    const percent = info?.percent ?? 0;
+    const correct = info?.correct;
+    const total = info?.total;
+
+    let detailsText = `${percent}%`;
+    if (typeof correct === "number" && typeof total === "number") {
+      detailsText += ` (${correct} из ${total})`;
+    }
+
     const row = document.createElement("div");
     row.className = "topic-row";
     row.innerHTML = `
       <div class="topic-name">${topic}</div>
-      <div class="topic-score">${score}%</div>
+      <div class="topic-score">${detailsText}</div>
     `;
     topicsContainer.appendChild(row);
   });
+
+
+  // (Опционально) Вопросы и ответы
+  if (questionsContainer) {
+    questionsContainer.innerHTML = "";
+
+    (candidate.questions || []).forEach((q, idx) => {
+      const item = document.createElement("div");
+      item.className = "question-row";
+      item.innerHTML = `
+        <div class="question-title">
+          ${idx + 1}. ${q.text || "Вопрос"}
+        </div>
+        <div class="question-meta">
+          Тема: ${q.category || "—"} · ${
+            q.is_correct ? "✅ верно" : "❌ неверно"
+          }
+        </div>
+      `;
+      questionsContainer.appendChild(item);
+    });
+  }
 
   overlay.classList.add("active");
   modal.classList.add("active");
