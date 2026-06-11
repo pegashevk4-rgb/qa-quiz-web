@@ -344,7 +344,7 @@ const modalVerdict = document.getElementById("modalVerdict");
 const modalDate = document.getElementById("modalDate");
 const modalId = document.getElementById("modalId");
 const topicsContainer = document.getElementById("topicsContainer");
-
+const questionsContainer = document.getElementById("questionsContainer");
 const filterButtons = document.querySelectorAll(".filter-btn");
 
 let sortDirection = "desc";
@@ -484,26 +484,7 @@ function openCandidateModal(candidate) {
 
 
   // (Опционально) Вопросы и ответы
-  if (questionsContainer) {
-    questionsContainer.innerHTML = "";
-
-    (candidate.questions || []).forEach((q, idx) => {
-      const item = document.createElement("div");
-      item.className = "question-row";
-      item.innerHTML = `
-        <div class="question-title">
-          ${idx + 1}. ${q.text || "Вопрос"}
-        </div>
-        <div class="question-meta">
-          Тема: ${q.category || "—"} · ${
-            q.is_correct ? "✅ верно" : "❌ неверно"
-          }
-        </div>
-      `;
-      questionsContainer.appendChild(item);
-    });
-  }
-
+  
   overlay.classList.add("active");
   modal.classList.add("active");
 }
