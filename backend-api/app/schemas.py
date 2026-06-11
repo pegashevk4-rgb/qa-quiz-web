@@ -127,22 +127,7 @@ class TestResultIn(BaseModel):
     categories: list[Category]
     strong_areas: list[Category]
     weak_areas: list[Category]
-
-
-class ResultRow(BaseModel):
-    result_id: int
-    user_id: int
-    first_name: str
-    last_name: str
-    email: EmailStr | None
-    test_id: str
-    percent: int
-    verdict: str
-    created_at: datetime
-
-    class Config:
-        from_attributes = True
-
+    
 class CategorySummary(BaseModel):
     category: str
     percent: int
