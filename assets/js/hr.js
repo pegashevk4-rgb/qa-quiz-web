@@ -170,7 +170,11 @@ document.addEventListener("DOMContentLoaded", () => {
   if (btnLogin) {
     btnLogin.addEventListener("click", (e) => {
       e.preventDefault();
-      openAuthModal("login"); // всегда показываем модалку
+      if (!isLoggedIn()) {
+        openAuthModal("login");
+      } else {
+        window.location.href = "/hr-dashboard/";
+      }
     });
   }
 
@@ -178,7 +182,11 @@ document.addEventListener("DOMContentLoaded", () => {
   if (btnCta) {
     btnCta.addEventListener("click", (e) => {
       e.preventDefault();
-      openAuthModal("login"); // тоже всегда модалка
+      if (!isLoggedIn()) {
+        openAuthModal("login");
+      } else {
+        window.location.href = "/hr-dashboard/";
+      }
     });
   }
 
