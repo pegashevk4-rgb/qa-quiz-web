@@ -1,7 +1,8 @@
 const THEME_KEY = "qa_theme";
+const API_BASE_URL = "https://api.qa-quiz-test.ru";
 
+// ===== ТЕМА =====
 function applyTheme(theme) {
-  // вешаем тему на <html>, чтобы :root[data-theme="..."] работало везде
   document.documentElement.setAttribute("data-theme", theme);
 
   const btn = document.getElementById("theme-toggle");
@@ -11,7 +12,7 @@ function applyTheme(theme) {
 }
 
 document.addEventListener("DOMContentLoaded", () => {
-  // ===== ТЕМА =====
+  // --- Инициализация темы ---
   const saved = localStorage.getItem(THEME_KEY);
   const prefersDark =
     window.matchMedia &&
@@ -71,21 +72,21 @@ document.addEventListener("DOMContentLoaded", () => {
     authOverlay.classList.remove("open");
   }
 
-  // "Начать бесплатно" → модалка (если не залогинен)
+  // "Начать бесплатно" → просто открывает модалку (можно сразу на регистрацию)
   if (freeBtn) {
     freeBtn.addEventListener("click", (e) => {
       e.preventDefault();
-      openAuthModal("register"); // или "login" — как тебе удобнее
+      openAuthModal("register");
     });
   }
 
-  // "Войти" в хедере
+  // "Войти" в хедере → открывает модалку
   if (openAuthBtn) {
-  openAuthBtn.addEventListener("click", (e) => {
-    e.preventDefault();
-    openAuthModal("login");
-  });
-}
+    openAuthBtn.addEventListener("click", (e) => {
+      e.preventDefault();
+      openAuthModal("login");
+    });
+  }
 
   // Закрытие модалки
   if (authClose) {
@@ -122,4 +123,69 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
+  // ===== API-ФУНКЦИИ ДЛЯ ЛОГИНА =====
+  async function apiLoginHR({ email, password }) {
+    const resp = await fetch(`${API_BASE_URL}/auth/login`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email, password }),
+    });
+
+    if (!resp.ok) {
+      let payload = null;
+      try {
+        payload = await resp.json();
+      } catch (_) {}
+
+      const error = new Error(
+        (payload && payload.detail) || "Неверный email или пароль"
+      );
+      if (payload) {
+        error.backendPayload = payload;
+      }
+      throw error;
+    }
+
+    return await resp.json(); // { id, email, company_id, company_name, ... }
+  }
+
+  // ===== ОБРАБОТЧИК ФОРМЫ ЛОГИНА =====
+  if (loginForm) {
+    loginForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+
+      const formData = new FormData(loginForm);
+      const email = formData.get("email")?.toString().trim();
+      const password = formData.get("password")?.toString().trim();
+
+      if (!email || !password) {
+        alert("Укажите email и пароль");
+        return;
+      }
+
+      try {
+        const data = await apiLoginHR({ email, password });
+
+        localStorage.setItem("qa_is_logged_in", "1");
+        localStorage.setItem("qa_company_id", data.company_id);
+        localStorage.setItem("qa_company_name", data.company_name);
+        if (data.company_token) {
+          localStorage.setItem("qa_company_token", data.company_token);
+        }
+
+        closeAuthModal();
+        window.location.href = "/hr-dashboard/";
+      } catch (err) {
+        console.error(err);
+
+        const msg =
+          (err.backendPayload && err.backendPayload.detail) ||
+          err.message ||
+          "Ошибка входа";
+        alert(msg);
+      }
+    });
+  }
+
+  // (Опционально) Можно позже добавить регистрацию через API так же, как на главной
 });
