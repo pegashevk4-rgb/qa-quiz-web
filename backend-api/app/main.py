@@ -487,9 +487,11 @@ def get_company_results(
 
     for r in rows:
         categories: list[schemas.CategorySummary] = []
+
         for d in details_by_result.get(r.result_id, []):
             if d.category == "Overall":
-                continue  # общий результат уже есть в r.percent
+                continue  # общий процент уже есть в r.percent
+
             categories.append(
                 schemas.CategorySummary(
                     category=d.category,
