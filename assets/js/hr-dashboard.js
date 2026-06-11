@@ -347,6 +347,8 @@ const topicsContainer = document.getElementById("topicsContainer");
 const questionsContainer = document.getElementById("questionsContainer");
 const filterButtons = document.querySelectorAll(".filter-btn");
 
+const exportCsvBtn = document.getElementById("exportCsvBtn");
+
 let sortDirection = "desc";
 let activeVerdict = "All";
 
@@ -573,3 +575,94 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   });
 });
+
+function exportResultsToCsv() {
+  const data = getFilteredCandidates();
+  if (!data.length) {
+    alert("Нет данных для экспорта.");
+    return;
+  }
+
+  // Шапка CSV
+  const headers = [
+    "Result ID",
+    "Имя",
+    "Тест",
+    "Результат %",
+    "Вердикт",
+    "Дата",
+    "Темы (проценты)",
+    "Темы (детально)"
+  ];
+
+  const rows = [];
+
+  data.forEach((candidate) => {
+    // Темы: короткий вид и детальный
+    const topicScores = candidate.topicScores || {};
+    const topicsShort = [];
+    const topicsDetailed = [];
+
+    for (const [topicName, topicData] of Object.entries(topicScores)) {
+      const percent = topicData.percent ?? 0;
+      topicsShort.push(`${topicName}: ${percent}%`);
+
+      const correct = topicData.correct;
+      const total = topicData.total;
+
+      if (typeof correct === "number" && typeof total === "number") {
+        topicsDetailed.push(
+          `${topicName}: ${percent}% (${correct} из ${total})`
+        );
+      } else {
+        topicsDetailed.push(`${topicName}: ${percent}%`);
+      }
+    }
+
+    rows.push([
+      candidate.id,
+      candidate.name,
+      candidate.testName,
+      candidate.score,
+      translateVerdict(candidate.verdict),
+      candidate.date,
+      topicsShort.join(" | "),
+      topicsDetailed.join(" | ")
+    ]);
+  });
+
+  // Собираем CSV-строку
+  const lines = [];
+  lines.push(headers.join(";"));
+
+  rows.forEach((row) => {
+    // Экранируем ; и переносы строк
+    const safeRow = row.map((value) => {
+      if (value == null) return "";
+      const str = String(value).replace(/"/g, '""');
+      // обернем в кавычки, чтобы ; и переносы строк не ломали формат
+      return `"${str}"`;
+    });
+    lines.push(safeRow.join(";"));
+  });
+
+  const csvContent = lines.join("\r\n");
+
+  const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+  const url = URL.createObjectURL(blob);
+
+  const link = document.createElement("a");
+  link.href = url;
+
+  const today = new Date().toISOString().slice(0, 10);
+  link.download = `qa_results_${today}.csv`;
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+
+  URL.revokeObjectURL(url);
+}
+
+if (exportCsvBtn) {
+  exportCsvBtn.addEventListener("click", exportResultsToCsv);
+}
