@@ -647,6 +647,21 @@ body {
   margin-top: 20px;
   display: flex;
   justify-content: flex-end;
+  gap: 8px; 
+}
+
+.modal-footer .btn-secondary:first-child {
+  background: var(--accent);
+  color: #ffffff;
+  border-color: var(--accent);
+}
+
+.modal-footer .btn-secondary:first-child:hover {
+  background: var(--accent-hover);
+}
+
+.modal-footer .btn-secondary:last-child {
+  background: var(--bg-main);
 }
 
 .btn-secondary {
