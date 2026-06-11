@@ -75,25 +75,17 @@ document.addEventListener("DOMContentLoaded", () => {
   if (freeBtn) {
     freeBtn.addEventListener("click", (e) => {
       e.preventDefault();
-      if (!isLoggedIn()) {
-        openAuthModal("login");
-      } else {
-        window.location.href = "/hr-dashboard/";
-      }
+      openAuthModal("register"); // или "login" — как тебе удобнее
     });
   }
 
   // "Войти" в хедере
   if (openAuthBtn) {
-    openAuthBtn.addEventListener("click", (e) => {
-      e.preventDefault();
-      if (!isLoggedIn()) {
-        openAuthModal("login");
-      } else {
-        window.location.href = "/hr-dashboard/";
-      }
-    });
-  }
+  openAuthBtn.addEventListener("click", (e) => {
+    e.preventDefault();
+    openAuthModal("login");
+  });
+}
 
   // Закрытие модалки
   if (authClose) {
@@ -130,35 +122,4 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // ===== ВАЛИДАЦИЯ ФОРМ =====
-  function attachRequiredValidation(form) {
-    if (!form) return;
-
-    form.addEventListener("submit", (e) => {
-      e.preventDefault();
-
-      const inputs = form.querySelectorAll("input[required]");
-      let valid = true;
-
-      inputs.forEach((input) => {
-        const value = input.value.trim();
-
-        if (!value || !input.checkValidity()) {
-          valid = false;
-          input.classList.add("input-error");
-        } else {
-          input.classList.remove("input-error");
-        }
-      });
-
-      if (!valid) return;
-
-      localStorage.setItem("qa_is_logged_in", "1");
-      closeAuthModal();
-      window.location.href = "/hr-dashboard/";
-    });
-  }
-
-  attachRequiredValidation(loginForm);
-  attachRequiredValidation(registerForm);
 });
