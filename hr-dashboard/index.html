@@ -279,16 +279,28 @@
 
       <div class="candidate-topics">
         <h3>Разбивка по темам</h3>
-        <div class="topics-list" id="topicsContainer">
-          <!-- JS подставит темы -->
+
+        <div class="topics" id="cand-topics-body">
+          <!-- сюда JS подставит темы -->
         </div>
       </div>
 
       <div class="modal-footer">
-        <button type="button" class="btn-secondary" id="exportCandidateBtn">
-          Экспорт результата
+        <button
+          type="button"
+          class="btn-secondary"
+          id="demo-export-btn"
+          disabled
+          title="Демо: экспорт доступен в HR-дашборде"
+        >
+          Экспорт результата (демо)
         </button>
-        <button type="button" class="btn-secondary" id="closeFooterBtn">
+
+        <button
+          type="button"
+          class="btn-secondary"
+          id="candidate-close-footer"
+        >
           Закрыть
         </button>
       </div>
