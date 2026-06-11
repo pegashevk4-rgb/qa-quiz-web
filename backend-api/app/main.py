@@ -472,7 +472,6 @@ def get_company_results(
 
     result_ids = [r.result_id for r in rows]
 
-    # тянем все детали разом
     details = (
         db.query(models.DetailedResult)
         .filter(models.DetailedResult.result_id.in_(result_ids))
@@ -483,6 +482,20 @@ def get_company_results(
     for d in details:
         details_by_result[d.result_id].append(d)
 
+    # Вытаскиваем вопросы, чтобы знать total по каждой категории
+    test_ids = {r.test_id for r in rows}
+    questions = (
+        db.query(models.QuizQuestion)
+        .filter(models.QuizQuestion.test_id.in_(test_ids))
+        .all()
+    )
+
+    # ключ = (test_id, category), значение = total вопросов
+    questions_per_test_cat: dict[tuple[str, str], int] = defaultdict(int)
+    for q in questions:
+        cat = getattr(q, "category", None) or "Общее"
+        questions_per_test_cat[(q.test_id, cat)] += 1
+
     output: list[schemas.ResultRow] = []
 
     for r in rows:
@@ -490,12 +503,20 @@ def get_company_results(
 
         for d in details_by_result.get(r.result_id, []):
             if d.category == "Overall":
-                continue  # общий процент уже есть в r.percent
+                continue
+
+            total = questions_per_test_cat.get((r.test_id, d.category)) or None
+
+            correct = None
+            if total and d.percent is not None:
+                correct = round(d.percent * total / 100)
 
             categories.append(
                 schemas.CategorySummary(
                     category=d.category,
                     percent=d.percent,
+                    correct=correct,
+                    total=total,
                 )
             )
 

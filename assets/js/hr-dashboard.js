@@ -247,13 +247,13 @@ async function loadCompanyResults() {
       const topicScores = {};
 
       if (Array.isArray(row.categories)) {
-        row.categories.forEach((cat) => {
+        for (const cat of row.categories) {
           topicScores[cat.category] = {
             percent: cat.percent ?? 0,
             correct: cat.correct ?? null,
             total: cat.total ?? null,
           };
-        });
+        }
       } else {
         topicScores["Общий результат"] = {
           percent: row.percent ?? 0,
@@ -460,34 +460,32 @@ function openCandidateModal(candidate) {
   modalDate.textContent = candidate.date;
   modalId.textContent = `#${candidate.id}`;
 
-  // Темы
   topicsContainer.innerHTML = "";
 
-  Object.entries(candidate.topicScores).forEach(([topic, info]) => {
-    const percent = info?.percent ?? 0;
-    const correct = info?.correct;
-    const total = info?.total;
+  const topicScores = candidate.topicScores || {};
 
-    let detailsText = `${percent}%`;
+  for (const [topicName, topicData] of Object.entries(topicScores)) {
+    const item = document.createElement("div");
+    item.className = "topic-row";
+
+    const percent = topicData.percent ?? 0;
+    const correct = topicData.correct;
+    const total = topicData.total;
+
+    let text = `${topicName} — ${percent}%`;
+
     if (typeof correct === "number" && typeof total === "number") {
-      detailsText += ` (${correct} из ${total})`;
+      text += ` (${correct} из ${total})`;
     }
 
-    const row = document.createElement("div");
-    row.className = "topic-row";
-    row.innerHTML = `
-      <div class="topic-name">${topic}</div>
-      <div class="topic-score">${detailsText}</div>
-    `;
-    topicsContainer.appendChild(row);
-  });
+    item.textContent = text;
+    topicsContainer.appendChild(item);
+  }
 
-
-  // (Опционально) Вопросы и ответы
-  
   overlay.classList.add("active");
   modal.classList.add("active");
 }
+
 
 function closeModal() {
   overlay.classList.remove("active");

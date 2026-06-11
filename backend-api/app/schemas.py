@@ -131,7 +131,8 @@ class TestResultIn(BaseModel):
 class CategorySummary(BaseModel):
     category: str
     percent: int
-    # если хочешь сразу передавать correct/total, можно добавить позже
+    correct: int | None = None
+    total: int | None = None
 
 class ResultRow(BaseModel):
     result_id: int
