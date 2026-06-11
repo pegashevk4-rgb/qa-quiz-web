@@ -232,40 +232,6 @@ document.addEventListener("DOMContentLoaded", () => {
     { name: "Инструменты QA", score: 90 },
   ];
 
-  const candidateTopicsByEmail = {
-    "a.smirnova@mail.ru": [
-      { name: "Теория тестирования", score: 85 },
-      { name: "SQL", score: 70 },
-      { name: "API", score: 60 },
-      { name: "Инструменты QA", score: 90 },
-    ],
-    "d.kozlov@example.com": [
-      { name: "Принципы тестирования", score: 50 },
-      { name: "Виды тестирования", score: 55 },
-      { name: "Документация", score: 65 },
-      { name: "API", score: 45 },
-    ],
-    "m.ivanova@work.io": [
-      { name: "Теория тестирования", score: 95 },
-      { name: "SQL", score: 90 },
-      { name: "API", score: 92 },
-      { name: "Инструменты QA", score: 98 },
-    ],
-    "i.petrov@corp.ru": [
-      { name: "Принципы тестирования", score: 35 },
-      { name: "SQL", score: 25 },
-      { name: "API", score: 30 },
-      { name: "Жизненный цикл разработки", score: 40 },
-    ],
-    "o.sidorova@dev.com": [
-      { name: "Теория тестирования", score: 80 },
-      { name: "SQL", score: 70 },
-      { name: "API", score: 75 },
-      { name: "Инструменты QA", score: 65 },
-    ],
-  };
-
-
   function openCandidateModal(candidateData) {
     if (!candidateModal || !candidateOverlay) return;
 
@@ -331,23 +297,10 @@ document.addEventListener("DOMContentLoaded", () => {
     candidateOverlay.addEventListener("click", closeCandidateModal);
   }
 
-  const candidateCloseFooter = document.getElementById("candidate-close-footer");
-  if (candidateCloseFooter) {
-  candidateCloseFooter.addEventListener("click", closeCandidateModal);
-  }
-
   if (tableBody) {
     tableBody.querySelectorAll("tr").forEach((row) => {
       row.addEventListener("click", () => {
         const cells = row.querySelectorAll("td");
-
-        const email = cells[2]?.textContent.trim() || "";
-
-        // Ищем темы для конкретного кандидата по email
-        const topics =
-          candidateTopicsByEmail[email] && candidateTopicsByEmail[email].length
-            ? candidateTopicsByEmail[email]
-            : demoTopics;
 
         const candidateData = {
           firstName: cells[0]?.textContent.trim() || "",
@@ -356,7 +309,7 @@ document.addEventListener("DOMContentLoaded", () => {
           score: parseInt(cells[4]?.innerText, 10) || 0,
           verdict: cells[5]?.textContent.trim() || "",
           date: cells[6]?.textContent.trim() || "",
-          topics,
+          topics: demoTopics,
         };
 
         openCandidateModal(candidateData);
