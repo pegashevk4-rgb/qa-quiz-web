@@ -1,29 +1,36 @@
 const THEME_KEY = "qa_theme";
 const API_BASE_URL = "https://api.qa-quiz-test.ru";
 
+
 // --- Проверка авторизации перед показом дашборда ---
 (function guardDashboard() {
   const DEV_BYPASS_AUTH = false; // на проде обязательно false
+
 
   if (DEV_BYPASS_AUTH) {
     return;
   }
 
+
   const isLoggedIn = localStorage.getItem("qa_is_logged_in") === "1";
   const companyId = localStorage.getItem("qa_company_id");
+
 
   if (!isLoggedIn || !companyId) {
     window.location.href = "hr.html";
   }
 })();
 
+
 // --- Кандидаты (изначально пусто) ---
 let candidates = [];
+
 
 // --- Информация о тарифе ---
 function renderPlanInfo(planData) {
   const el = document.getElementById("planInfo");
   if (!el) return;
+
 
   const {
     plan_name = "Free trial",
@@ -33,8 +40,10 @@ function renderPlanInfo(planData) {
     is_trial = plan_name === "Free trial",
   } = planData || {};
 
+
   const remaining =
     tests_limit == null ? Infinity : Math.max(0, tests_limit - tests_used);
+
 
   // Считаем дни до окончания, если есть дата
   let daysLeft = null;
@@ -45,9 +54,12 @@ function renderPlanInfo(planData) {
     daysLeft = Math.floor(diffMs / (1000 * 60 * 60 * 24));
   }
 
+
   el.classList.remove("plan-card-okay", "plan-card-danger", "plan-card-warning");
 
+
   let textHtml = "";
+
 
   if (is_trial) {
     // --- ВЕТКА ПРОБНИКА ---
@@ -56,9 +68,12 @@ function renderPlanInfo(planData) {
         ? "Безлимит по тестам"
         : `Осталось ${remaining} из ${tests_limit} тестов`;
 
+
     const isOverLimit = tests_limit != null && remaining <= 0;
 
+
     el.classList.add(isOverLimit ? "plan-card-danger" : "plan-card-okay");
+
 
     textHtml = `
       Текущий тариф: <strong>${plan_name}</strong>
@@ -80,17 +95,20 @@ function renderPlanInfo(planData) {
       expiresText = "Подписка активна";
     }
 
+
     textHtml = `
       Текущий тариф: <strong>${plan_name}</strong>
       · ${expiresText}
     `;
   }
 
+
   el.innerHTML = `
     <span>${textHtml}</span>
     <a href="pricing.html">Перейти к тарифам</a>
   `;
 }
+
 
 // --- Блокировка/разблокировка кнопок тестов по тарифу ---
 function applyPlanLimitToButtons(planData) {
@@ -102,8 +120,10 @@ function applyPlanLimitToButtons(planData) {
     is_trial = plan_name === "Free trial",
   } = planData || {};
 
+
   const remaining =
     tests_limit == null ? Infinity : Math.max(0, tests_limit - tests_used);
+
 
   // Считаем дни до окончания, если есть дата
   let daysLeft = null;
@@ -114,7 +134,9 @@ function applyPlanLimitToButtons(planData) {
     daysLeft = Math.floor(diffMs / (1000 * 60 * 60 * 24));
   }
 
+
   const testButtons = document.querySelectorAll(".btn-copy");
+
 
   const disableAll = (label) => {
     testButtons.forEach((btn) => {
@@ -124,6 +146,7 @@ function applyPlanLimitToButtons(planData) {
     });
   };
 
+
   const enableAll = () => {
     testButtons.forEach((btn) => {
       btn.disabled = false;
@@ -132,7 +155,9 @@ function applyPlanLimitToButtons(planData) {
     });
   };
 
+
   // --- ЛОГИКА ---
+
 
   // 1) TRIAL: ограничиваем чисто по лимиту
   if (is_trial) {
@@ -144,7 +169,9 @@ function applyPlanLimitToButtons(planData) {
     return;
   }
 
+
   // 2) ПЛАТНАЯ ПОДПИСКА
+
 
   // 2.1. Если есть лимит и он выбит — блокируем независимо от даты
   if (tests_limit != null && remaining <= 0) {
@@ -156,6 +183,7 @@ function applyPlanLimitToButtons(planData) {
     return;
   }
 
+
   // 2.2. Лимит ещё есть
   // Если подписка истекла (daysLeft < 0), но remaining > 0 — разрешаем использовать
   if (daysLeft !== null && daysLeft < 0 && remaining > 0) {
@@ -163,9 +191,11 @@ function applyPlanLimitToButtons(planData) {
     return;
   }
 
+
   // 2.3. Во всех остальных случаях (активная подписка, лимит не выбит)
   enableAll();
 }
+
 
 // --- Загрузка тарифа компании (с заглушкой, как у тебя) ---
 async function loadCompanyPlan() {
@@ -185,12 +215,14 @@ async function loadCompanyPlan() {
     return;
   }
 
+
   try {
     const resp = await fetch(`${API_BASE_URL}/api/company/${companyId}/plan`);
     if (!resp.ok) {
       throw new Error("Ошибка ответа плана " + resp.status);
     }
     const planData = await resp.json();
+
 
     renderPlanInfo(planData);
     applyPlanLimitToButtons(planData);
@@ -208,6 +240,7 @@ async function loadCompanyPlan() {
   }
 }
 
+
 // --- Загрузка результатов компании из API ---
 async function loadCompanyResults() {
   const companyId = localStorage.getItem("qa_company_id");
@@ -215,6 +248,7 @@ async function loadCompanyResults() {
     console.warn("Нет company_id в localStorage");
     return;
   }
+
 
   try {
     const resp = await fetch(
@@ -228,7 +262,9 @@ async function loadCompanyResults() {
       return;
     }
 
+
     const data = await resp.json(); // массив ResultRow
+
 
     candidates = data.map((row, index) => {
       const fullName = `${row.first_name} ${row.last_name}`.trim();
@@ -236,15 +272,19 @@ async function loadCompanyResults() {
         ? row.created_at.slice(0, 10)
         : "";
 
+
       let testName = row.test_id;
       if (row.test_id === "qa_junior_web") testName = "Junior QA";
       if (row.test_id === "qa_middle_web") testName = "Middle QA";
       if (row.test_id === "qa_senior_web") testName = "Senior QA";
 
+
       const verdict = row.verdict || "On the edge";
+
 
       // Детальная разбивка по темам
       const topicScores = {};
+
 
       if (Array.isArray(row.categories)) {
         for (const cat of row.categories) {
@@ -262,6 +302,7 @@ async function loadCompanyResults() {
         };
       }
 
+
       return {
         id: row.result_id ?? index + 1,
         name: fullName || "Кандидат",
@@ -275,6 +316,7 @@ async function loadCompanyResults() {
       };
     });
 
+
     updateMetrics();
     renderTable();
   } catch (err) {
@@ -283,27 +325,34 @@ async function loadCompanyResults() {
 }
 
 
+
 // --- Генерация ссылок на тесты ---
 const testButtons = document.querySelectorAll(".btn-copy");
 
+
 function getTestLink(testId) {
   const companyToken = localStorage.getItem("qa_company_token");
+
 
   if (!companyToken) {
     alert("Не найден токен компании. Зайдите в систему заново.");
     return "";
   }
 
+
   // Квиз живёт в папке quiz
   const baseUrl = "https://qa-quiz-test.ru/quiz/index.html";
+
 
   const params = new URLSearchParams({
     test_id: testId,           // qa_junior_web / qa_middle_web / qa_senior_web
     company_token: companyToken,
   });
 
+
   return `${baseUrl}?${params.toString()}`;
 }
+
 
 
 
@@ -312,6 +361,7 @@ testButtons.forEach((btn) => {
     const testId = btn.getAttribute("data-test-id");
     const url = getTestLink(testId);
     if (!url) return;
+
 
     navigator.clipboard
       .writeText(url)
@@ -327,6 +377,7 @@ testButtons.forEach((btn) => {
   });
 });
 
+
 // --- Таблица кандидатов и метрики ---
 const tableBody = document.getElementById("tableBody");
 const searchInput = document.getElementById("searchInput");
@@ -334,8 +385,10 @@ const scoreSort = document.getElementById("scoreSortButton");
 const sortIndicator = document.getElementById("sortIndicator");
 const emptyState = document.getElementById("emptyState");
 
+
 const modal = document.getElementById("candidateModal");
 const overlay = document.getElementById("modalOverlay");
+
 
 const modalName = document.getElementById("modalName");
 const modalTest = document.getElementById("modalTest");
@@ -346,36 +399,45 @@ const modalId = document.getElementById("modalId");
 const topicsContainer = document.getElementById("topicsContainer");
 const questionsContainer = document.getElementById("questionsContainer");
 const filterButtons = document.querySelectorAll(".filter-btn");
+const filterButtons = document.querySelectorAll(".filter-btn");
 const testFilterButtons = document.querySelectorAll(".test-filter-btn");
 
+
 const exportCsvBtn = document.getElementById("exportCsvBtn");
+
 
 let sortDirection = "desc";
 let activeVerdict = "All";
 let activeTestFilter = "All";
 let currentCandidate = null;
 
+
 function updateMetrics() {
   document.getElementById("metricTotal").textContent = candidates.length;
+
 
   document.getElementById("metricPassed").textContent = candidates.filter(
     (c) => c.verdict === "Passed"
   ).length;
 
+
   document.getElementById("metricEdge").textContent = candidates.filter(
     (c) => c.verdict === "On the edge"
   ).length;
+
 
   document.getElementById("metricFailed").textContent = candidates.filter(
     (c) => c.verdict === "Failed"
   ).length;
 }
 
+
 function getVerdictClass(verdict) {
   if (verdict === "Passed") return "passed";
   if (verdict === "On the edge") return "edge";
   return "failed";
 }
+
 
 function translateVerdict(verdict) {
   if (verdict === "Passed") return "Прошёл";
@@ -384,20 +446,26 @@ function translateVerdict(verdict) {
   return verdict;
 }
 
+
 function setVerdictFilter(value) {
   activeVerdict = value;
+
 
   filterButtons.forEach((btn) => {
     btn.classList.toggle("active", btn.dataset.value === value);
   });
 
+
   renderTable();
 }
+
 
 function getFilteredCandidates() {
   const searchValue = searchInput.value.trim().toLowerCase();
 
+
   let filtered = [...candidates];
+
 
   // Фильтр по вердикту
   if (activeVerdict !== "All") {
@@ -406,12 +474,14 @@ function getFilteredCandidates() {
     );
   }
 
+
   // Фильтр по тесту
   if (activeTestFilter !== "All") {
     filtered = filtered.filter(
       (candidate) => candidate.testName === activeTestFilter
     );
   }
+
 
   // Поиск по имени
   if (searchValue) {
@@ -420,23 +490,29 @@ function getFilteredCandidates() {
     );
   }
 
+
   // Сортировка по результату
   filtered.sort((a, b) => {
     return sortDirection === "desc" ? b.score - a.score : a.score - b.score;
   });
 
+
   return filtered;
 }
 
+
 function setTestFilter(value) {
   activeTestFilter = value;
+
 
   testFilterButtons.forEach((btn) => {
     btn.classList.toggle("active", btn.dataset.test === value);
   });
 
+
   renderTable();
 }
+
 
 testFilterButtons.forEach((btn) => {
   btn.addEventListener("click", () => {
@@ -444,20 +520,26 @@ testFilterButtons.forEach((btn) => {
   });
 });
 
+
 function renderTable() {
   const data = getFilteredCandidates();
 
+
   tableBody.innerHTML = "";
+
 
   if (!data.length) {
     emptyState.style.display = "block";
     return;
   }
 
+
   emptyState.style.display = "none";
+
 
   data.forEach((candidate) => {
     const row = document.createElement("tr");
+
 
     row.innerHTML = `
       <td>${candidate.name}</td>
@@ -475,13 +557,16 @@ function renderTable() {
       <td class="date-cell">${candidate.date}</td>
     `;
 
+
     row.addEventListener("click", () => {
       openCandidateModal(candidate);
     });
 
+
     tableBody.appendChild(row);
   });
 }
+
 
 function openCandidateModal(candidate) {
   currentCandidate = candidate; // сохраняем для экспорта
@@ -492,33 +577,43 @@ function openCandidateModal(candidate) {
   modalDate.textContent = candidate.date;
   modalId.textContent = `#${candidate.id}`;
 
+
   topicsContainer.innerHTML = "";
 
+
   const topicScores = candidate.topicScores || {};
+
 
   for (const [topicName, topicData] of Object.entries(topicScores)) {
     const item = document.createElement("div");
     item.className = "topic-row";
 
+
     const percent = topicData.percent ?? 0;
     const correct = topicData.correct;
     const total = topicData.total;
 
+
     let text = `${topicName} — ${percent}%`;
+
 
     if (typeof correct === "number" && typeof total === "number") {
       text += ` (${correct} из ${total})`;
     }
 
+
     item.textContent = text;
     topicsContainer.appendChild(item);
   }
+
 
   overlay.classList.add("active");
   modal.classList.add("active");
 }
 
+
 const exportCandidateBtn = document.getElementById("exportCandidateBtn");
+
 
 function exportCurrentCandidateToCsv() {
   if (!currentCandidate) {
@@ -526,7 +621,9 @@ function exportCurrentCandidateToCsv() {
     return;
   }
 
+
   const c = currentCandidate;
+
 
   const headers = [
     "Result ID",
@@ -541,11 +638,15 @@ function exportCurrentCandidateToCsv() {
     "Всего"
   ];
 
+
   const rows = [];
+
 
   const topicScores = c.topicScores || {};
 
+
   const entries = Object.entries(topicScores);
+
 
   if (!entries.length) {
     // хотя бы одна строка без тем
@@ -569,6 +670,7 @@ function exportCurrentCandidateToCsv() {
       const total =
         typeof topicData.total === "number" ? topicData.total : "";
 
+
       rows.push([
         c.id,
         c.name,
@@ -584,8 +686,10 @@ function exportCurrentCandidateToCsv() {
     });
   }
 
+
   const lines = [];
   lines.push(headers.join(";"));
+
 
   rows.forEach((row) => {
     const safeRow = row.map((value) => {
@@ -596,28 +700,36 @@ function exportCurrentCandidateToCsv() {
     lines.push(safeRow.join(";"));
   });
 
+
   const csvContent = lines.join("\r\n");
+
 
   const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
   const url = URL.createObjectURL(blob);
 
+
   const today = new Date().toISOString().slice(0, 10);
   const safeName = c.name.replace(/\s+/g, "_");
+
 
   const link = document.createElement("a");
   link.href = url;
   link.download = `qa_result_${safeName}_${today}.csv`;
 
+
   document.body.appendChild(link);
   link.click();
   document.body.removeChild(link);
 
+
   URL.revokeObjectURL(url);
 }
+
 
 if (exportCandidateBtn) {
   exportCandidateBtn.addEventListener("click", exportCurrentCandidateToCsv);
 }
+
 
 
 
@@ -626,13 +738,16 @@ function closeModal() {
   modal.classList.remove("active");
 }
 
+
 filterButtons.forEach((btn) => {
   btn.addEventListener("click", () => {
     setVerdictFilter(btn.dataset.value);
   });
 });
 
+
 searchInput.addEventListener("input", renderTable);
+
 
 scoreSort.addEventListener("click", () => {
   sortDirection = sortDirection === "desc" ? "asc" : "desc";
@@ -640,31 +755,40 @@ scoreSort.addEventListener("click", () => {
   renderTable();
 });
 
+
 document
   .getElementById("closeModalBtn")
   .addEventListener("click", closeModal);
+
 
 document
   .getElementById("closeFooterBtn")
   .addEventListener("click", closeModal);
 
+
 overlay.addEventListener("click", closeModal);
+
 
 // --- Переключатель темы ---
 const themeToggle = document.getElementById("themeToggle");
 const themeIcon = document.getElementById("themeIcon");
 
+
 function applyTheme(theme) {
   document.documentElement.setAttribute("data-theme", theme);
   localStorage.setItem(THEME_KEY, theme);
 
+
   if (!themeIcon) return;
+
 
   themeIcon.textContent = theme === "dark" ? "🌙" : "☀";
 }
 
+
 const savedTheme = localStorage.getItem(THEME_KEY) || "dark";
 applyTheme(savedTheme);
+
 
 if (themeToggle) {
   themeToggle.addEventListener("click", () => {
@@ -674,8 +798,10 @@ if (themeToggle) {
   });
 }
 
+
 // --- Кнопка "Выйти" ---
 const logoutBtn = document.getElementById("logoutBtn");
+
 
 if (logoutBtn) {
   logoutBtn.addEventListener("click", () => {
@@ -686,16 +812,19 @@ if (logoutBtn) {
   });
 }
 
+
 // --- ЕДИНСТВЕННЫЙ DOMContentLoaded ---
 document.addEventListener("DOMContentLoaded", () => {
   // Company pill
   const companyPill = document.getElementById("companyPill");
   const companyName = localStorage.getItem("qa_company_name");
 
+
   if (companyPill && companyName) {
     const cleanName = companyName.replace(/\\_/g, "_").replace(/\\(.)/g, "$1");
     companyPill.textContent = `Компания: ${cleanName}`;
   }
+
 
   // 1) Загружаем тариф и рендерим план
   loadCompanyPlan().then(() => {
@@ -708,12 +837,14 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 });
 
+
 function exportResultsToCsv() {
   const data = getFilteredCandidates();
   if (!data.length) {
     alert("Нет данных для экспорта.");
     return;
   }
+
 
   // Шапка CSV
   const headers = [
@@ -727,7 +858,9 @@ function exportResultsToCsv() {
     "Темы (детально)"
   ];
 
+
   const rows = [];
+
 
   data.forEach((candidate) => {
     // Темы: короткий вид и детальный
@@ -735,12 +868,15 @@ function exportResultsToCsv() {
     const topicsShort = [];
     const topicsDetailed = [];
 
+
     for (const [topicName, topicData] of Object.entries(topicScores)) {
       const percent = topicData.percent ?? 0;
       topicsShort.push(`${topicName}: ${percent}%`);
 
+
       const correct = topicData.correct;
       const total = topicData.total;
+
 
       if (typeof correct === "number" && typeof total === "number") {
         topicsDetailed.push(
@@ -750,6 +886,7 @@ function exportResultsToCsv() {
         topicsDetailed.push(`${topicName}: ${percent}%`);
       }
     }
+
 
     rows.push([
       candidate.id,
@@ -763,9 +900,11 @@ function exportResultsToCsv() {
     ]);
   });
 
+
   // Собираем CSV-строку
   const lines = [];
   lines.push(headers.join(";"));
+
 
   rows.forEach((row) => {
     // Экранируем ; и переносы строк
@@ -778,13 +917,17 @@ function exportResultsToCsv() {
     lines.push(safeRow.join(";"));
   });
 
+
   const csvContent = lines.join("\r\n");
+
 
   const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
   const url = URL.createObjectURL(blob);
 
+
   const link = document.createElement("a");
   link.href = url;
+
 
   const today = new Date().toISOString().slice(0, 10);
   link.download = `qa_results_${today}.csv`;
@@ -792,8 +935,10 @@ function exportResultsToCsv() {
   link.click();
   document.body.removeChild(link);
 
+
   URL.revokeObjectURL(url);
 }
+
 
 if (exportCsvBtn) {
   exportCsvBtn.addEventListener("click", exportResultsToCsv);
