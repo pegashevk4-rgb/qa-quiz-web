@@ -110,6 +110,40 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   });
 
+   // ===== UI в хедере в зависимости от авторизации =====
+  const openAuthBtn = document.getElementById("open-auth-btn");
+  const navActions = document.querySelector(".nav-actions");
+
+  if (isLoggedIn() && navActions) {
+    const companyName = localStorage.getItem("qa_company_name") || "Компания";
+
+    // убираем кнопку "Войти"
+    if (openAuthBtn) {
+      openAuthBtn.remove();
+    }
+
+    // добавляем плашку компании и кнопку "Выйти"
+    const companySpan = document.createElement("span");
+    companySpan.className = "company-pill";
+    companySpan.textContent = `Компания: ${companyName}`;
+
+    const logoutBtn = document.createElement("button");
+    logoutBtn.type = "button";
+    logoutBtn.className = "nav-link";
+    logoutBtn.textContent = "Выйти";
+
+    logoutBtn.addEventListener("click", () => {
+      localStorage.removeItem("qa_is_logged_in");
+      localStorage.removeItem("qa_company_id");
+      localStorage.removeItem("qa_company_name");
+      localStorage.removeItem("qa_company_token");
+      window.location.href = "/";
+    });
+
+    navActions.prepend(companySpan);
+    navActions.appendChild(logoutBtn);
+  }
+
   // ===== ПЕРЕХОД В ДАШБОРД ПО ССЫЛКЕ В НАВИГАЦИИ =====
   const dashboardLink = document.getElementById("dashboard-link");
 
