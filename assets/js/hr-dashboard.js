@@ -400,7 +400,7 @@ const topicsContainer = document.getElementById("topicsContainer");
 const questionsContainer = document.getElementById("questionsContainer");
 const filterButtons = document.querySelectorAll(".filter-btn");
 const testFilterButtons = document.querySelectorAll(".test-filter-btn");
-
+const dateFilterButtons = document.querySelectorAll(".date-filter-btn");
 
 const exportCsvBtn = document.getElementById("exportCsvBtn");
 
@@ -409,7 +409,7 @@ let sortDirection = "desc";
 let activeVerdict = "All";
 let activeTestFilter = "All";
 let currentCandidate = null;
-
+let currentDateRange = "all";
 
 function updateMetrics() {
   document.getElementById("metricTotal").textContent = candidates.length;
@@ -458,13 +458,42 @@ function setVerdictFilter(value) {
   renderTable();
 }
 
+function isInDateRange(candidate) {
+  if (currentDateRange === "all") return true;
+
+  if (!candidate.date) return false;
+
+  // candidate.date в формате YYYY-MM-DD
+  const now = new Date();
+  const d = new Date(candidate.date);
+
+  // Сравнение по датам без учёта времени
+  const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  const candidateDay = new Date(d.getFullYear(), d.getMonth(), d.getDate());
+
+  const diffMs = today - candidateDay;
+  const diffDays = diffMs / (1000 * 60 * 60 * 24);
+
+  if (currentDateRange === "today") {
+    return diffDays === 0;
+  }
+
+  if (currentDateRange === "week") {
+    return diffDays >= 0 && diffDays <= 7;
+  }
+
+  if (currentDateRange === "month") {
+    return diffDays >= 0 && diffDays <= 30;
+  }
+
+  return true;
+}
+
 
 function getFilteredCandidates() {
   const searchValue = searchInput.value.trim().toLowerCase();
 
-
   let filtered = [...candidates];
-
 
   // Фильтр по вердикту
   if (activeVerdict !== "All") {
@@ -473,7 +502,6 @@ function getFilteredCandidates() {
     );
   }
 
-
   // Фильтр по тесту
   if (activeTestFilter !== "All") {
     filtered = filtered.filter(
@@ -481,6 +509,8 @@ function getFilteredCandidates() {
     );
   }
 
+  // Фильтр по дате
+  filtered = filtered.filter(isInDateRange);
 
   // Поиск по имени
   if (searchValue) {
@@ -489,16 +519,13 @@ function getFilteredCandidates() {
     );
   }
 
-
   // Сортировка по результату
   filtered.sort((a, b) => {
     return sortDirection === "desc" ? b.score - a.score : a.score - b.score;
   });
 
-
   return filtered;
 }
-
 
 function setTestFilter(value) {
   activeTestFilter = value;
@@ -516,6 +543,18 @@ function setTestFilter(value) {
 testFilterButtons.forEach((btn) => {
   btn.addEventListener("click", () => {
     setTestFilter(btn.dataset.test);
+  });
+});
+
+dateFilterButtons.forEach((btn) => {
+  btn.addEventListener("click", () => {
+    currentDateRange = btn.dataset.range;
+
+    dateFilterButtons.forEach((b) =>
+      b.classList.toggle("active", b === btn)
+    );
+
+    renderTable();
   });
 });
 
