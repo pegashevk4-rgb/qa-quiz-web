@@ -548,6 +548,14 @@ body {
   box-shadow: var(--shadow-md);
 }
 
+@media (min-width: 1024px) {
+  .modal-inner {
+    width: min(70vw, 640px);      /* уже и не ближе 15% к краям */
+    max-height: 80vh;             /* не выше 80% окна */
+    overflow-y: auto;             /* если контента много – скролл внутри */
+  }
+}
+
 .modal-header {
   display: flex;
   justify-content: space-between;
