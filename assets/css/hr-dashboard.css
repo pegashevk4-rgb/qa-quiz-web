@@ -729,18 +729,10 @@ body {
 .filter-block {
   display: flex;
   flex-direction: column;
-  gap: 6px; 
+  gap: 6px;
 }
 
-.filters-row-bottom {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  align-items: center;
-}
-
-/* тесты – обычные чипы */
-.test-filter-group {
+.filter-row {
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
@@ -771,12 +763,9 @@ body {
     transform 0.05s ease;
 }
 
-
-.date-filter-group {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 8px;
-  max-width: 240px;
+.filter-row .date-filter-btn[data-range="all"],
+.filter-row .date-filter-btn[data-range="week"] {
+  margin-left: 16px; /* по вкусу: 12–24px */
 }
 
 /* Ховер */
