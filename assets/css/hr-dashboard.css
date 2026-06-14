@@ -63,23 +63,25 @@ body {
 }
 
 .logo-mark {
-  width: 32px;
-  height: 32px;
-  border-radius: 10px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  width: 30px;                  /* чуть меньше, чем 34px на главной */
+  height: 30px;
 
-  background: linear-gradient(135deg, #4fffb0, #00c9ff);
-  color: #0b1020;
+  display: grid;
+  place-items: center;
 
-  font-size: 14px;
+  border-radius: 9px;
+
+  /* тот же градиент через переменные, как на главной */
+  background: linear-gradient(135deg, var(--accent), var(--accent2));
+  color: #0d0f14;
+
+  font-size: 0.8rem;           
   font-weight: 800;
 }
 
 .logo-text {
-  font-size: 14px;
-  font-weight: 700;
+  font-size: 13px;            
+  font-weight: 600;
   color: var(--text-primary);
 }
 
