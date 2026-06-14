@@ -461,8 +461,8 @@ body[data-theme="light"] header {
 
 .pricing-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
   gap: 28px;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
 }
 
 .pricing-card {
@@ -471,13 +471,8 @@ body[data-theme="light"] header {
   border: 1px solid var(--border);
   border-radius: var(--radius);
   box-shadow: var(--shadow);
-
-  padding: 32px 28px;
-
-  transition:
-    border-color var(--transition),
-    transform var(--transition),
-    box-shadow var(--transition);
+  padding: 24px 22px; /* было 32px 28px */
+  transition: border-color var(--transition), transform var(--transition), box-shadow var(--transition);
 }
 
 .pricing-card:hover {
@@ -506,12 +501,10 @@ body[data-theme="light"] header {
 }
 
 .plan-price {
-  font-size: 3rem;
+  font-size: 2.4rem; /* было 3rem */
   font-weight: 800;
-
   letter-spacing: -0.04em;
-
-  margin-bottom: 28px;
+  margin-bottom: 24px;
 }
 
 .plan-price span {
