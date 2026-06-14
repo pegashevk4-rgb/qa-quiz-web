@@ -33,6 +33,10 @@
   --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.4);
 }
 
+:root[data-theme="dark"] .logo-mark {
+  background: linear-gradient(135deg, #4fffb0, #00c9ff);
+}
+
 * {
   margin: 0;
   padding: 0;
@@ -80,24 +84,20 @@ body {
 
   border-radius: 9px;
 
-  /* жёстко задаём тот же градиент, что и на главной */
-  background: linear-gradient(135deg, #4fffb0, #00c9ff);
+  /* по умолчанию — светлая тема: слева-сверху синий, справа-снизу зелёный */
+  background: linear-gradient(135deg, #2563eb, #22c55e);
   color: #0d0f14;
 
   font-size: 0.8rem;
   font-weight: 800;
 }
 
+
 .logo-text {
   font-size: 13px;
   font-weight: 600;
   letter-spacing: -0.02em;
-
-  /* тоже фиксируем градиент под текст, без зависимостей от темы дашборда */
-  background: linear-gradient(90deg, #4fffb0, #00c9ff);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+  color: var(--text-primary);
 }
 
 .sidebar-nav {
