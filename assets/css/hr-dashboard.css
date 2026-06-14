@@ -63,23 +63,23 @@ body {
 }
 
 .logo-mark {
-  width: 34px;
-  height: 34px;
-  border-radius: 9px;
+  width: 32px;
+  height: 32px;
+  border-radius: 10px;
   display: flex;
   align-items: center;
   justify-content: center;
-  
+
   background: linear-gradient(135deg, #4fffb0, #00c9ff);
-  color: #0d0f14;
-  
+  color: #0b1020;
+
   font-size: 14px;
   font-weight: 800;
 }
 
 .logo-text {
-  font-size: 13px;
-  font-weight: 600;
+  font-size: 14px;
+  font-weight: 700;
   color: var(--text-primary);
 }
 
