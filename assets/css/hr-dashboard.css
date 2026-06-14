@@ -729,10 +729,17 @@ body {
 .filter-block {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 6px; 
 }
 
-.filter-group,
+.filters-row-bottom {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+}
+
+/* тесты – обычные чипы */
 .test-filter-group {
   display: flex;
   flex-wrap: wrap;
@@ -741,7 +748,8 @@ body {
 
 /* Общая база для чипов (вердикт + уровень теста) */
 .filter-btn,
-.test-filter-btn {
+.test-filter-btn,
+.date-filter-btn {
   min-width: 90px;
   height: 32px;
   padding: 0 12px;
@@ -763,36 +771,12 @@ body {
     transform 0.05s ease;
 }
 
+
 .date-filter-group {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 8px;
-  max-width: 260px;   /* чуть шире, чтобы текст уместился */
-  margin-left: 0;     /* убираем увод вправо */
-}
-
-/* Базовый стиль как у остальных чипов */
-.date-filter-btn {
-  width: 100%;
-  min-width: 0;       /* важно, чтобы grid мог ужимать */
-  height: 32px;
-  padding: 0 12px;
-  border-radius: 999px;
-  border: 1px solid var(--border);
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 13px;
-  line-height: 1;
-  cursor: pointer;
-  background: #f9fafb;
-  color: var(--text-secondary);
-  transition:
-    background 0.15s ease,
-    color 0.15s ease,
-    border-color 0.15s ease,
-    box-shadow 0.15s ease,
-    transform 0.05s ease;
+  max-width: 240px;
 }
 
 /* Ховер */
@@ -807,7 +791,6 @@ body {
   border-color: var(--accent);
   color: var(--accent);
   box-shadow: 0 3px 8px rgba(32, 201, 151, 0.25);
-  font-weight: 600;
 }
 
 /* Эффект нажатия, как у других чипов */
@@ -818,7 +801,8 @@ body {
 
 /* Ховер для всех чипов */
 .filter-btn:hover,
-.test-filter-btn:hover {
+.test-filter-btn:hover,
+.date-filter-btn:hover {
   background: #eef2ff;
   border-color: #c7d2fe;
 }
@@ -841,7 +825,8 @@ body {
 
 /* Эффект нажатия */
 .filter-btn:active,
-.test-filter-btn:active {
+.test-filter-btn:active,
+.date-filter-btn:active {
   transform: translateY(1px);
   box-shadow: 0 2px 5px rgba(15, 23, 42, 0.18);
 }
