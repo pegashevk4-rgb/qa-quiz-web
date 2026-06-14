@@ -110,8 +110,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   });
 
-   // ===== UI в хедере в зависимости от авторизации =====
-  const openAuthBtn = document.getElementById("open-auth-btn");
+     // ===== UI в хедере в зависимости от авторизации =====
   const navActions = document.querySelector(".nav-actions");
 
   if (isLoggedIn() && navActions) {
