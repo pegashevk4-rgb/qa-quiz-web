@@ -769,13 +769,15 @@ body {
 }
 
 .date-filter-group {
-  display: flex;
-  flex-wrap: wrap;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 8px;
+  max-width: 280px;
 }
 
 /* Базовый стиль как у остальных чипов */
 .date-filter-btn {
+  width: 100%;
   min-width: 90px;
   height: 32px;
   padding: 0 12px;
@@ -900,5 +902,25 @@ body {
   .btn-export {
     width: 100%;
     justify-content: center;
+  }
+}
+
+@media (max-width: 900px) {
+  .table-controls {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .table-exports {
+    align-items: stretch;
+  }
+
+  .btn-export {
+    width: 100%;
+  }
+
+  .date-filter-group {
+    max-width: 100%;
   }
 }
