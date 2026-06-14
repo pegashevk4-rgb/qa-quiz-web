@@ -72,7 +72,7 @@ body {
 }
 
 .logo-mark {
-  width: 30px;                  /* чуть меньше, чем 34px на главной */
+  width: 30px;
   height: 30px;
 
   display: grid;
@@ -80,11 +80,11 @@ body {
 
   border-radius: 9px;
 
-  /* тот же градиент через переменные, как на главной */
-  background: linear-gradient(135deg, var(--accent), var(--accent2));
+  /* жёстко задаём тот же градиент, что и на главной */
+  background: linear-gradient(135deg, #4fffb0, #00c9ff);
   color: #0d0f14;
 
-  font-size: 0.8rem;           
+  font-size: 0.8rem;
   font-weight: 800;
 }
 
@@ -93,13 +93,11 @@ body {
   font-weight: 600;
   letter-spacing: -0.02em;
 
-  background: linear-gradient(90deg, var(--accent), var(--accent2));
+  /* тоже фиксируем градиент под текст, без зависимостей от темы дашборда */
+  background: linear-gradient(90deg, #4fffb0, #00c9ff);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
-
-  /* на всякий случай, если что-то не поддерживается */
-  color: transparent;
 }
 
 .sidebar-nav {
