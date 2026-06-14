@@ -374,11 +374,6 @@ body {
   color: var(--text-secondary);
 }
 
-.filter-group {
-  display: flex;
-  gap: 8px;
-}
-
 .table-controls > .search-input {
   flex: 1;
 }
@@ -772,13 +767,14 @@ body {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 8px;
-  max-width: 280px;
+  max-width: 260px;   /* чуть шире, чтобы текст уместился */
+  margin-left: 0;     /* убираем увод вправо */
 }
 
 /* Базовый стиль как у остальных чипов */
 .date-filter-btn {
   width: 100%;
-  min-width: 90px;
+  min-width: 0;       /* важно, чтобы grid мог ужимать */
   height: 32px;
   padding: 0 12px;
   border-radius: 999px;
