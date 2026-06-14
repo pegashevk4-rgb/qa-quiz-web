@@ -90,9 +90,16 @@ body {
 
 .logo-text {
   font-size: 13px;
-  font-weight: 600;           /* чуть мягче, чем 700 на главной */
-  letter-spacing: -0.02em;    /* как на главной */
-  color: var(--text-primary);
+  font-weight: 600;
+  letter-spacing: -0.02em;
+
+  background: linear-gradient(90deg, var(--accent), var(--accent2));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+
+  /* на всякий случай, если что-то не поддерживается */
+  color: transparent;
 }
 
 .sidebar-nav {
