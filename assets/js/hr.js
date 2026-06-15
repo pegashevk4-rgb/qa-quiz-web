@@ -337,15 +337,22 @@ document.addEventListener("DOMContentLoaded", () => {
     if (candTopicsBody) {
       candTopicsBody.innerHTML = "";
 
-      candidateData.topics.forEach((topic) => {
+      (candidateData.topics || []).forEach((topic) => {
         const row = document.createElement("div");
         row.className = "topic-row";
 
-        row.innerHTML = `
-          <div class="topic-name">${topic.name}</div>
-          <div class="topic-score">${topic.score}%</div>
-        `;
+        const percent = topic.percent ?? topic.score ?? 0;
+        const correct =
+          typeof topic.correct === "number" ? topic.correct : null;
+        const total =
+          typeof topic.total === "number" ? topic.total : null;
 
+        let text = `${topic.name} — ${percent}%`;
+        if (correct !== null && total !== null) {
+          text += ` (${correct} из ${total})`;
+        }
+
+        row.textContent = text;
         candTopicsBody.appendChild(row);
       });
     }
