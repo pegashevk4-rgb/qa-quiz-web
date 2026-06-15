@@ -20,10 +20,11 @@
   <main class="privacy-page">
     <div class="inner">
 
-      <a href="/" class="privacy-back">
+      <!-- Кнопка "Назад" — логику маршрута задаём через JS ниже -->
+      <a href="/" class="privacy-back" id="privacy-back">
         ← На главную
       </a>
-      
+
       <section class="privacy-hero">
         <span class="privacy-badge">Privacy</span>
 
@@ -82,8 +83,8 @@
         <h2>Cookies</h2>
 
         <p>
-          Сервис может использовать cookies для сохранения темы интерфейса,
-          авторизации и корректной работы страниц.
+          Сервис может использовать cookies в будущем для
+          сохранения настроек интерфейса и авторизации.
         </p>
       </section>
 
@@ -96,40 +97,43 @@
         </p>
 
         <div class="privacy-contacts">
-            <a href="mailto:pegashev.k@yandex.ru" class="footer-link">
-                pegashev.k@yandex.ru
-            </a>
+          <a href="mailto:pegashev.k@yandex.ru" class="footer-link">
+            pegashev.k@yandex.ru
+          </a>
 
-            <a href="mailto:pegashev.k@yandex.ru" class="footer-link">
-                Email: pegashev.k@yandex.ru
-            </a>
+          <a href="https://t.me/Kirill_A5" target="_blank" rel="noopener" class="footer-link">
+            Telegram: @Kirill_A5
+          </a>
         </div>
       </section>
 
     </div>
   </main>
 
-    <footer>
-        <div class="footer-inner">
-            <span>© QA Hiring Assistant, 2026</span>
-            <span>·</span>
+  <script>
+    (function () {
+      const backLink = document.getElementById('privacy-back');
+      if (!backLink || !document.referrer) return;
 
-            <a href="/privacy" class="footer-link">
-                Политика конфиденциальности
-            </a>
+      try {
+        const ref = new URL(document.referrer);
+        const isSameOrigin = ref.origin === window.location.origin;
+        if (!isSameOrigin) return;
 
-            <span>·</span>
-
-            <a href="https://t.me/Kirill_A5" target="_blank" rel="noopener" class="footer-link">
-                Telegram: Kirill_A5
-            </a>
-
-            <span>·</span>
-
-            <a href="mailto:pegashev.k@yandex.ru" class="footer-link">
-                Email: pegashev.k@yandex.ru
-            </a>
-        </div>
-    </footer>
+        if (ref.pathname.startsWith('/pricing')) {
+          backLink.href = '/pricing';
+          backLink.textContent = '← К тарифам';
+        } else if (ref.pathname.startsWith('/hr-dashboard')) {
+          backLink.href = '/hr-dashboard';
+          backLink.textContent = '← К дашборду';
+        } else {
+          backLink.href = '/';
+          backLink.textContent = '← На главную';
+        }
+      } catch (e) {
+        // если с referrer что-то не так — оставляем переход на главную
+      }
+    })();
+  </script>
 </body>
 </html>
