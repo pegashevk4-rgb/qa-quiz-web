@@ -257,45 +257,50 @@ document.addEventListener("DOMContentLoaded", () => {
   const candTopicsBody = document.getElementById("cand-topics-body");
   const tableBody = document.getElementById("results-table-body");
 
-  const demoTopics = [
-    { name: "Теория тестирования", score: 85 },
-    { name: "SQL", score: 70 },
-    { name: "API", score: 60 },
-    { name: "Инструменты QA", score: 90 },
-  ];
-
   const candidateTopicsByEmail = {
-    "a.smirnova@mail.ru": [
-      { name: "Теория тестирования", score: 85 },
-      { name: "SQL", score: 70 },
-      { name: "API", score: 60 },
-      { name: "Инструменты QA", score: 90 },
-    ],
-    "d.kozlov@example.com": [
-      { name: "Принципы тестирования", score: 50 },
-      { name: "Виды тестирования", score: 55 },
-      { name: "Документация", score: 65 },
-      { name: "API", score: 45 },
-    ],
-    "m.ivanova@work.io": [
-      { name: "Теория тестирования", score: 95 },
-      { name: "SQL", score: 90 },
-      { name: "API", score: 92 },
-      { name: "Инструменты QA", score: 98 },
-    ],
-    "i.petrov@corp.ru": [
-      { name: "Принципы тестирования", score: 35 },
-      { name: "SQL", score: 25 },
-      { name: "API", score: 30 },
-      { name: "Жизненный цикл разработки", score: 40 },
-    ],
-    "o.sidorova@dev.com": [
-      { name: "Теория тестирования", score: 80 },
-      { name: "SQL", score: 70 },
-      { name: "API", score: 75 },
-      { name: "Инструменты QA", score: 65 },
-    ],
-  };
+  "a.smirnova@mail.ru": [
+    { name: "Принципы тестирования", percent: 80, correct: 7, total: 9 },
+    { name: "Виды тестирования", percent: 98, correct: 15, total: 16 },
+    { name: "Документация", percent: 100, correct: 13, total: 13 },
+    { name: "Smoke / Sanity / Регрессия", percent: 100, correct: 5, total: 5 },
+    { name: "Жизненный цикл разработки", percent: 80, correct: 6, total: 9 },
+    { name: "API-тестирование", percent: 85, correct: 10, total: 14 },
+    { name: "SQL / Базы данных", percent: 90, correct: 8, total: 9 },
+    { name: "Жизненный цикл дефекта", percent: 50, correct: 3, total: 6 },
+  ],
+
+  "d.kozlov@example.com": [
+    { name: "Принципы тестирования", percent: 40, correct: 4, total: 10 },
+    { name: "Виды тестирования", percent: 45, correct: 9, total: 20 },
+    { name: "Документация", percent: 80, correct: 8, total: 10 },
+    { name: "API-тестирование", percent: 30, correct: 3, total: 10 },
+    { name: "SQL / Базы данных", percent: 20, correct: 2, total: 10 },
+  ],
+
+  "m.ivanova@work.io": [
+    { name: "Принципы тестирования", percent: 95, correct: 19, total: 20 },
+    { name: "Виды тестирования", percent: 90, correct: 18, total: 20 },
+    { name: "Документация", percent: 100, correct: 10, total: 10 },
+    { name: "API-тестирование", percent: 92, correct: 23, total: 25 },
+    { name: "SQL / Базы данных", percent: 90, correct: 9, total: 10 },
+  ],
+
+  "i.petrov@corp.ru": [
+    { name: "Принципы тестирования", percent: 30, correct: 3, total: 10 },
+    { name: "Документация", percent: 40, correct: 4, total: 10 },
+    { name: "API-тестирование", percent: 25, correct: 5, total: 20 },
+    { name: "SQL / Базы данных", percent: 20, correct: 2, total: 10 },
+  ],
+
+  "o.sidorova@dev.com": [
+    { name: "Принципы тестирования", percent: 80, correct: 8, total: 10 },
+    { name: "Виды тестирования", percent: 75, correct: 15, total: 20 },
+    { name: "Документация", percent: 70, correct: 7, total: 10 },
+    { name: "API-тестирование", percent: 65, correct: 13, total: 20 },
+    { name: "SQL / Базы данных", percent: 60, correct: 6, total: 10 },
+  ],
+};
+
 
 
   function openCandidateModal(candidateData) {
