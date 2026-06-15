@@ -465,6 +465,16 @@ body[data-theme="light"] header {
   gap: 28px;
 }
 
+.btn-telegram {
+  border-color: rgba(0, 201, 255, 0.5);
+}
+
+.btn-telegram:hover {
+  transform: translateY(-2px);
+  border-color: #00c9ff;
+  box-shadow: 0 16px 30px rgba(0, 201, 255, 0.25);
+}
+
 .pricing-card {
   position: relative;
   background: var(--surface-2);
