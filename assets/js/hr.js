@@ -174,12 +174,52 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // Кнопка "Получить доступ" в hero
+    // Кнопка "Получить доступ" в hero
   if (btnCta) {
     btnCta.addEventListener("click", (e) => {
       e.preventDefault();
-      openAuthModal("login"); // или "register", если так логичнее
+
+      if (isLoggedIn()) {
+        window.location.href = "/hr-dashboard/";
+      } else {
+        openAuthModal("register"); // или "login" — как тебе удобнее
+      }
     });
+  }
+
+   // ===== UI в хедере в зависимости от авторизации =====
+  const navActions = document.querySelector(".nav-actions");
+
+  if (isLoggedIn() && navActions) {
+    const companyName = localStorage.getItem("qa_company_name") || "Компания";
+
+    // убираем кнопку "Войти" из шапки
+    if (btnLogin) {
+      btnLogin.remove();
+    }
+
+    // плашка с названием компании
+    const companySpan = document.createElement("span");
+    companySpan.className = "company-pill";
+    companySpan.textContent = `Компания: ${companyName}`;
+
+    // кнопка "Выйти"
+    const logoutBtn = document.createElement("button");
+    logoutBtn.type = "button";
+    logoutBtn.className = "nav-link";
+    logoutBtn.textContent = "Выйти";
+
+    logoutBtn.addEventListener("click", () => {
+      localStorage.removeItem("qa_is_logged_in");
+      localStorage.removeItem("qa_company_id");
+      localStorage.removeItem("qa_company_name");
+      localStorage.removeItem("qa_company_token");
+      window.location.href = "/";
+    });
+
+    // вставляем элементы в правую часть навигации
+    navActions.appendChild(companySpan);
+    navActions.appendChild(logoutBtn);
   }
 
   // Закрытие модалки
