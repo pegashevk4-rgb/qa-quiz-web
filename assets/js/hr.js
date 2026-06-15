@@ -182,7 +182,7 @@ document.addEventListener("DOMContentLoaded", () => {
       if (isLoggedIn()) {
         window.location.href = "/hr-dashboard/";
       } else {
-        openAuthModal("register"); // или "login" — как тебе удобнее
+        openAuthModal("login");
       }
     });
   }
