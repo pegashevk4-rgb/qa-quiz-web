@@ -193,6 +193,12 @@ TOP NAV ACTIONS
   outline: none;
 }
 
+
+/* Только в модалке кандидата при ховере — зелёный контур */
+.candidate-modal-footer .btn-secondary:hover {
+  border-color: #20c997;              /* или #20c997 — выбери, какой зелёный больше нравится */
+}
+
 .nav-link {
   border: 1px solid var(--border);
   background: transparent;
@@ -1334,6 +1340,21 @@ RESPONSIVE
   font-size: 13px;
   cursor: pointer;
   transition: all 0.2s;
+}
+
+:root[data-theme="dark"] .candidate-modal-footer .btn-secondary {
+  background: var(--card);   /* тёмный фон, как у модалки */
+  color: var(--text);        /* светлый текст */
+  border-color: var(--border);
+}
+
+:root[data-theme="dark"] .candidate-modal-footer .btn-secondary:hover {
+  border-color: #22c55e;     /* зелёный контур при ховере */
+}
+
+/* Светлая тема: оставляем светлой, но тоже с зелёным контуром при ховере */
+:root[data-theme="light"] .candidate-modal-footer .btn-secondary:hover {
+  border-color: #22c55e;
 }
 
 .btn-secondary:hover {
