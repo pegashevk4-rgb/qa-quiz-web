@@ -1386,3 +1386,9 @@ RESPONSIVE
   font-size: 14px;
   font-weight: 600;
 }
+
+.footer-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
