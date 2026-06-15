@@ -308,6 +308,16 @@ nav {
   justify-content: space-between;
 }
 
+.candidate-modal-footer {
+  margin-top: 16px;          /* отступ от блока с темами */
+  display: flex;
+  justify-content: flex-end; /* кнопка уезжает вправо */
+}
+
+.candidate-modal-footer .btn-secondary {
+  min-width: 120px;
+}
+
 .nav-logo {
   display: flex;
   align-items: center;
