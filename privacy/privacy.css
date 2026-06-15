@@ -3,47 +3,32 @@
 ========================= */
 
 .privacy-page {
-  padding: 100px 0 80px;
+  padding: 60px 0 80px;
   background: var(--bg);
 }
 
-.privacy-hero {
-  max-width: 760px;
-  margin-bottom: 42px;
-}
-
-.privacy-badge {
-  display: inline-flex;
-  align-items: center;
+/* Логотип + кнопка под ним слева */
+.privacy-header {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
   gap: 8px;
+  margin-bottom: 32px;
+}
 
-  padding: 8px 14px;
-  margin-bottom: 18px;
-
-  border: 1px solid var(--border);
-  border-radius: 999px;
-
-  background: rgba(255,255,255,0.03);
-
+/* Логотип */
+.privacy-logo {
+  font-family: "Syne", sans-serif;
+  font-size: 20px;
   color: var(--accent);
-  font-size: 14px;
-  font-weight: 600;
+  text-decoration: none;
 }
 
-.privacy-subtitle {
-  max-width: 760px;
-
-  color: var(--muted);
-  font-size: 18px;
-  line-height: 1.7;
-}
-
+/* Кнопка "назад" под логотипом */
 .privacy-back {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-
-  margin-bottom: 28px;
 
   padding: 6px 12px;
   border-radius: 999px;
@@ -68,6 +53,39 @@
   transform: translateY(-1px);
 }
 
+/* Hero-блок */
+.privacy-hero {
+  max-width: 760px;
+  margin-bottom: 42px;
+}
+
+.privacy-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+
+  padding: 8px 14px;
+  margin-bottom: 18px;
+
+  border: 1px solid var(--border);
+  border-radius: 999px;
+
+  background: rgba(255, 255, 255, 0.03);
+
+  color: var(--accent);
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.privacy-subtitle {
+  max-width: 760px;
+
+  color: var(--muted);
+  font-size: 18px;
+  line-height: 1.7;
+}
+
+/* Карточки */
 .privacy-card {
   margin-bottom: 24px;
   padding: 32px;
@@ -94,6 +112,7 @@
   line-height: 1.9;
 }
 
+/* Контакты */
 .privacy-contacts {
   display: flex;
   flex-direction: column;
@@ -107,9 +126,8 @@
 ========================= */
 
 @media (max-width: 640px) {
-
   .privacy-page {
-    padding: 100px 0 64px;
+    padding: 40px 0 64px;
   }
 
   .privacy-card {
@@ -123,5 +141,4 @@
   .privacy-subtitle {
     font-size: 16px;
   }
-
 }
