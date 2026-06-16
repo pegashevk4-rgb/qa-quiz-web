@@ -6,7 +6,11 @@
 
 :root {
   /* дефолт — тёмная тема */
-  --bg: #020617;
+  --bg: radial-gradient(circle at top, #0f172a 0, #020617 45%, #020617 100%);
+  --card-bg: rgba(15, 23, 42, 0.95);
+  --card-border: rgba(148, 163, 184, 0.4);
+  --card-shadow: 0 18px 45px rgba(15, 23, 42, 0.8);
+
   --text: #f3f4f6;
   --muted: #e5e7eb;
   --accent: #22c55e;
@@ -14,7 +18,11 @@
 }
 
 html[data-theme="light"] {
-  --bg: #f9fafb;
+  --bg: radial-gradient(circle at top, #ffffff 0, #f3f4f6 45%, #e5e7eb 100%);
+  --card-bg: #ffffff;
+  --card-border: rgba(148, 163, 184, 0.35);
+  --card-shadow: 0 16px 40px rgba(15, 23, 42, 0.12);
+
   --text: #111827;
   --muted: #4b5563;
   --accent: #16a34a;
@@ -22,7 +30,7 @@ html[data-theme="light"] {
 }
 
 body {
-  background-color: var(--bg);
+  background: var(--bg);
   color: var(--text);
 }
 
@@ -141,11 +149,15 @@ html[data-theme="light"] .privacy-card.card {
   border: 1px solid var(--border);
   border-radius: 999px;
 
-  background: rgba(255, 255, 255, 0.03);
+   background: rgba(15, 23, 42, 0.9);
 
   color: var(--accent);
   font-size: 14px;
   font-weight: 600;
+}
+
+html[data-theme="light"] .privacy-badge {
+  background: rgba(255, 255, 255, 0.85);
 }
 
 .privacy-subtitle {
@@ -154,12 +166,20 @@ html[data-theme="light"] .privacy-card.card {
   color: var(--text);
   font-size: 18px;
   line-height: 1.7;
+  opacity: 0.9;
 }
 
 /* Карточки */
 .privacy-card {
   margin-bottom: 24px;
   padding: 32px;
+
+  background-color: var(--card-bg);
+  border-radius: 18px;
+  border: 1px solid var(--card-border);
+  box-shadow: var(--card-shadow);
+
+  backdrop-filter: blur(18px);
 }
 
 .privacy-card h2 {
