@@ -30,22 +30,24 @@ html[data-theme="light"] {
 }
 
 body {
-  background: var(--bg);
+  background-color: var(--bg);
   color: var(--text);
 }
 
 .privacy-page {
   padding: 60px 0 80px;
-  background: transparent; /* градиент уже на body */
+  background: var(--bg);
 }
 
 /* Логотип + кнопка под ним слева */
 .privacy-header {
   display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 8px;
-  margin-bottom: 32px;
+  align-items: center;
+  justify-content: space-between;
+
+  max-width: 960px;
+  margin: 0 auto 32px;
+  padding: 0 16px;
 }
 
 .privacy-header-actions {
@@ -60,6 +62,8 @@ body {
   font-size: 20px;
   color: var(--accent);
   text-decoration: none;
+
+  margin-left: 16px;
 }
 
 .theme-toggle {
@@ -215,13 +219,13 @@ html[data-theme="light"] .privacy-badge {
 .privacy-contacts {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 8px;
   margin-top: 16px;
 }
 
 .privacy-contacts .footer-link {
-  color: var(--accent);
-  font-weight: 500;
+  color: var(--text);         
+  font-weight: 400;
   text-decoration: none;
 }
 
@@ -232,6 +236,8 @@ html[data-theme="light"] .privacy-badge {
 .privacy-hero,
 .privacy-card {
   max-width: 760px;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 /* Заголовок страницы */
