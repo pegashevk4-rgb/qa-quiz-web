@@ -25,9 +25,15 @@
           QA Hiring Assistant
         </a>
 
-        <a href="/" class="privacy-back" id="privacy-back">
-          ← На главную
-        </a>
+        <div class="privacy-header-actions">
+          <button id="theme-toggle" class="theme-toggle">
+          Светлая / тёмная тема
+          </button>
+
+          <a href="/" class="privacy-back" id="privacy-back">
+            ← На главную
+          </a>
+        </div>
       </header>
 
       <section class="privacy-hero">
@@ -117,6 +123,28 @@
 
   <script>
     (function () {
+      // --- Переключатель темы ---
+      const root = document.documentElement;
+      const themeToggle = document.getElementById('theme-toggle');
+
+      // восстановить тему из localStorage
+      const savedTheme = localStorage.getItem('theme');
+      if (savedTheme === 'light') {
+        root.setAttribute('data-theme', 'light');
+      } else {
+        root.setAttribute('data-theme', 'dark');
+      }
+
+      if (themeToggle) {
+        themeToggle.addEventListener('click', () => {
+          const current = root.getAttribute('data-theme') || 'dark';
+          const next = current === 'dark' ? 'light' : 'dark';
+          root.setAttribute('data-theme', next);
+          localStorage.setItem('theme', next);
+        });
+      }
+
+      // --- Логика кнопки "назад" ---
       const backLink = document.getElementById('privacy-back');
       if (!backLink || !document.referrer) return;
 

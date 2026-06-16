@@ -2,6 +2,30 @@
    PRIVACY PAGE
 ========================= */
 
+/* Тёмная и светлая темы через data-theme на <html> */
+
+:root {
+  /* дефолт — тёмная тема */
+  --bg: #020617;
+  --text: #f3f4f6;
+  --muted: #e5e7eb;
+  --accent: #22c55e;
+  --border: rgba(148, 163, 184, 0.3);
+}
+
+html[data-theme="light"] {
+  --bg: #f9fafb;
+  --text: #111827;
+  --muted: #4b5563;
+  --accent: #16a34a;
+  --border: rgba(148, 163, 184, 0.6);
+}
+
+body {
+  background-color: var(--bg);
+  color: var(--text);
+}
+
 .privacy-page {
   padding: 60px 0 80px;
   background: var(--bg);
@@ -16,6 +40,12 @@
   margin-bottom: 32px;
 }
 
+.privacy-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
 /* Логотип */
 .privacy-logo {
   font-family: "Syne", sans-serif;
@@ -24,33 +54,74 @@
   text-decoration: none;
 }
 
+.theme-toggle {
+  padding: 8px 16px;
+  border-radius: 999px;
+  border: 1px solid rgba(148, 163, 184, 0.4);
+  background: transparent;
+  color: var(--muted);
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+
+  transition:
+    color 0.2s ease,
+    border-color 0.2s ease,
+    background 0.2s ease,
+    transform 0.1s ease,
+    box-shadow 0.2s ease;
+}
+
+.theme-toggle:hover {
+  color: var(--accent);
+  border-color: var(--accent);
+  background: rgba(34, 197, 94, 0.06);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 14px rgba(15, 23, 42, 0.5);
+}
+
 /* Кнопка "назад" под логотипом */
 .privacy-back {
   display: inline-flex;
   align-items: center;
   gap: 6px;
 
-  padding: 6px 12px;
+  padding: 8px 16px;
   border-radius: 999px;
 
-  color: var(--muted);
+  color: #f9fafb; /* более белый текст */
   text-decoration: none;
-  border: 1px solid transparent;
+  border: 1px solid rgba(148, 163, 184, 0.4);
 
   font-size: 14px;
+  font-weight: 500;
+
+  background: rgba(15, 23, 42, 0.9);
 
   transition:
     color 0.2s ease,
     border-color 0.2s ease,
     background 0.2s ease,
-    transform 0.1s ease;
+    transform 0.1s ease,
+    box-shadow 0.2s ease;
 }
 
 .privacy-back:hover {
-  color: var(--accent);
+  color: #ffffff;
   border-color: var(--accent);
-  background: rgba(32, 201, 151, 0.06);
+  background: rgba(34, 197, 94, 0.22);
   transform: translateY(-1px);
+  box-shadow: 0 6px 18px rgba(15, 23, 42, 0.6);
+}
+
+html[data-theme="light"] .privacy-back {
+  background: #111827;
+  color: #f9fafb;
+}
+
+html[data-theme="light"] .privacy-card.card {
+  background-color: #ffffff;
+  box-shadow: 0 12px 30px rgba(15, 23, 42, 0.08);
 }
 
 /* Hero-блок */
@@ -80,7 +151,7 @@
 .privacy-subtitle {
   max-width: 760px;
 
-  color: var(--muted);
+  color: var(--text);
   font-size: 18px;
   line-height: 1.7;
 }
@@ -100,7 +171,7 @@
 }
 
 .privacy-card p {
-  color: var(--muted);
+  color: var(--text); /* вместо muted, чтобы текст был светлее */
   line-height: 1.8;
 }
 
@@ -108,7 +179,7 @@
   margin: 18px 0;
   padding-left: 18px;
 
-  color: var(--muted);
+  color: var(--text); 
   line-height: 1.9;
 }
 
