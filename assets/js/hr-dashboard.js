@@ -578,28 +578,37 @@ function renderTable() {
   data.forEach((candidate) => {
     const row = document.createElement("tr");
 
+    const tdName = document.createElement("td");
+    tdName.textContent = candidate.name;
+    row.appendChild(tdName);
 
-    row.innerHTML = `
-      <td>${candidate.name}</td>
-      <td>${candidate.testName}</td>
-      <td class="score-cell">
-        <span class="score-badge">
-          ${candidate.score}%
-        </span>
-      </td>
-      <td>
-        <span class="verdict ${getVerdictClass(candidate.verdict)}">
-          ${translateVerdict(candidate.verdict)}
-        </span>
-      </td>
-      <td class="date-cell">${candidate.date}</td>
-    `;
+    const tdTest = document.createElement("td");
+    tdTest.textContent = candidate.testName;
+    row.appendChild(tdTest);
 
+    const tdScore = document.createElement("td");
+    tdScore.className = "score-cell";
+    const scoreBadge = document.createElement("span");
+    scoreBadge.className = "score-badge";
+    scoreBadge.textContent = `${candidate.score}%`;
+    tdScore.appendChild(scoreBadge);
+    row.appendChild(tdScore);
+
+    const tdVerdict = document.createElement("td");
+    const verdictSpan = document.createElement("span");
+    verdictSpan.className = `verdict ${getVerdictClass(candidate.verdict)}`;
+    verdictSpan.textContent = translateVerdict(candidate.verdict);
+    tdVerdict.appendChild(verdictSpan);
+    row.appendChild(tdVerdict);
+
+    const tdDate = document.createElement("td");
+    tdDate.className = "date-cell";
+    tdDate.textContent = candidate.date;
+    row.appendChild(tdDate);
 
     row.addEventListener("click", () => {
       openCandidateModal(candidate);
     });
-
 
     tableBody.appendChild(row);
   });
