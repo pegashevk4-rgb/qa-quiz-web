@@ -919,3 +919,130 @@ body {
     max-width: 100%;
   }
 }
+
+@media (max-width: 480px) {
+  .top-header {
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 14px 16px;
+    gap: 10px;
+  }
+
+  .header-left h1 {
+    font-size: 18px;
+  }
+
+  .header-right {
+    width: 100%;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .company-pill {
+    font-size: 11px;
+    padding: 6px 10px;
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .logout-btn {
+    font-size: 12px;
+    padding: 6px 12px;
+  }
+
+  .dashboard-content {
+    padding: 16px;
+  }
+
+  .metrics-section {
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+
+  .metric-card {
+    padding: 14px;
+  }
+
+  .metric-value {
+    font-size: 24px;
+  }
+
+  .metric-label {
+    font-size: 11px;
+  }
+
+  .tests-section,
+  .candidates-section {
+    padding: 16px;
+  }
+
+  .tests-section h2,
+  .candidates-section h2 {
+    font-size: 16px;
+  }
+
+  .section-subtitle {
+    font-size: 12px;
+  }
+
+  .btn-copy {
+    font-size: 12px;
+    padding: 6px 14px;
+  }
+
+  .test-title {
+    font-size: 14px;
+  }
+
+  .test-desc {
+    font-size: 12px;
+  }
+
+  .filter-btn,
+  .test-filter-btn,
+  .date-filter-btn {
+    min-width: 70px;
+    height: 28px;
+    font-size: 11px;
+    padding: 0 8px;
+  }
+
+  .search-input {
+    height: 36px;
+    font-size: 13px;
+  }
+
+  .candidates-table td {
+    padding: 10px 8px;
+    font-size: 12px;
+  }
+
+  .candidates-table thead th {
+    padding: 8px 8px;
+    font-size: 10px;
+  }
+
+  .modal-inner {
+    padding: 18px 14px;
+  }
+
+  .modal-header h3 {
+    font-size: 16px;
+  }
+
+  .candidate-meta {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+
+  .meta-value {
+    font-size: 14px;
+  }
+
+  .plan-card {
+    flex-direction: column;
+    align-items: flex-start;
+    font-size: 13px;
+  }
+}

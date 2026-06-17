@@ -418,9 +418,4 @@ elements.restartBtn?.addEventListener("click", () => {
   window.location.reload();
 });
 
-// =========================
-// INIT
-// =========================
-
-console.log("APP_JS_LOADED");
 loadQuestions();

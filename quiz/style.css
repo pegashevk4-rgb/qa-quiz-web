@@ -320,3 +320,73 @@ h1 {
 #user-form:empty {
   display: none;
 }
+
+@media (max-width: 480px) {
+  .page-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+    margin-top: 12px;
+  }
+
+  .page-header h1 {
+    font-size: 20px;
+  }
+
+  .timer {
+    margin-left: 0;
+    font-size: 14px;
+  }
+
+  .container {
+    padding: 10px 8px;
+  }
+
+  #intro,
+  #quiz,
+  #result {
+    margin-top: 16px;
+    padding: 16px 12px;
+    border-radius: 8px;
+  }
+
+  #intro h2,
+  #user-form h2,
+  #result h2 {
+    font-size: 20px;
+  }
+
+  #question-text {
+    font-size: 16px;
+  }
+
+  .option-label {
+    padding: 10px 10px;
+    font-size: 14px;
+    min-height: 44px;
+  }
+
+  #data-form input {
+    font-size: 16px;
+    padding: 12px;
+  }
+
+  #next-btn,
+  #start-btn,
+  #restart-btn,
+  #data-form button {
+    font-size: 15px;
+    padding: 12px 16px;
+    max-width: 100%;
+  }
+
+  #result h3 {
+    font-size: 16px;
+  }
+
+  #strong-areas li,
+  #weak-areas li,
+  #categories-breakdown li {
+    font-size: 14px;
+  }
+}

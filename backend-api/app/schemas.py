@@ -164,7 +164,7 @@ class QuestionPublic(BaseModel):
     options: List[str]
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 
 class TestPublic(BaseModel):
@@ -218,4 +218,4 @@ class CompanyPlan(BaseModel):
     is_trial: bool
 
     class Config:
-        orm_mode = True
+        from_attributes = True

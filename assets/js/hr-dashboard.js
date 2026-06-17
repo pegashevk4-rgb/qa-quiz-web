@@ -397,7 +397,6 @@ const modalVerdict = document.getElementById("modalVerdict");
 const modalDate = document.getElementById("modalDate");
 const modalId = document.getElementById("modalId");
 const topicsContainer = document.getElementById("topicsContainer");
-const questionsContainer = document.getElementById("questionsContainer");
 const filterButtons = document.querySelectorAll(".filter-btn");
 const testFilterButtons = document.querySelectorAll(".test-filter-btn");
 const dateFilterButtons = document.querySelectorAll(".date-filter-btn");

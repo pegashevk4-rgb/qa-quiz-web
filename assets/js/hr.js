@@ -391,7 +391,7 @@ document.addEventListener("DOMContentLoaded", () => {
         const topics =
           candidateTopicsByEmail[email] && candidateTopicsByEmail[email].length
             ? candidateTopicsByEmail[email]
-            : demoTopics;
+            : [];
 
         const candidateData = {
           firstName: cells[0]?.textContent.trim() || "",

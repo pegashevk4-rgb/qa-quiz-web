@@ -943,29 +943,6 @@ CANDIDATE MODAL
   overflow: hidden;
 }
 
-.topic-row {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 10px 12px;
-  border-bottom: 1px solid var(--border);
-}
-
-.topic-row:last-child {
-  border-bottom: none;
-}
-
-.topic-name {
-  color: var(--muted);
-  font-size: 0.9rem;
-}
-
-.topic-score {
-  font-weight: 500;
-  font-size: 0.9rem;
-  color: var(--text);   /* можно оставить как есть, если и так ок */
-}
-
 @media (max-width: 480px) {
   .candidate-modal-header {
     flex-direction: column-reverse;
@@ -1369,8 +1346,9 @@ RESPONSIVE
 .topic-row {
   display: flex;
   justify-content: space-between;
-  padding: 12px;
-  border-bottom: 1px solid var(--border, #dde5ed);
+  align-items: center;
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--border);
 }
 
 .topic-row:last-child {
@@ -1378,17 +1356,161 @@ RESPONSIVE
 }
 
 .topic-name {
-  font-size: 14px;
-  color: var(--text-secondary, #6c7a89);
+  color: var(--muted);
+  font-size: 0.88rem;
 }
 
 .topic-score {
-  font-size: 14px;
-  font-weight: 600;
+  font-weight: 500;
+  font-size: 0.88rem;
+  color: var(--text);
 }
 
 .footer-link {
   display: inline-flex;
   align-items: center;
   gap: 4px;
+}
+
+/* =========================
+   MOBILE 480px
+   ========================= */
+@media (max-width: 480px) {
+  .nav-inner {
+    height: auto;
+    min-height: 56px;
+    padding: 10px var(--px);
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .nav-actions {
+    gap: 6px;
+  }
+
+  .nav-link {
+    padding: 0 10px;
+    height: 30px;
+    font-size: 0.8rem;
+  }
+
+  .header-icon-btn {
+    min-width: 28px;
+    height: 28px;
+    padding: 0 8px;
+    font-size: 0.8rem;
+  }
+
+  .theme-toggle {
+    width: 28px;
+    height: 28px;
+    min-width: 28px;
+    font-size: 14px;
+  }
+
+  #hero {
+    padding: 60px 0 50px;
+  }
+
+  .eyebrow {
+    font-size: 0.7rem;
+    padding: 4px 10px;
+    margin-bottom: 20px;
+  }
+
+  .hero-sub {
+    font-size: 0.95rem;
+    margin-bottom: 32px;
+  }
+
+  .cards {
+    grid-template-columns: 1fr;
+    gap: 14px;
+    margin-bottom: 32px;
+  }
+
+  .card {
+    padding: 20px 18px;
+  }
+
+  .card h3 {
+    font-size: 0.92rem;
+  }
+
+  .card p {
+    font-size: 0.82rem;
+  }
+
+  .btn-cta {
+    padding: 12px 24px;
+    font-size: 0.9rem;
+    width: 100%;
+    justify-content: center;
+  }
+
+  #how-inner {
+    padding: 48px var(--px);
+  }
+
+  .section-title {
+    margin-bottom: 36px;
+    font-size: clamp(1.3rem, 4vw, 2rem);
+  }
+
+  #dashboard-inner {
+    padding: 40px var(--px) 60px;
+  }
+
+  .dashboard-hint {
+    font-size: 13px;
+  }
+
+  .dashboard-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .modal-inner.modal-card {
+    padding: 18px 16px;
+  }
+
+  .candidate-meta {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+
+  .modal-inner {
+    max-width: calc(100vw - 32px);
+    padding: 18px 16px;
+  }
+
+  .modal-form input {
+    font-size: 16px;
+    padding: 10px 12px;
+  }
+
+  .modal-submit {
+    padding: 12px 0;
+    font-size: 0.95rem;
+  }
+
+  .footer-inner {
+    flex-direction: column;
+    text-align: center;
+    gap: 8px;
+    padding: 24px var(--px);
+  }
+
+  table {
+    font-size: 0.8rem;
+  }
+
+  thead th {
+    padding: 10px 10px;
+    font-size: 0.65rem;
+  }
+
+  tbody td {
+    padding: 10px 10px;
+  }
 }
