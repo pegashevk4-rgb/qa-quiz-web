@@ -191,15 +191,13 @@ def create_company(payload: schemas.CompanyCreate, db: Session = Depends(get_db)
 )
 def upgrade_company(
     company_id: int = Path(...),
+    current_company: models.Company = Depends(get_current_company),
     db: Session = Depends(get_db),
 ):
-    company = (
-        db.query(models.Company)
-        .filter(models.Company.id == company_id)
-        .first()
-    )
-    if not company:
-        raise HTTPException(status_code=404, detail="Company not found")
+    if current_company.id != company_id:
+        raise HTTPException(status_code=403, detail="Forbidden")
+
+    company = current_company
 
     if company.is_paid:
         return company
@@ -302,68 +300,68 @@ def get_candidate(candidate_id: int, db: Session = Depends(get_db)):
     return candidate
 
 
-@app.post(
-    "/results",
-    response_model=schemas.ResultPublic,
-    status_code=status.HTTP_201_CREATED,
-)
-def create_result(payload: schemas.ResultCreate, db: Session = Depends(get_db)):
-    user = (
-        db.query(models.User)
-        .filter(models.User.id == payload.user_id)
-        .first()
-    )
-    if not user:
-        raise HTTPException(status_code=400, detail="User not found")
+# @app.post(
+#     "/results",
+#     response_model=schemas.ResultPublic,
+#     status_code=status.HTTP_201_CREATED,
+# )
+# def create_result(payload: schemas.ResultCreate, db: Session = Depends(get_db)):
+#     user = (
+#         db.query(models.User)
+#         .filter(models.User.id == payload.user_id)
+#         .first()
+#     )
+#     if not user:
+#         raise HTTPException(status_code=400, detail="User not found")
 
-    company = None
-    if payload.company_id:
-        company = (
-            db.query(models.Company)
-            .filter(models.Company.id == payload.company_id)
-            .first()
-        )
-        if not company:
-            raise HTTPException(status_code=400, detail="Company not found")
+#     company = None
+#     if payload.company_id:
+#         company = (
+#             db.query(models.Company)
+#             .filter(models.Company.id == payload.company_id)
+#             .first()
+#         )
+#         if not company:
+#             raise HTTPException(status_code=400, detail="Company not found")
 
-        if not company.is_paid:
-            if company.trial_tests_used >= company.trial_tests_limit:
-                raise HTTPException(
-                    status_code=status.HTTP_403_FORBIDDEN,
-                    detail=(
-                        "Trial tests limit reached. "
-                        "Please upgrade to a paid plan."
-                    ),
-                )
-            company.trial_tests_used += 1
-            db.add(company)
+#         if not company.is_paid:
+#             if company.trial_tests_used >= company.trial_tests_limit:
+#                 raise HTTPException(
+#                     status_code=status.HTTP_403_FORBIDDEN,
+#                     detail=(
+#                         "Trial tests limit reached. "
+#                         "Please upgrade to a paid plan."
+#                     ),
+#                 )
+#             company.trial_tests_used += 1
+#             db.add(company)
 
-    result = models.Result(
-        user_id=payload.user_id,
-        test_id=payload.test_id,
-        total_score=payload.total_score,
-        max_score=payload.max_score,
-        percent=payload.percent,
-        verdict=payload.verdict,
-        company_id=payload.company_id,
-    )
-    db.add(result)
-    db.commit()
-    db.refresh(result)
+#     result = models.Result(
+#         user_id=payload.user_id,
+#         test_id=payload.test_id,
+#         total_score=payload.total_score,
+#         max_score=payload.max_score,
+#         percent=payload.percent,
+#         verdict=payload.verdict,
+#         company_id=payload.company_id,
+#     )
+#     db.add(result)
+#     db.commit()
+#     db.refresh(result)
 
-    for item in payload.details:
-        detail = models.DetailedResult(
-            result_id=result.id,
-            category=item.category,
-            percent=item.percent,
-            is_strong=item.is_strong,
-            is_weak=item.is_weak,
-        )
-        db.add(detail)
+#     for item in payload.details:
+#         detail = models.DetailedResult(
+#             result_id=result.id,
+#             category=item.category,
+#             percent=item.percent,
+#             is_strong=item.is_strong,
+#             is_weak=item.is_weak,
+#         )
+#         # db.add(detail)
 
-    db.commit()
-    db.refresh(result)
-    return result
+#     # db.commit()
+#     # db.refresh(result)
+#     # return result
 
 
 @app.get("/results/{result_id}", response_model=schemas.ResultPublic)
