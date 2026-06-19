@@ -205,6 +205,9 @@ document.addEventListener("DOMContentLoaded", () => {
         if (data.company_token) {
           localStorage.setItem("qa_company_token", data.company_token);
         }
+        if (data.access_token) {
+          localStorage.setItem("qa_access_token", data.access_token);
+        }
 
         closeAuthModal();
         window.location.href = "/hr-dashboard/";
