@@ -200,9 +200,10 @@ function applyPlanLimitToButtons(planData) {
 // --- Загрузка тарифа компании (с заглушкой, как у тебя) ---
 async function loadCompanyPlan() {
   const companyId = localStorage.getItem("qa_company_id");
-  if (!companyId) {
-    console.warn("Нет company_id в localStorage для плана");
-    // Мягкий дефолт, если что-то пошло не так
+  const token = localStorage.getItem("qa_access_token");
+
+  if (!companyId || !token) {
+    console.warn("Нет company_id или access_token в localStorage для плана");
     const fallback = {
       plan_name: "Free trial",
       tests_limit: 10,
@@ -215,15 +216,21 @@ async function loadCompanyPlan() {
     return;
   }
 
-
   try {
-    const resp = await fetch(`${API_BASE_URL}/api/company/${companyId}/plan`);
+    const resp = await fetch(`${API_BASE_URL}/api/company/${companyId}/plan`, {
+      method: "GET",
+      headers: {
+        "Authorization": `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+    });
+
     if (!resp.ok) {
+      console.error("Ошибка ответа плана", resp.status);
       throw new Error("Ошибка ответа плана " + resp.status);
     }
+
     const planData = await resp.json();
-
-
     renderPlanInfo(planData);
     applyPlanLimitToButtons(planData);
   } catch (err) {
@@ -241,50 +248,48 @@ async function loadCompanyPlan() {
 }
 
 
+
 // --- Загрузка результатов компании из API ---
 async function loadCompanyResults() {
   const companyId = localStorage.getItem("qa_company_id");
-  if (!companyId) {
-    console.warn("Нет company_id в localStorage");
+  const token = localStorage.getItem("qa_access_token");
+
+  if (!companyId || !token) {
+    console.warn("Нет company_id или access_token в localStorage для результатов");
     return;
   }
-
 
   try {
     const resp = await fetch(
       `${API_BASE_URL}/api/company/${companyId}/results`,
       {
-        credentials: "include",
+        method: "GET",
+        headers: {
+          "Authorization": `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
       }
     );
+
     if (!resp.ok) {
       console.error("Ошибка загрузки результатов компании", resp.status);
       return;
     }
 
-
     const data = await resp.json(); // массив ResultRow
-
 
     candidates = data.map((row, index) => {
       const fullName = `${row.first_name} ${row.last_name}`.trim();
-      const dateStr = row.created_at
-        ? row.created_at.slice(0, 10)
-        : "";
-
+      const dateStr = row.created_at ? row.created_at.slice(0, 10) : "";
 
       let testName = row.test_id;
       if (row.test_id === "qa_junior_web") testName = "Junior QA";
       if (row.test_id === "qa_middle_web") testName = "Middle QA";
       if (row.test_id === "qa_senior_web") testName = "Senior QA";
 
-
       const verdict = row.verdict || "On the edge";
 
-
-      // Детальная разбивка по темам
       const topicScores = {};
-
 
       if (Array.isArray(row.categories)) {
         for (const cat of row.categories) {
@@ -302,7 +307,6 @@ async function loadCompanyResults() {
         };
       }
 
-
       return {
         id: row.result_id ?? index + 1,
         name: fullName || "Кандидат",
@@ -315,7 +319,6 @@ async function loadCompanyResults() {
         strongAreas: row.strong_areas || [],
       };
     });
-
 
     updateMetrics();
     renderTable();
@@ -854,10 +857,11 @@ if (logoutBtn) {
     localStorage.removeItem("qa_is_logged_in");
     localStorage.removeItem("qa_company_id");
     localStorage.removeItem("qa_company_name");
+    localStorage.removeItem("qa_company_token");
+    localStorage.removeItem("qa_access_token");
     window.location.href = "/";
   });
 }
-
 
 // --- ЕДИНСТВЕННЫЙ DOMContentLoaded ---
 document.addEventListener("DOMContentLoaded", () => {

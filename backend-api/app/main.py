@@ -8,7 +8,9 @@ from .database import Base, engine, SessionLocal
 from . import models, schemas
 from .auth import get_password_hash, verify_password
 from datetime import datetime
+from .auth import get_current_company
 
+from .auth import create_access_token
 
 import secrets
 import string
@@ -22,18 +24,14 @@ app = FastAPI()
 
 # Разрешённые источники (origin'ы) для разработки
 origins = [
-    "http://127.0.0.1:8001",
-    "http://localhost:8001",
-    "http://localhost:8000",
-    "http://127.0.0.1:8000",
-    "https://pegashevk4-rgb.github.io",
     "https://qa-quiz-test.ru",
-    "https://api.qa-quiz-test.ru",
+    "https://www.qa-quiz-test.ru",
+    "http://127.0.0.1:5500",
 ]
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],          # временно для проверки
+    allow_origins=origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -118,7 +116,7 @@ def register_hr_user(
 
 
 
-@app.post("/auth/login", response_model=schemas.CompanyHRUserPublic)
+@app.post("/auth/login")
 def login_hr_user(
     payload: schemas.HRLoginRequest,
     db: Session = Depends(get_db),
@@ -139,16 +137,22 @@ def login_hr_user(
         .filter(models.Company.id == hr_user.company_id)
         .first()
     )
+    if not company:
+        raise HTTPException(status_code=404, detail="Company not found")
 
-    return schemas.CompanyHRUserPublic(
-        id=hr_user.id,
-        email=hr_user.email,
-        name=hr_user.name,
-        company_id=hr_user.company_id,
-        role=hr_user.role,
-        company_name=company.name if company else "",
-        company_token=company.public_token if company else "",  # НОВОЕ
+    access_token = create_access_token(
+        data={"sub": hr_user.email, "company_id": hr_user.company_id}
     )
+
+    return {
+        "access_token": access_token,
+        "token_type": "bearer",
+        "company_id": hr_user.company_id,
+        "company_name": company.name,
+        # временно можно оставить, если фронт ещё использует
+        "company_token": company.public_token,
+    }
+
 
 
 
@@ -231,28 +235,27 @@ def get_company_by_public_token(
 )
 def get_company_plan(
     company_id: int,
+    current_company: models.Company = Depends(get_current_company),
     db: Session = Depends(get_db),
 ):
-    company = (
-        db.query(models.Company)
-        .filter(models.Company.id == company_id)
-        .first()
-    )
+    # защита: нельзя смотреть план чужой компании
+    if current_company.id != company_id:
+        raise HTTPException(status_code=403, detail="Forbidden")
+
+    company = current_company
+
     if not company:
         raise HTTPException(status_code=404, detail="Company not found")
 
-    # Логика на основе твоих полей
     if not company.is_paid:
-        # Триал
         plan_name = "Free trial"
         tests_limit = company.trial_tests_limit
         tests_used = company.trial_tests_used
         subscription_expires_at = None
         is_trial = True
     else:
-        # Простая платная версия: безлимит
         plan_name = "Paid"
-        tests_limit = None          # None = безлимит
+        tests_limit = None
         tests_used = company.trial_tests_used or 0
         subscription_expires_at = None
         is_trial = False
@@ -449,8 +452,12 @@ def save_public_result(data: schemas.TestResultIn, db: Session = Depends(get_db)
 def get_company_results(
     company_id: int,
     limit: int = 50,
+    current_company: models.Company = Depends(get_current_company),
     db: Session = Depends(get_db),
 ):
+    if current_company.id != company_id:
+        raise HTTPException(status_code=403, detail="Forbidden")
+
     rows = (
         db.query(
             models.Result.id.label("result_id"),

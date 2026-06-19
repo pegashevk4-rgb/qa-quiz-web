@@ -191,36 +191,37 @@ document.addEventListener("DOMContentLoaded", () => {
   const navActions = document.querySelector(".nav-actions");
 
   if (isLoggedIn() && navActions) {
-    const companyName = localStorage.getItem("qa_company_name") || "Компания";
+  const companyName = localStorage.getItem("qa_company_name") || "Компания";
 
-    // убираем кнопку "Войти" из шапки
-    if (btnLogin) {
-      btnLogin.remove();
-    }
-
-    // плашка с названием компании
-    const companySpan = document.createElement("span");
-    companySpan.className = "company-pill";
-    companySpan.textContent = `Компания: ${companyName}`;
-
-    // кнопка "Выйти"
-    const logoutBtn = document.createElement("button");
-    logoutBtn.type = "button";
-    logoutBtn.className = "nav-link";
-    logoutBtn.textContent = "Выйти";
-
-    logoutBtn.addEventListener("click", () => {
-      localStorage.removeItem("qa_is_logged_in");
-      localStorage.removeItem("qa_company_id");
-      localStorage.removeItem("qa_company_name");
-      localStorage.removeItem("qa_company_token");
-      window.location.href = "/";
-    });
-
-    // вставляем элементы в правую часть навигации
-    navActions.appendChild(companySpan);
-    navActions.appendChild(logoutBtn);
+  // убираем кнопку "Войти" из шапки
+  if (btnLogin) {
+    btnLogin.remove();
   }
+
+  // плашка с названием компании
+  const companySpan = document.createElement("span");
+  companySpan.className = "company-pill";
+  companySpan.textContent = `Компания: ${companyName}`;
+
+  // кнопка "Выйти"
+  const logoutBtn = document.createElement("button");
+  logoutBtn.type = "button";
+  logoutBtn.className = "nav-link";
+  logoutBtn.textContent = "Выйти";
+
+  logoutBtn.addEventListener("click", () => {
+    localStorage.removeItem("qa_is_logged_in");
+    localStorage.removeItem("qa_company_id");
+    localStorage.removeItem("qa_company_name");
+    localStorage.removeItem("qa_company_token");
+    localStorage.removeItem("qa_access_token");
+    window.location.href = "/";
+  });
+
+  // вставляем элементы в правую часть навигации
+  navActions.appendChild(companySpan);
+  navActions.appendChild(logoutBtn);
+}
 
   // Закрытие модалки
   if (authClose) {
@@ -412,105 +413,100 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // --- Вход ---
   if (loginForm) {
-    const loginEmailInput = loginForm.querySelector('input[name="email"]');
-    const loginPasswordInput = loginForm.querySelector(
-      'input[name="password"]'
-    );
-    const loginEmailError = loginForm.querySelector(
-      '.field-error-text[data-error-for="login-email"]'
-    );
-    const loginPasswordError = loginForm.querySelector(
-      '.field-error-text[data-error-for="login-password"]'
-    );
+  const loginEmailInput = loginForm.querySelector('input[name="email"]');
+  const loginPasswordInput = loginForm.querySelector(
+    'input[name="password"]'
+  );
+  const loginEmailError = loginForm.querySelector(
+    '.field-error-text[data-error-for="login-email"]'
+  );
+  const loginPasswordError = loginForm.querySelector(
+    '.field-error-text[data-error-for="login-password"]'
+  );
 
-    function clearLoginErrors() {
-      if (loginEmailInput) loginEmailInput.classList.remove("input-error");
+
+  function clearLoginErrors() {
+    if (loginEmailInput) loginEmailInput.classList.remove("input-error");
+    if (loginPasswordInput)
+      loginPasswordInput.classList.remove("input-error");
+    if (loginEmailError) loginEmailError.textContent = "";
+    if (loginPasswordError) loginPasswordError.textContent = "";
+  }
+
+
+  loginForm.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    clearLoginErrors();
+
+
+    const formData = new FormData(loginForm);
+    const email = formData.get("email")?.toString().trim();
+    const password = formData.get("password")?.toString().trim();
+
+
+    let hasClientErrors = false;
+
+
+    if (!email) {
+      if (loginEmailInput) loginEmailInput.classList.add("input-error");
+      if (loginEmailError) loginEmailError.textContent = "Укажите email";
+      hasClientErrors = true;
+    }
+    if (!password) {
       if (loginPasswordInput)
-        loginPasswordInput.classList.remove("input-error");
-      if (loginEmailError) loginEmailError.textContent = "";
-      if (loginPasswordError) loginPasswordError.textContent = "";
+        loginPasswordInput.classList.add("input-error");
+      if (loginPasswordError)
+        loginPasswordError.textContent = "Укажите пароль";
+      hasClientErrors = true;
     }
 
-    loginForm.addEventListener("submit", async (e) => {
-      e.preventDefault();
-      clearLoginErrors();
 
-      const formData = new FormData(loginForm);
-      const email = formData.get("email")?.toString().trim();
-      const password = formData.get("password")?.toString().trim();
+    if (hasClientErrors) {
+      return;
+    }
 
-      let hasClientErrors = false;
 
-      if (!email) {
-        if (loginEmailInput) loginEmailInput.classList.add("input-error");
-        if (loginEmailError) loginEmailError.textContent = "Укажите email";
-        hasClientErrors = true;
-      }
-      if (!password) {
-        if (loginPasswordInput)
-          loginPasswordInput.classList.add("input-error");
-        if (loginPasswordError)
-          loginPasswordError.textContent = "Укажите пароль";
-        hasClientErrors = true;
+    try {
+      const data = await apiLoginHR({ email, password });
+
+
+      localStorage.setItem("qa_is_logged_in", "1");
+      localStorage.setItem("qa_company_id", data.company_id);
+      localStorage.setItem("qa_company_name", data.company_name);
+
+      if (data.access_token) {
+        localStorage.setItem("qa_access_token", data.access_token);
       }
 
-      if (hasClientErrors) {
-        return;
+      if (data.company_token) {
+        localStorage.setItem("qa_company_token", data.company_token);
       }
 
-      try {
-        const data = await apiLoginHR({ email, password });
 
-        localStorage.setItem("qa_is_logged_in", "1");
-        localStorage.setItem("qa_company_id", data.company_id);
-        localStorage.setItem("qa_company_name", data.company_name);
+      closeAuthModal();
+      window.location.href = "/hr-dashboard/";
 
-        // НОВОЕ:
-        if (data.company_token) {
-          localStorage.setItem("qa_company_token", data.company_token);
-        }
 
-        closeAuthModal();
-        window.location.href = "/hr-dashboard/";
+    } catch (err) {
+      console.error(err);
 
-      } catch (err) {
-        console.error(err);
 
-        if (err.backendPayload) {
-          const payload = err.backendPayload;
-          const msg =
-            typeof payload.detail === "string"
-              ? payload.detail
-              : err.message || "Ошибка входа";
+      if (err.backendPayload) {
+        const payload = err.backendPayload;
+        const msg =
+          typeof payload.detail === "string"
+            ? payload.detail
+            : err.message || "Ошибка входа";
 
-          const lower = msg.toLowerCase();
 
-          if (loginEmailInput)
-            loginEmailInput.classList.add("input-error");
-          if (loginPasswordInput)
-            loginPasswordInput.classList.add("input-error");
-
-          if (
-            lower.includes("email") &&
-            !lower.includes("парол") &&
-            loginEmailError
-          ) {
-            loginEmailError.textContent = msg;
-          } else if (loginPasswordError) {
-            loginPasswordError.textContent = msg;
-          } else {
-            alert(msg);
-          }
-          return;
-        }
-
-        const msg = err.message || "Ошибка входа";
         const lower = msg.toLowerCase();
+
 
         if (loginEmailInput)
           loginEmailInput.classList.add("input-error");
         if (loginPasswordInput)
           loginPasswordInput.classList.add("input-error");
+
 
         if (
           lower.includes("email") &&
@@ -523,14 +519,40 @@ document.addEventListener("DOMContentLoaded", () => {
         } else {
           alert(msg);
         }
+        return;
       }
-    });
+
+
+      const msg = err.message || "Ошибка входа";
+      const lower = msg.toLowerCase();
+
+
+      if (loginEmailInput)
+        loginEmailInput.classList.add("input-error");
+      if (loginPasswordInput)
+        loginPasswordInput.classList.add("input-error");
+
+
+      if (
+        lower.includes("email") &&
+        !lower.includes("парол") &&
+        loginEmailError
+      ) {
+        loginEmailError.textContent = msg;
+      } else if (loginPasswordError) {
+        loginPasswordError.textContent = msg;
+      } else {
+        alert(msg);
+      }
+    }
+  });
   }
 
   // --- Регистрация ---
   if (registerForm) {
     const registerInputs = registerForm.querySelectorAll("input[name]");
     const errorBlocks = registerForm.querySelectorAll(".field-error-text");
+
 
     function clearRegisterErrors() {
       registerInputs.forEach((input) => {
@@ -540,6 +562,7 @@ document.addEventListener("DOMContentLoaded", () => {
         el.textContent = "";
       });
     }
+
 
     function setFieldError(fieldName, message) {
       const input = registerForm.querySelector(`input[name="${fieldName}"]`);
@@ -554,11 +577,10 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     }
 
-    // разбор ошибок бэка (HTTPException, 422 и т.п.)
+
     function applyBackendErrors(errPayload) {
       if (!errPayload) return;
 
-      // detail — строка
       if (typeof errPayload.detail === "string") {
         const msg = errPayload.detail;
         const lower = msg.toLowerCase();
@@ -577,7 +599,6 @@ document.addEventListener("DOMContentLoaded", () => {
         return;
       }
 
-      // detail — массив ошибок (422 от FastAPI)
       if (Array.isArray(errPayload.detail)) {
         let hasFieldErrors = false;
 
@@ -618,7 +639,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
       let hasClientErrors = false;
 
-      // Простая ручная проверка
       if (!name) {
         setFieldError("name", "Укажите имя");
         hasClientErrors = true;
@@ -636,7 +656,6 @@ document.addEventListener("DOMContentLoaded", () => {
         hasClientErrors = true;
       }
 
-      // HTML5-валидация (minlength, pattern и т.п.)
       if (!registerForm.checkValidity()) {
         registerInputs.forEach((input) => {
           if (!input.checkValidity()) {
@@ -673,9 +692,12 @@ document.addEventListener("DOMContentLoaded", () => {
         localStorage.setItem("qa_company_id", data.company_id);
         localStorage.setItem("qa_company_name", data.company_name);
 
-        // НОВОЕ:
         if (data.company_token) {
-        localStorage.setItem("qa_company_token", data.company_token);
+          localStorage.setItem("qa_company_token", data.company_token);
+        }
+
+        if (data.access_token) {
+          localStorage.setItem("qa_access_token", data.access_token);
         }
 
         closeAuthModal();
