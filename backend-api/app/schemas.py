@@ -36,7 +36,9 @@ class CompanyHRUserPublic(BaseModel):
     company_id: int
     role: str
     company_name: str
-    company_token: str  # НОВОЕ
+    company_token: str
+    access_token: str | None = None
+    token_type: str | None = None
 
     class Config:
         from_attributes = True
