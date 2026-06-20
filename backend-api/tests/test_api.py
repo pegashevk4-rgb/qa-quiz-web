@@ -117,7 +117,7 @@ class TestCandidates:
         assert response.status_code == 200
         assert response.json()["first_name"] == "Иван"
 
-    def test_get_nonexistent_candidate(self, client):
+    def test_get_nonexistent_candidate(self, client, sample_company):
         response = client.get("/candidates/99999")
         assert response.status_code == 404
 

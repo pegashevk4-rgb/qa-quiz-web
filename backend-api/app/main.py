@@ -6,11 +6,7 @@ from sqlalchemy.orm import Session
 
 from .database import Base, engine, SessionLocal
 from . import models, schemas
-from .auth import get_password_hash, verify_password
-from datetime import datetime
-from .auth import get_current_company
-
-from .auth import create_access_token
+from .auth import get_password_hash, verify_password, get_current_company, get_db, create_access_token
 
 import secrets
 import string
@@ -42,13 +38,6 @@ def generate_public_token(length: int = 32) -> str:
     alphabet = string.ascii_letters + string.digits
     return "".join(secrets.choice(alphabet) for _ in range(length))
 
-
-def get_db():
-    db = SessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
 
 
 def map_test_title(test_id: str) -> str:
@@ -242,9 +231,6 @@ def get_company_plan(
 
     company = current_company
 
-    if not company:
-        raise HTTPException(status_code=404, detail="Company not found")
-
     if not company.is_paid:
         plan_name = "Free trial"
         tests_limit = company.trial_tests_limit
@@ -275,7 +261,14 @@ def get_company_plan(
     response_model=schemas.CandidatePublic,
     status_code=status.HTTP_201_CREATED,
 )
-def create_candidate(payload: schemas.CandidateCreate, db: Session = Depends(get_db)):
+def create_candidate(
+    payload: schemas.CandidateCreate,
+    current_company: models.Company = Depends(get_current_company),
+    db: Session = Depends(get_db),
+):
+    if payload.company_id != current_company.id:
+        raise HTTPException(status_code=403, detail="Forbidden")
+
     candidate = models.User(
         first_name=payload.first_name,
         last_name=payload.last_name,
@@ -289,7 +282,11 @@ def create_candidate(payload: schemas.CandidateCreate, db: Session = Depends(get
 
 
 @app.get("/candidates/{candidate_id}", response_model=schemas.CandidatePublic)
-def get_candidate(candidate_id: int, db: Session = Depends(get_db)):
+def get_candidate(
+    candidate_id: int,
+    current_company: models.Company = Depends(get_current_company),
+    db: Session = Depends(get_db),
+):
     candidate = (
         db.query(models.User)
         .filter(models.User.id == candidate_id)
@@ -297,85 +294,12 @@ def get_candidate(candidate_id: int, db: Session = Depends(get_db)):
     )
     if not candidate:
         raise HTTPException(status_code=404, detail="Candidate not found")
+    if candidate.company_id != current_company.id:
+        raise HTTPException(status_code=403, detail="Forbidden")
     return candidate
 
-@app.get("/results/{result_id}", response_model=schemas.ResultPublic)
-def get_result(result_id: int, db: Session = Depends(get_db)):
-    result = (
-        db.query(models.Result)
-        .filter(models.Result.id == result_id)
-        .first()
-    )
-    if not result:
-        raise HTTPException(status_code=404, detail="Result not found")
-    return result
 
 
-@app.post("/api/results")
-def save_public_result(data: schemas.TestResultIn, db: Session = Depends(get_db)):
-    company = (
-        db.query(models.Company)
-        .filter(models.Company.public_token == data.company_token)
-        .first()
-    )
-    if not company:
-        raise HTTPException(status_code=400, detail="Unknown company token")
-
-    user = None
-    if data.email:
-        user = (
-            db.query(models.User)
-            .filter(
-                models.User.company_id == company.id,
-                models.User.email == data.email,
-            )
-            .first()
-        )
-
-    if not user:
-        user = models.User(
-            company_id=company.id,
-            first_name=data.first_name,
-            last_name=data.last_name,
-            email=data.email or None,
-        )
-        db.add(user)
-        db.commit()
-        db.refresh(user)
-    else:
-        user.first_name = data.first_name
-        user.last_name = data.last_name
-        db.commit()
-        db.refresh(user)
-
-    result = models.Result(
-        user_id=user.id,
-        company_id=company.id,
-        test_id=data.test_id,
-        total_score=data.total_score,
-        max_score=data.max_score,
-        percent=data.percent,
-        verdict=data.verdict,
-    )
-    db.add(result)
-    db.commit()
-    db.refresh(result)
-
-    strong_cats = {cat.category for cat in data.strong_areas}
-    weak_cats = {cat.category for cat in data.weak_areas}
-
-    for cat in data.categories:
-        detail = models.DetailedResult(
-            result_id=result.id,
-            category=cat.category,
-            percent=cat.percent,
-            is_strong=cat.category in strong_cats,
-            is_weak=cat.category in weak_cats,
-        )
-        db.add(detail)
-
-    db.commit()
-    return {"status": "success", "result_id": result.id}
 
 
 @app.get(
