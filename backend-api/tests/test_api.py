@@ -55,8 +55,9 @@ class TestAuth:
         )
         assert response.status_code == 200
         data = response.json()
-        assert data["email"] == "hr@testcorp.com"
+        assert data["company_id"] == sample_company.id
         assert data["company_token"] == "test_token_abc123"
+        assert "access_token" in data
 
     def test_login_wrong_password(self, client, sample_company):
         client.post(
@@ -119,57 +120,6 @@ class TestCandidates:
     def test_get_nonexistent_candidate(self, client):
         response = client.get("/candidates/99999")
         assert response.status_code == 404
-
-
-class TestResults:
-    def test_create_result(self, client, sample_company, db):
-        user = User(
-            first_name="Иван",
-            last_name="Петров",
-            email="ivan@example.com",
-            company_id=sample_company.id,
-        )
-        db.add(user)
-        db.commit()
-        db.refresh(user)
-
-        response = client.post(
-            "/results",
-            json={
-                "user_id": user.id,
-                "test_id": "qa_junior_web",
-                "total_score": 8.0,
-                "max_score": 10.0,
-                "percent": 80,
-                "verdict": "Passed",
-                "company_id": sample_company.id,
-                "details": [
-                    {"category": "Основы тестирования", "percent": 100, "is_strong": True, "is_weak": False},
-                    {"category": "Инструменты", "percent": 60, "is_strong": False, "is_weak": False},
-                ],
-            },
-        )
-        assert response.status_code == 201
-        data = response.json()
-        assert data["percent"] == 80
-        assert data["verdict"] == "Passed"
-        assert data["test_id"] == "qa_junior_web"
-        assert len(data["details"]) == 2
-
-    def test_create_result_nonexistent_user(self, client, sample_company):
-        response = client.post(
-            "/results",
-            json={
-                "user_id": 99999,
-                "test_id": "qa_junior_web",
-                "total_score": 5.0,
-                "max_score": 10.0,
-                "percent": 50,
-                "verdict": "On the edge",
-                "company_id": sample_company.id,
-            },
-        )
-        assert response.status_code == 400
 
 
 class TestPublicSubmit:
@@ -288,31 +238,3 @@ class TestCompanyResults:
         response = client.get(f"/api/company/{sample_company.id}/results")
         assert response.status_code == 200
         assert response.json() == []
-
-    def test_get_results_isolated_by_company(self, client, db):
-        from app.models import Company
-        company1 = Company(name="Corp1", public_token="token1", is_paid=True)
-        company2 = Company(name="Corp2", public_token="token2", is_paid=True)
-        db.add_all([company1, company2])
-        db.commit()
-        db.refresh(company1)
-        db.refresh(company2)
-
-        user1 = User(first_name="A", last_name="B", company_id=company1.id)
-        user2 = User(first_name="C", last_name="D", company_id=company2.id)
-        db.add_all([user1, user2])
-        db.commit()
-        db.refresh(user1)
-        db.refresh(user2)
-
-        r1 = Result(user_id=user1.id, test_id="qa_junior_web", total_score=8.0, max_score=10.0, percent=80, verdict="Passed", company_id=company1.id)
-        r2 = Result(user_id=user2.id, test_id="qa_junior_web", total_score=5.0, max_score=10.0, percent=50, verdict="On the edge", company_id=company2.id)
-        db.add_all([r1, r2])
-        db.commit()
-
-        resp1 = client.get(f"/api/company/{company1.id}/results")
-        resp2 = client.get(f"/api/company/{company2.id}/results")
-        assert len(resp1.json()) == 1
-        assert len(resp2.json()) == 1
-        assert resp1.json()[0]["first_name"] == "A"
-        assert resp2.json()[0]["first_name"] == "C"

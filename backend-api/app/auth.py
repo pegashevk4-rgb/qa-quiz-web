@@ -1,6 +1,8 @@
 # auth.py
+import os
 from datetime import datetime, timedelta, timezone
 
+from dotenv import load_dotenv
 from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
 from jose import jwt, JWTError  # pip install "python-jose[cryptography]"
@@ -11,8 +13,10 @@ from . import models
 
 from pwdlib import PasswordHash
 
+load_dotenv()
 
 password_hasher = PasswordHash.recommended()
+
 
 # --- Пароли ---
 def get_password_hash(password: str) -> str:
@@ -24,9 +28,12 @@ def verify_password(plain_password: str, hashed_password: str) -> bool:
 
 
 # --- JWT-настройки ---
-SECRET_KEY = "CHANGE_ME_TO_LONG_RANDOM_SECRET"  # вынеси в env на проде
-ALGORITHM = "HS256"
-ACCESS_TOKEN_EXPIRE_MINUTES = 60 * 24  # 1 день
+SECRET_KEY = os.getenv("SECRET_KEY")
+if not SECRET_KEY:
+    raise RuntimeError("SECRET_KEY environment variable is not set")
+
+ALGORITHM = os.getenv("ALGORITHM", "HS256")
+ACCESS_TOKEN_EXPIRE_MINUTES = int(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES", "1440"))  # 60 * 24
 
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/login")

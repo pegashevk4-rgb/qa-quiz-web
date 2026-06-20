@@ -1,48 +1,30 @@
-# QA Quiz Web
+# QA Hiring Assistant
 
-QA Quiz Web — pet‑проект для оценки QA‑кандидатов при найме.
-
-Сервис включает:
-- онлайн‑квиз для кандидатов (Junior / Middle / Senior);
-- HR‑лендинг и дашборд для рекрутеров;
-- бэкенд API с сохранением результатов в PostgreSQL.
+Сервис для автоматизированной оценки QA-кандидатов при найме. Включает онлайн-квиз для кандидатов (Junior / Middle / Senior), HR-дашборд с аналитикой и FastAPI-бэкенд с сохранением результатов в PostgreSQL.
 
 ## Демо
 
-- Лендинг: [qa-quiz-test.ru](https://qa-quiz-test.ru)
+- Лендинг и дашборд: [qa-quiz-test.ru](https://qa-quiz-test.ru)
 - API: [api.qa-quiz-test.ru](https://api.qa-quiz-test.ru)
 
-## Что реализовано
-
-- тесты для уровней Junior / Middle / Senior;
-- случайная выборка вопросов за попытку;
-- вопросы с одним и несколькими правильными вариантами;
-- таймер прохождения;
-- подсчёт результата и вердикта (Passed / On the edge / Failed);
-- разбивка по категориям с выделением сильных и слабых сторон;
-- сохранение результатов в PostgreSQL;
-- HR‑дашборд с фильтрами, поиском и экспортом в CSV;
-- публичные тесты по ссылке с токеном компании;
-- тарифная система (Free trial / Paid);
-- авторизация HR‑пользователей.
-
-## Технологии
+## Стек технологий
 
 **Frontend:**
-- HTML, CSS, чистый JavaScript (без фреймворков);
-- хостинг: GitHub Pages (кастомный домен через CNAME).
+- HTML, CSS, чистый JavaScript (без фреймворков)
 
 **Backend:**
-- Python 3.13;
-- FastAPI;
-- SQLAlchemy + psycopg;
-- Uvicorn;
-- хостинг: VPS (reg.ru).
+- Python 3.13
+- FastAPI
+- SQLAlchemy + psycopg
+- Uvicorn
+- JWT-авторизация (python-jose)
 
 **База данных:**
-- PostgreSQL 17;
-- хостинг: VPS (reg.ru);
-- основные таблицы: `companies`, `company_hr_users`, `users`, `results`, `detailed_results`, `quiz_questions`.
+- PostgreSQL 17
+
+**Тесты:**
+- pytest + TestClient FastAPI
+- Тестовая БД: in-memory SQLite
 
 ## Структура проекта
 
@@ -64,154 +46,94 @@ qa-quiz-web/
 │   ├── css/                   # Стили лендинга, дашборда, тарифов
 │   └── js/                    # Скрипты лендинга, дашборда, тарифов
 ├── backend-api/
-│   └── app/
-│       ├── main.py            # FastAPI endpoints
-│       ├── models.py          # SQLAlchemy модели
-│       ├── schemas.py         # Pydantic-схемы
-│       ├── database.py        # Подключение к БД
-│       ├── auth.py            # Авторизация и хеширование паролей
-│       └── data/              # JSON-файлы с вопросами
-└── tests/                     # Интеграционные тесты backend-а
+│   ├── app/
+│   │   ├── main.py            # FastAPI endpoints
+│   │   ├── models.py          # SQLAlchemy модели
+│   │   ├── schemas.py         # Pydantic-схемы
+│   │   ├── database.py        # Подключение к БД
+│   │   ├── auth.py            # JWT-авторизация и хеширование паролей
+│   │   └── data/              # JSON-файлы с вопросами
+│   ├── tests/
+│   │   ├── conftest.py        # Фикстуры и настройка тестовой БД
+│   │   └── test_api.py        # Интеграционные тесты API
+│   └── pytest.ini
+├── requirements.txt           # Зависимости Python
+├── .env.example               # Пример переменных окружения
+└── README.md
 ```
 
-## Локальный запуск
+## Установка и запуск
 
-### Frontend
-
-```bash
-python -m http.server 8000
-```
-
-После запуска лендинг будет доступен по адресу `http://localhost:8000`.
-
-### Backend
+### 1. Виртуальное окружение и зависимости
 
 ```bash
 cd backend-api
 python -m venv .venv
+
 # Windows
 .venv\Scripts\activate
+
 # Linux / macOS
 source .venv/bin/activate
 
 pip install -r requirements.txt
+```
+
+### 2. Настройка переменных окружения
+
+Скопируйте `.env.example` в `.env` и заполните значения:
+
+```bash
+cp .env.example .env
+```
+
+```env
+# Подключение к PostgreSQL
+DATABASE_URL=postgresql://user:password@localhost:5432/qa_quiz
+
+# Секретный ключ для JWT (задайте длинную случайную строку)
+SECRET_KEY=your-secret-key-here
+
+# Алгоритм для JWT (по умолчанию HS256)
+ALGORITHM=HS256
+
+# Время жизни токена в минутах (по умолчанию 1440 = 24 часа)
+ACCESS_TOKEN_EXPIRE_MINUTES=1440
+```
+
+### 3. Запуск backend
+
+```bash
+cd backend-api
 uvicorn app.main:app --reload --port 8000
 ```
 
-По умолчанию API будет доступен по адресу `http://localhost:8000`.
+API будет доступен по адресу `http://localhost:8000`.
+
+### 4. Запуск frontend
+
+Frontend — статические HTML-файлы. Откройте корень проекта через Live Server (VS Code) или любой статический сервер:
+
+```bash
+# Из корня проекта
+python -m http.server 5500
+```
+
+Откройте `http://127.0.0.1:5500` в браузере.
+
+> **Важно:** фронт и бэкенд работают на разных портах (5500 и 8000 соответственно). CORS уже настроен для `http://127.0.0.1:5500`.
 
 ## Тесты
 
 ```bash
 cd backend-api
-pip install pytest httpx
-python -m pytest tests/test_api.py -v
+pytest -v
 ```
 
-В тестах используются:
-- pytest;
-- httpx / TestClient FastAPI;
-- отдельная тестовая БД (in-memory).
-
-## База данных
-
-### companies
-
-- `id` — SERIAL PRIMARY KEY  
-- `name` — VARCHAR, UNIQUE  
-- `public_token` — VARCHAR (токен для публичных тестов)  
-- `is_paid` — BOOLEAN  
-- `trial_tests_limit` — INTEGER  
-- `trial_tests_used` — INTEGER  
-- `created_at` — TIMESTAMP  
-
-### company_hr_users
-
-- `id` — SERIAL PRIMARY KEY  
-- `company_id` — INTEGER (FK → companies)  
-- `email` — VARCHAR, UNIQUE  
-- `password_hash` — VARCHAR  
-- `name` — VARCHAR  
-- `role` — VARCHAR  
-- `created_at` — TIMESTAMP  
-
-### users
-
-- `id` — SERIAL PRIMARY KEY  
-- `first_name` — VARCHAR  
-- `last_name` — VARCHAR  
-- `email` — VARCHAR  
-- `company_id` — FK → companies  
-- `created_at` — TIMESTAMP  
-
-### results
-
-- `id` — SERIAL PRIMARY KEY  
-- `user_id` — FK → users  
-- `test_id` — VARCHAR  
-- `total_score` — DECIMAL  
-- `max_score` — DECIMAL  
-- `percent` — INTEGER  
-- `verdict` — VARCHAR  
-- `company_id` — FK → companies  
-- `created_at` — TIMESTAMP  
-
-### detailed_results
-
-- `id` — SERIAL PRIMARY KEY  
-- `result_id` — FK → results  
-- `category` — VARCHAR  
-- `percent` — INTEGER  
-- `is_strong` — BOOLEAN  
-- `is_weak` — BOOLEAN  
-
-### quiz_questions
-
-- `id` — SERIAL PRIMARY KEY  
-- `test_id` — VARCHAR (qa_junior_web / qa_middle_web / qa_senior_web)  
-- `text` — VARCHAR  
-- `options` — JSON  
-- `correct_index` — INTEGER  
-- `order` — INTEGER  
-- `category` — VARCHAR  
-
-## API
-
-### Публичные
-
-- `GET /health` — проверка работы API  
-- `GET /public/tests/{test_id}` — получить вопросы теста  
-- `POST /public/tests/{test_id}/submit?company_token=...` — отправить результат  
-
-### Авторизация
-
-- `POST /auth/register` — регистрация HR‑пользователя  
-- `POST /auth/login` — вход HR‑пользователя  
-
-### Компании
-
-- `POST /companies` — создать компанию  
-- `GET /public/companies/{public_token}` — информация о компании по токену  
-- `GET /api/company/{company_id}/plan` — тариф компании  
-- `POST /companies/{company_id}/upgrade` — апгрейд до платного тарифа  
-
-### Кандидаты и результаты
-
-- `POST /candidates` — создать кандидата  
-- `GET /candidates/{candidate_id}` — получить кандидата  
-- `POST /results` — сохранить результат  
-- `GET /results/{result_id}` — получить результат  
-- `POST /api/results` — сохранить публичный результат  
-- `GET /api/company/{company_id}/results` — результаты компании  
-
-## Деплой
-
-- Frontend: GitHub Pages (автодеплой при push в `main`, домен через CNAME).  
-- Backend: VPS (reg.ru), запуск через Uvicorn.  
-- База данных: PostgreSQL на VPS (reg.ru).  
+Тесты используют in-memory SQLite и не требуют подключения к PostgreSQL.
 
 ## Автор
 
-Кирилл Пегашев — QA‑инженер и разработчик  
-Email: [pegashevk4@gmail.com](mailto:pegashevk4@gmail.com)  
+Кирилл Пегашев — QA-инженер и разработчик
+Email: [pegashevk4@gmail.com](mailto:pegashevk4@gmail.com)
 GitHub: [pegashevk4-rgb](https://github.com/pegashevk4-rgb)

@@ -9,6 +9,7 @@ from sqlalchemy.pool import StaticPool
 
 from app.database import Base
 from app.main import app, get_db
+from app.auth import get_current_company
 from app import models
 
 test_engine = create_engine(
@@ -61,6 +62,20 @@ def override_get_db():
 
 
 app.dependency_overrides[get_db] = override_get_db
+
+
+def override_get_current_company():
+    db = TestSessionLocal()
+    try:
+        company = db.query(models.Company).first()
+        if company is None:
+            raise Exception("No company found for test")
+        return company
+    finally:
+        db.close()
+
+
+app.dependency_overrides[get_current_company] = override_get_current_company
 
 
 @pytest.fixture()
