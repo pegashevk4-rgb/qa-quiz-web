@@ -260,7 +260,7 @@ function handleNext() {
     window._quizBlockF5 = true;
     setTimeout(function () {
       window._quizBlockF5 = false;
-    }, 600);
+    }, 800);
   } else {
     showForm();
   }
