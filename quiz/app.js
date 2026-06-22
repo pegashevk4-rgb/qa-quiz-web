@@ -21,6 +21,7 @@ const state = {
   questions: [],            // [{id, text, options}]
   currentIndex: 0,
   answers: {},              // questionId -> selectedIndex[]
+  phase: 'quiz',            // 'quiz' | 'form' | 'result'
   // данные, которые приходят с бэка в TestResultResponse
   percentFromServer: null,
   verdictFromServer: null,
@@ -116,6 +117,7 @@ function startQuiz() {
 
   state.currentIndex = 0;
   state.answers = {};
+  state.phase = 'quiz';
   state.percentFromServer = null;
   state.verdictFromServer = null;
   state.strongAreasFromServer = [];
@@ -249,6 +251,9 @@ function showForm() {
   elements.quizQuestions.style.display = "none";
   if (elements.userForm) elements.userForm.style.display = "block";
 
+  state.phase = 'form';
+  if (typeof saveQuizState === 'function') saveQuizState();
+
   // останавливаем таймер, если есть
   if (window.timerInterval) {
     clearInterval(window.timerInterval);
@@ -358,6 +363,9 @@ function renderResult() {
   if (elements.userForm) elements.userForm.style.display = "none";
   elements.quiz.style.display = "none";
   elements.result.style.display = "block";
+
+  state.phase = 'result';
+  if (typeof saveQuizState === 'function') saveQuizState();
 
   const percent = state.percentFromServer ?? 0;
   const verdict = state.verdictFromServer || "On the edge";

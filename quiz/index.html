@@ -224,132 +224,211 @@
 
   <!-- TIMER -->
   <script>
+  // --- CONFIG ---
+  const TIMER_TEST_ID =
+    new URLSearchParams(window.location.search)
+      .get('test_id') || 'default_test';
+  let QUIZ_MINUTES = 15;
+  if (TIMER_TEST_ID === 'qa_junior_web')  QUIZ_MINUTES = 20;
+  if (TIMER_TEST_ID === 'qa_middle_web')  QUIZ_MINUTES = 20;
+  if (TIMER_TEST_ID === 'qa_senior_web')  QUIZ_MINUTES = 25;
 
-    const TIMER_TEST_ID =
-      new URLSearchParams(window.location.search)
-        .get('test_id') || 'default_test';
+  const STORAGE_KEY = 'quiz_end_time_' + TIMER_TEST_ID;
+  const STATE_KEY   = 'quiz_state_'   + TIMER_TEST_ID;
 
-    let QUIZ_MINUTES = 15;
+  let endTime = null;
+  const timerEl = document.getElementById('timer');
 
-    if (TIMER_TEST_ID === 'qa_junior_web') {
-      QUIZ_MINUTES = 20;
+  // --- HELPERS ---
+  function formatTimeLeft(msLeft) {
+    var totalSeconds = Math.max(0, Math.floor(msLeft / 1000));
+    var minutes = Math.floor(totalSeconds / 60);
+    var seconds = totalSeconds % 60;
+    return (
+      String(minutes).padStart(2, '0') +
+      ':' +
+      String(seconds).padStart(2, '0')
+    );
+  }
+
+  // --- TIMEOUT (unchanged) ---
+  function handleTimeIsUp() {
+    var userFormEl = document.getElementById('user-form');
+    var resultEl   = document.getElementById('result');
+
+    if (
+      (userFormEl && userFormEl.style.display === 'block') ||
+      (resultEl   && resultEl.style.display   === 'block')
+    ) {
+      localStorage.removeItem(STORAGE_KEY);
+      localStorage.removeItem(STATE_KEY);
+      return;
     }
 
-    if (TIMER_TEST_ID === 'qa_middle_web') {
-      QUIZ_MINUTES = 20;
+    var timeupModal = document.getElementById('timeup-modal');
+    if (timeupModal) timeupModal.style.display = 'flex';
+
+    localStorage.removeItem(STORAGE_KEY);
+    localStorage.removeItem(STATE_KEY);
+  }
+
+  // --- STATE PERSISTENCE ---
+  function saveQuizState() {
+    try {
+      if (typeof state === 'undefined' || !state.questions.length) return;
+
+      localStorage.setItem(STATE_KEY, JSON.stringify({
+        currentIndex: state.currentIndex,
+        answers:      state.answers,
+        phase:        state.phase || 'quiz',
+      }));
+    } catch (e) {}
+  }
+
+  function getSavedState() {
+    try {
+      var raw = localStorage.getItem(STATE_KEY);
+      if (!raw) return null;
+      var saved = JSON.parse(raw);
+      if (typeof saved.currentIndex !== 'number') return null;
+      return saved;
+    } catch (e) {
+      localStorage.removeItem(STATE_KEY);
+      return null;
+    }
+  }
+
+  // --- TIMER ---
+  function updateTimer() {
+    if (!endTime) return;
+
+    var now    = Date.now();
+    var msLeft = endTime - now;
+
+    if (msLeft <= 0) {
+      timerEl.textContent = 'Время вышло';
+      handleTimeIsUp();
+      if (window.timerInterval) clearInterval(window.timerInterval);
+      return;
     }
 
-    if (TIMER_TEST_ID === 'qa_senior_web') {
-      QUIZ_MINUTES = 25;
+    timerEl.textContent = 'Осталось: ' + formatTimeLeft(msLeft);
+    saveQuizState();
+  }
+
+  function startTimer() {
+    if (endTime && endTime > Date.now()) {
+      if (window.timerInterval) clearInterval(window.timerInterval);
+      window.timerInterval = setInterval(updateTimer, 1000);
+      updateTimer();
+      return;
     }
 
-    const STORAGE_KEY =
-      'quiz_end_time_' + TIMER_TEST_ID;
+    var now = Date.now();
+    endTime = now + QUIZ_MINUTES * 60 * 1000;
+    localStorage.setItem(STORAGE_KEY, endTime);
 
-    let endTime = null;
+    if (window.timerInterval) clearInterval(window.timerInterval);
+    window.timerInterval = setInterval(updateTimer, 1000);
+    updateTimer();
+  }
 
-    const timerEl =
-      document.getElementById('timer');
+  // --- RESTORE ON LOAD ---
+  (function restoreSession() {
+    try {
+      var savedEnd = localStorage.getItem(STORAGE_KEY);
+      if (!savedEnd) return;
 
-
-
-    function formatTimeLeft(msLeft) {
-
-      const totalSeconds =
-        Math.max(0, Math.floor(msLeft / 1000));
-
-      const minutes =
-        Math.floor(totalSeconds / 60);
-
-      const seconds =
-        totalSeconds % 60;
-
-      return (
-        String(minutes).padStart(2, '0') +
-        ':' +
-        String(seconds).padStart(2, '0')
-      );
-    }
-
-
-
-    function handleTimeIsUp() {
-
-      const userFormEl =
-        document.getElementById('user-form');
-
-      const resultEl =
-        document.getElementById('result');
-
-      if (
-        (userFormEl &&
-          userFormEl.style.display === 'block') ||
-
-        (resultEl &&
-          resultEl.style.display === 'block')
-      ) {
+      var parsed = Number(savedEnd);
+      if (isNaN(parsed)) {
         localStorage.removeItem(STORAGE_KEY);
+        localStorage.removeItem(STATE_KEY);
         return;
       }
 
-      if (typeof showResult === 'function') {
-        showResult();
+      if (parsed <= Date.now()) {
+        localStorage.removeItem(STORAGE_KEY);
+        localStorage.removeItem(STATE_KEY);
+        handleTimeIsUp();
+        return;
       }
 
-      localStorage.removeItem(STORAGE_KEY);
-    }
+      endTime = parsed;
 
+      if (window.timerInterval) clearInterval(window.timerInterval);
+      window.timerInterval = setInterval(updateTimer, 1000);
+      updateTimer();
 
+      var attempts = 0;
+      var check = setInterval(function () {
+        attempts++;
 
-    function updateTimer() {
+        if (typeof state !== 'undefined' && state.questions.length > 0) {
+          clearInterval(check);
 
-      if (!endTime) return;
+          var saved = getSavedState();
+          if (!saved) return;
 
-      const now = Date.now();
+          if (saved.phase === 'result') {
+            localStorage.removeItem(STORAGE_KEY);
+            localStorage.removeItem(STATE_KEY);
+            return;
+          }
 
-      const msLeft = endTime - now;
+          state.currentIndex = saved.currentIndex;
+          state.answers = saved.answers || {};
 
-      if (msLeft <= 0) {
+          document.getElementById('intro').style.display  = 'none';
+          document.getElementById('quiz').style.display   = 'block';
+          document.getElementById('result').style.display = 'none';
 
-        timerEl.textContent = 'Время вышло';
+          var uf = document.getElementById('user-form');
+          var quizQuestions = document.getElementById('quiz-questions');
 
-        handleTimeIsUp();
+          if (saved.phase === 'form') {
+            if (quizQuestions) quizQuestions.style.display = 'none';
+            if (uf) uf.style.display = 'block';
 
-        if (window.timerInterval) {
-          clearInterval(window.timerInterval);
+            var df = document.getElementById('data-form');
+            if (df) df.onsubmit = function (e) {
+              e.preventDefault();
+              handleFormSubmit();
+            };
+          } else {
+            if (quizQuestions) quizQuestions.style.display = 'block';
+            if (uf) uf.style.display = 'none';
+
+            var nextBtn = document.getElementById('next-btn');
+            if (nextBtn) {
+              nextBtn.style.display = 'block';
+              nextBtn.onclick = handleNext;
+            }
+
+            if (typeof showQuestion === 'function') showQuestion();
+          }
         }
 
-        return;
-      }
-
-      timerEl.textContent =
-        'Осталось: ' + formatTimeLeft(msLeft);
+        if (attempts > 100) clearInterval(check);
+      }, 100);
+    } catch (e) {
+      localStorage.removeItem(STORAGE_KEY);
+      localStorage.removeItem(STATE_KEY);
     }
+  })();
 
+  // --- HANDLERS ---
+  document.getElementById('timeup-ok-btn')
+    ?.addEventListener('click', function () {
+      var m = document.getElementById('timeup-modal');
+      if (m) m.style.display = 'none';
+      if (typeof showResult === 'function') showResult();
+    });
 
-
-    function startTimer() {
-
-      const now = Date.now();
-
-      endTime =
-        now + QUIZ_MINUTES * 60 * 1000;
-
-      localStorage.setItem(
-        STORAGE_KEY,
-        endTime
-      );
-
-      if (window.timerInterval) {
-        clearInterval(window.timerInterval);
-      }
-
-      window.timerInterval =
-        setInterval(updateTimer, 1000);
-
-      updateTimer();
-    }
-
+  document.getElementById('restart-btn')
+    ?.addEventListener('click', function () {
+      localStorage.removeItem(STORAGE_KEY);
+      localStorage.removeItem(STATE_KEY);
+    });
   </script>
 
 </body>
