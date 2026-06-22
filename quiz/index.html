@@ -335,86 +335,92 @@
 
   // --- RESTORE ON LOAD ---
   (function restoreSession() {
-    try {
-      var savedEnd = localStorage.getItem(STORAGE_KEY);
-      if (!savedEnd) return;
+  try {
+    var savedLast = localStorage.getItem('quiz_last_save');
+    if (savedLast) {
+      // Пока просто читаем — сюда можно добавить логику,
+      // если захочешь учитывать "слишком свежий" save
+    }
 
-      var parsed = Number(savedEnd);
-      if (isNaN(parsed)) {
-        localStorage.removeItem(STORAGE_KEY);
-        localStorage.removeItem(STATE_KEY);
-        return;
-      }
+    var savedEnd = localStorage.getItem(STORAGE_KEY);
+    if (!savedEnd) return;
 
-      if (parsed <= Date.now()) {
-        localStorage.removeItem(STORAGE_KEY);
-        localStorage.removeItem(STATE_KEY);
-        handleTimeIsUp();
-        return;
-      }
-
-      endTime = parsed;
-
-      if (window.timerInterval) clearInterval(window.timerInterval);
-      window.timerInterval = setInterval(updateTimer, 1000);
-      updateTimer();
-
-      var attempts = 0;
-      var check = setInterval(function () {
-        attempts++;
-
-        if (typeof state !== 'undefined' && state.questions.length > 0) {
-          clearInterval(check);
-
-          var saved = getSavedState();
-          if (!saved) return;
-
-          if (saved.phase === 'result') {
-            localStorage.removeItem(STORAGE_KEY);
-            localStorage.removeItem(STATE_KEY);
-            return;
-          }
-
-          state.currentIndex = saved.currentIndex;
-          state.answers = saved.answers || {};
-
-          document.getElementById('intro').style.display  = 'none';
-          document.getElementById('quiz').style.display   = 'block';
-          document.getElementById('result').style.display = 'none';
-
-          var uf = document.getElementById('user-form');
-          var quizQuestions = document.getElementById('quiz-questions');
-
-          if (saved.phase === 'form') {
-            if (quizQuestions) quizQuestions.style.display = 'none';
-            if (uf) uf.style.display = 'block';
-
-            var df = document.getElementById('data-form');
-            if (df) df.onsubmit = function (e) {
-              e.preventDefault();
-              handleFormSubmit();
-            };
-          } else {
-            if (quizQuestions) quizQuestions.style.display = 'block';
-            if (uf) uf.style.display = 'none';
-
-            var nextBtn = document.getElementById('next-btn');
-            if (nextBtn) {
-              nextBtn.style.display = 'block';
-              nextBtn.onclick = handleNext;
-            }
-
-            if (typeof showQuestion === 'function') showQuestion();
-          }
-        }
-
-        if (attempts > 100) clearInterval(check);
-      }, 100);
-    } catch (e) {
+    var parsed = Number(savedEnd);
+    if (isNaN(parsed)) {
       localStorage.removeItem(STORAGE_KEY);
       localStorage.removeItem(STATE_KEY);
+      return;
     }
-  })();
+
+    if (parsed <= Date.now()) {
+      localStorage.removeItem(STORAGE_KEY);
+      localStorage.removeItem(STATE_KEY);
+      handleTimeIsUp();
+      return;
+    }
+
+    endTime = parsed;
+
+    if (window.timerInterval) clearInterval(window.timerInterval);
+    window.timerInterval = setInterval(updateTimer, 1000);
+    updateTimer();
+
+    var attempts = 0;
+    var check = setInterval(function () {
+      attempts++;
+
+      if (typeof state !== 'undefined' && state.questions.length > 0) {
+        clearInterval(check);
+
+        var saved = getSavedState();
+        if (!saved) return;
+
+        if (saved.phase === 'result') {
+          localStorage.removeItem(STORAGE_KEY);
+          localStorage.removeItem(STATE_KEY);
+          return;
+        }
+
+        state.currentIndex = saved.currentIndex;
+        state.answers = saved.answers || {};
+
+        document.getElementById('intro').style.display  = 'none';
+        document.getElementById('quiz').style.display   = 'block';
+        document.getElementById('result').style.display = 'none';
+
+        var uf = document.getElementById('user-form');
+        var quizQuestions = document.getElementById('quiz-questions');
+
+        if (saved.phase === 'form') {
+          if (quizQuestions) quizQuestions.style.display = 'none';
+          if (uf) uf.style.display = 'block';
+
+          var df = document.getElementById('data-form');
+          if (df) df.onsubmit = function (e) {
+            e.preventDefault();
+            handleFormSubmit();
+          };
+        } else {
+          if (quizQuestions) quizQuestions.style.display = 'block';
+          if (uf) uf.style.display = 'none';
+
+          var nextBtn = document.getElementById('next-btn');
+          if (nextBtn) {
+            nextBtn.style.display = 'block';
+            nextBtn.onclick = handleNext;
+          }
+
+          if (typeof showQuestion === 'function') showQuestion();
+        }
+      }
+
+      if (attempts > 100) clearInterval(check);
+    }, 100);
+  } catch (e) {
+    localStorage.removeItem(STORAGE_KEY);
+    localStorage.removeItem(STATE_KEY);
+  }
+})();
 
   // --- HANDLERS ---
   document.getElementById('timeup-ok-btn')

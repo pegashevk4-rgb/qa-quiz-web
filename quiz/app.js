@@ -248,12 +248,18 @@ function handleNext() {
     state.currentIndex += 1;
     showQuestion();
 
-    // СРАЗУ сохранить новое currentIndex
-    if (typeof saveQuizState === 'function') saveQuizState();
+    // Сразу сохранить новое currentIndex
+    if (typeof saveQuizState === 'function') {
+      saveQuizState();
+
+      // Жёстко убедиться, что localStorage успел записаться
+      localStorage.setItem('quiz_last_save', 'saved_' + Date.now());
+    }
   } else {
     showForm();
   }
 }
+
 
 
 
