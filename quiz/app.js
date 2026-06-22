@@ -248,12 +248,13 @@ function handleNext() {
     state.currentIndex += 1;
     showQuestion();
 
-    // СЕРОЗ: сразу сохранить новое currentIndex
+    // СРАЗУ сохранить новое currentIndex
     if (typeof saveQuizState === 'function') saveQuizState();
   } else {
     showForm();
   }
 }
+
 
 
 // =========================
