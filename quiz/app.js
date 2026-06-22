@@ -247,10 +247,14 @@ function handleNext() {
   if (state.currentIndex < state.questions.length - 1) {
     state.currentIndex += 1;
     showQuestion();
+
+    // СЕРОЗ: сразу сохранить новое currentIndex
+    if (typeof saveQuizState === 'function') saveQuizState();
   } else {
     showForm();
   }
 }
+
 
 // =========================
 // Переход к форме данных
