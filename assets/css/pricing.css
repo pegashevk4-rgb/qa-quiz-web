@@ -784,7 +784,7 @@ footer {
   font-size: 0.9rem;
 }
 
-modal-form input:focus {
+.modal-form input:focus {
   outline: none;
   border-color: var(--accent);
 }

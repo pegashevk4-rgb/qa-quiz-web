@@ -30,3 +30,5 @@ Thumbs.db
 
 # CSV файлы с результатами
 *.csv
+
+graphify-out
