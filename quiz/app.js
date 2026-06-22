@@ -92,7 +92,17 @@ async function loadQuestions() {
       elements.testTitle.textContent = data.title || "QA Quiz";
     }
 
-    // стартовое состояние
+    // Если restoreSession уже переключил нас с intro на quiz/form,
+    // не трогаем текущий UI
+    if (
+      elements.quiz.style.display === "block" ||
+      (elements.userForm && elements.userForm.style.display === "block") ||
+      elements.result.style.display === "block"
+    ) {
+      return;
+    }
+
+    // Стартовое состояние только при самом первом заходе
     elements.intro.style.display = "block";
     elements.quiz.style.display = "none";
     elements.result.style.display = "none";
@@ -105,11 +115,18 @@ async function loadQuestions() {
 
 
 
+
 // =========================
 // Старт квиза
 // =========================
 
 function startQuiz() {
+  // Если уже не intro-экран, не даём повторно стартовать и сбивать восстановленное состояние
+  if (elements.intro.style.display === "none" &&
+      elements.quiz.style.display === "block") {
+    return;
+  }
+
   if (!state.questions.length) {
     alert("Вопросы ещё не загрузились");
     return;
@@ -141,6 +158,7 @@ function startQuiz() {
 
   showQuestion();
 }
+
 
 
 
