@@ -255,13 +255,16 @@ function handleNext() {
       // Жёстко убедиться, что localStorage успел записаться
       localStorage.setItem('quiz_last_save', 'saved_' + Date.now());
     }
+
+    // Заблокировать F5 на 500ms после перехода
+    window._quizBlockF5 = true;
+    setTimeout(function () {
+      window._quizBlockF5 = false;
+    }, 600);
   } else {
     showForm();
   }
 }
-
-
-
 
 // =========================
 // Переход к форме данных

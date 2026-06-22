@@ -422,6 +422,14 @@
   }
 })();
 
+  window.addEventListener('keydown', function (e) {
+  if ((e.key === 'F5' || (e.ctrlKey && e.key === 'r')) && window._quizBlockF5) {
+    e.preventDefault();
+    return false;
+  }
+});
+
+
   // --- HANDLERS ---
   document.getElementById('timeup-ok-btn')
     ?.addEventListener('click', function () {
