@@ -422,64 +422,6 @@
   }
 })();
 
-  window.addEventListener('keydown', function (e) {
-    if (e.key === 'F5' || (e.ctrlKey && e.key === 'r')) {
-      e.preventDefault();
-      e.stopPropagation();
-
-      // Показать оверлей
-      showReloadOverlay();
-
-      // Перезагрузить страницу через 1 секунду
-      setTimeout(function () {
-        hideReloadOverlay();
-        window.location.reload();
-      }, 1000);
-    }
-  });
-
-  function showReloadOverlay() {
-    if (document.getElementById('reload-overlay')) return;
-
-    var overlay = document.createElement('div');
-    overlay.id = 'reload-overlay';
-    overlay.style.position = 'fixed';
-    overlay.style.inset = '0';
-    overlay.style.background = 'rgba(0,0,0,0.7)';
-    overlay.style.display = 'flex';
-    overlay.style.justifyContent = 'center';
-    overlay.style.alignItems = 'center';
-    overlay.style.zIndex = '99999';
-
-    var box = document.createElement('div');
-    box.style.background = '#fff';
-    box.style.padding = '20px 24px';
-    box.style.borderRadius = '8px';
-    box.style.maxWidth = '400px';
-    box.style.width = '90%';
-    box.style.textAlign = 'center';
-
-    var h2 = document.createElement('h2');
-    h2.style.marginTop = '0';
-    h2.style.marginBottom = '10px';
-    h2.textContent = 'Перезагрузка...';
-
-    var p = document.createElement('p');
-    p.style.marginBottom = '16px';
-    p.textContent = 'Подождите секунду, квиз перезагрузится и сохранит ваши ответы.';
-
-    box.appendChild(h2);
-    box.appendChild(p);
-    overlay.appendChild(box);
-
-    document.body.appendChild(overlay);
-  }
-
-  function hideReloadOverlay() {
-    var overlay = document.getElementById('reload-overlay');
-    if (overlay) overlay.remove();
-  }
-
   // --- HANDLERS ---
   document.getElementById('timeup-ok-btn')
     ?.addEventListener('click', function () {

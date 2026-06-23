@@ -95,6 +95,7 @@ class QuestionPublic(BaseModel):
     id: int
     text: str
     options: List[str]
+    type: str = "single"
 
     class Config:
         from_attributes = True
@@ -108,7 +109,8 @@ class TestPublic(BaseModel):
 
 class AnswerItem(BaseModel):
     question_id: int
-    selected_index: int
+    selected_index: int | None = None
+    selected_indexes: List[int] | None = None
 
 
 class CandidateInfo(BaseModel):

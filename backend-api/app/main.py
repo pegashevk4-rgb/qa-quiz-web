@@ -427,6 +427,7 @@ def get_test_public(
                 id=q.id,
                 text=q.text,
                 options=q.options,
+                type=q.question_type,
             )
             for q in questions
         ],
@@ -505,7 +506,13 @@ def submit_test(
         cat_name = getattr(q, "category", None) or "Общее"
         cat_stats[cat_name]["total"] += 1
 
-        if a.selected_index == q.correct_index:
+        if q.question_type == "multiple" and a.selected_indexes is not None:
+            correct_set = set(q.correct_indexes or [q.correct_index])
+            selected_set = set(a.selected_indexes)
+            if selected_set == correct_set:
+                correct += 1
+                cat_stats[cat_name]["correct"] += 1
+        elif a.selected_index is not None and a.selected_index == q.correct_index:
             correct += 1
             cat_stats[cat_name]["correct"] += 1
 
@@ -695,6 +702,8 @@ def import_junior_questions_from_json(json_path: str):
                 text=item["question"],
                 options=item["options"],
                 correct_index=correct_index,
+                correct_indexes=correct_indexes,
+                question_type=item.get("type") or "single",
                 order=order_counter,
                 category=item.get("category") or "Общее",
             )
@@ -741,6 +750,8 @@ def import_middle_questions_from_json(json_path: str):
                 text=item["question"],
                 options=item["options"],
                 correct_index=correct_index,
+                correct_indexes=correct_indexes,
+                question_type=item.get("type") or "single",
                 order=order_counter,
                 category=item.get("category") or "Общее",
             )
@@ -787,6 +798,8 @@ def import_senior_questions_from_json(json_path: str):
                 text=item["question"],
                 options=item["options"],
                 correct_index=correct_index,
+                correct_indexes=correct_indexes,
+                question_type=item.get("type") or "single",
                 order=order_counter,
                 category=item.get("category") or "Общее",
             )

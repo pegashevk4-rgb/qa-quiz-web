@@ -320,8 +320,6 @@ async function loadCompanyResults() {
       };
     });
 
-    updateMetrics();
-    renderTable();
   } catch (err) {
     console.error("Ошибка при запросе результатов компании", err);
   }
@@ -882,7 +880,6 @@ document.addEventListener("DOMContentLoaded", () => {
     loadCompanyResults().then(() => {
       updateMetrics();
       setVerdictFilter("All");
-      renderTable();
     });
   });
 });

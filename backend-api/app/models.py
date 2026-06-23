@@ -80,5 +80,7 @@ class QuizQuestion(Base):
     text = Column(String, nullable=False)
     options = Column(JSON, nullable=False)
     correct_index = Column(Integer, nullable=False)
+    correct_indexes = Column(JSON, nullable=True)
+    question_type = Column(String(20), nullable=False, default="single")
     order = Column(Integer, nullable=False, default=1)
     category = Column(String, nullable=True)  

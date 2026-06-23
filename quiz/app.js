@@ -177,7 +177,9 @@ function showQuestion() {
   elements.questionText.textContent = question.text;
 
   elements.questionHint.textContent =
-    "Тип вопроса: выберите один вариант ответа.";
+    question.type === "multiple"
+      ? "Тип вопроса: выберите один или несколько вариантов ответа."
+      : "Тип вопроса: выберите один вариант ответа.";
 
   renderOptions(question);
 }
@@ -187,6 +189,7 @@ function renderOptions(question) {
   elements.nextBtn.disabled = true;
 
   const optionsList = document.createElement("div");
+  const isMultiple = question.type === "multiple";
 
   const shuffledOptions = question.options
     .map((text, index) => ({ text, originalIndex: index }))
@@ -202,8 +205,8 @@ function renderOptions(question) {
     label.className = "option-label";
 
     const input = document.createElement("input");
-    input.type = "radio";
-    input.name = "answer";
+    input.type = isMultiple ? "checkbox" : "radio";
+    input.name = isMultiple ? "answer[]" : "answer";
     input.value = option.originalIndex;
 
     if (selected.includes(option.originalIndex)) {
@@ -225,8 +228,17 @@ function renderOptions(question) {
   inputs.forEach((input) => {
     input.addEventListener("change", () => {
       const chosenIndex = Number(input.value);
-      state.answers[question.id] = [chosenIndex];
-      elements.nextBtn.disabled = false;
+      if (isMultiple) {
+        const current = state.answers[question.id] || [];
+        if (input.checked) {
+          state.answers[question.id] = [...current, chosenIndex];
+        } else {
+          state.answers[question.id] = current.filter((i) => i !== chosenIndex);
+        }
+      } else {
+        state.answers[question.id] = [chosenIndex];
+      }
+      elements.nextBtn.disabled = !(state.answers[question.id] || []).length;
     });
   });
 }
@@ -329,10 +341,16 @@ async function handleFormSubmit() {
 
   try {
     const answersPayload = Object.entries(state.answers).map(
-      ([questionId, selectedIndexes]) => ({
-        question_id: Number(questionId),
-        selected_index: selectedIndexes[0],
-      })
+      ([questionId, selectedIndexes]) => {
+        const q = state.questions.find((q) => q.id === Number(questionId));
+        const isMultiple = q && q.type === "multiple";
+        return {
+          question_id: Number(questionId),
+          ...(isMultiple
+            ? { selected_indexes: selectedIndexes }
+            : { selected_index: selectedIndexes[0] }),
+        };
+      }
     );
 
     const payload = {
