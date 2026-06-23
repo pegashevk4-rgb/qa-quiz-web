@@ -427,7 +427,7 @@ def get_test_public(
                 id=q.id,
                 text=q.text,
                 options=q.options,
-                type=q.question_type,
+                type=q.question_type or "single",
             )
             for q in questions
         ],
