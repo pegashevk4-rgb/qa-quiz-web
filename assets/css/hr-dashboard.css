@@ -380,6 +380,11 @@ body {
   color: #991b1b;
 }
 
+.plan-card-warning {
+  border-left: 4px solid #f59e0b;
+  background: rgba(245, 158, 11, 0.08);
+}
+
 .plan-card a {
   color: inherit;
   font-weight: 500;
