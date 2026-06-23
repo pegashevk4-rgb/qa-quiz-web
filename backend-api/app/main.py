@@ -8,6 +8,8 @@ from .database import Base, engine, SessionLocal
 from . import models, schemas
 from .auth import get_password_hash, verify_password, get_current_company, get_db, create_access_token
 
+from sqlalchemy import update
+
 import secrets
 import string
 
@@ -298,10 +300,6 @@ def get_candidate(
         raise HTTPException(status_code=403, detail="Forbidden")
     return candidate
 
-
-
-
-
 @app.get(
     "/api/company/{company_id}/results",
     response_model=list[schemas.ResultRow],
@@ -457,7 +455,20 @@ def submit_test(
 
     # 2. Лимит триала
     if not company.is_paid:
-        if company.trial_tests_used >= company.trial_tests_limit:
+        stmt = (
+            update(models.Company)
+            .where(
+                models.Company.id == company.id,
+                models.Company.trial_tests_used < models.Company.trial_tests_limit,
+            )
+            .values(
+                trial_tests_used=models.Company.trial_tests_used + 1,
+            )
+        )
+        result = db.execute(stmt)
+        db.commit()
+
+        if result.rowcount == 0:
             raise HTTPException(
                 status_code=status.HTTP_403_FORBIDDEN,
                 detail=(
@@ -465,6 +476,9 @@ def submit_test(
                     "Please upgrade to a paid plan."
                 ),
             )
+
+        # company в сессии может быть неактуален — обновим при желании
+        db.refresh(company)
 
     # 3. Вопросы
     db_questions = (
@@ -592,11 +606,7 @@ def submit_test(
     )
     db.add(overall_detail)
 
-    # 7. Обновляем счётчик триала
-    if not company.is_paid:
-        company.trial_tests_used = (company.trial_tests_used or 0) + 1
-        db.add(company)
-
+    
     db.commit()
 
     return schemas.TestResultResponse(
