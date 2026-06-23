@@ -176,8 +176,10 @@ function showQuestion() {
   elements.categoryText.textContent = "";
   elements.questionText.textContent = question.text;
 
+  const qType = question.question_type || question.type || "single";
+
   elements.questionHint.textContent =
-    question.type === "multiple"
+    qType === "multiple"
       ? "Тип вопроса: выберите один или несколько вариантов ответа."
       : "Тип вопроса: выберите один вариант ответа.";
 
@@ -189,7 +191,8 @@ function renderOptions(question) {
   elements.nextBtn.disabled = true;
 
   const optionsList = document.createElement("div");
-  const isMultiple = question.type === "multiple";
+  const qType = question.question_type || question.type || "single";
+  const isMultiple = qType === "multiple";
 
   const shuffledOptions = question.options
     .map((text, index) => ({ text, originalIndex: index }))
@@ -343,7 +346,7 @@ async function handleFormSubmit() {
     const answersPayload = Object.entries(state.answers).map(
       ([questionId, selectedIndexes]) => {
         const q = state.questions.find((q) => q.id === Number(questionId));
-        const isMultiple = q && q.type === "multiple";
+        const isMultiple = q && (q.question_type === "multiple" || q.type === "multiple");
         return {
           question_id: Number(questionId),
           ...(isMultiple
