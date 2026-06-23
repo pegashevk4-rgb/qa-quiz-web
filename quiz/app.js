@@ -359,6 +359,8 @@ async function handleFormSubmit() {
     if (!response.ok) {
       console.error("Submit error:", response.status, await response.text());
       alert("Ошибка при сохранении результата. Попробуйте позже.");
+      submitButton.disabled = false;
+      submitButton.textContent = "Сохранить результат";
       return;
     }
 
@@ -380,10 +382,12 @@ async function handleFormSubmit() {
   } catch (error) {
     console.error("Ошибка сети при отправке результата:", error);
     alert("Не удалось отправить результат. Проверьте соединение.");
-    // даже в случае ошибки всё равно покажем результат как есть (заглушки)
-    renderResult();
+    submitButton.disabled = false;
+    submitButton.textContent = "Сохранить результат";
   } finally {
-    submitButton.textContent = "Результат сохранён";
+    if (submitButton.disabled) {
+      submitButton.textContent = "Результат сохранён";
+    }
   }
 }
 

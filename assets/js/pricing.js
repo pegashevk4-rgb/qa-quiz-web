@@ -223,5 +223,106 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // (Опционально) Можно позже добавить регистрацию через API так же, как на главной
+  // ===== API-ФУНКЦИЯ ДЛЯ РЕГИСТРАЦИИ (аналогична hr.js) =====
+  async function apiRegisterHR({ name, company, email, password }) {
+    const companyResp = await fetch(`${API_BASE_URL}/companies`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ name: company }),
+    });
+
+    if (!companyResp.ok) {
+      let payload = null;
+      try {
+        payload = await companyResp.json();
+      } catch (_) {}
+      const error = new Error(
+        (payload && payload.detail) || "Ошибка создания компании"
+      );
+      if (payload) error.backendPayload = payload;
+      throw error;
+    }
+
+    const companyData = await companyResp.json();
+
+    const hrResp = await fetch(`${API_BASE_URL}/auth/register`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        email,
+        password,
+        name,
+        company_id: companyData.id,
+        role: "hr",
+      }),
+    });
+
+    if (!hrResp.ok) {
+      let payload = null;
+      try {
+        payload = await hrResp.json();
+      } catch (_) {}
+      const error = new Error(
+        (payload && payload.detail) || "Ошибка регистрации HR"
+      );
+      if (payload) error.backendPayload = payload;
+      throw error;
+    }
+
+    return await hrResp.json();
+  }
+
+  // ===== ОБРАБОТЧИК ФОРМЫ РЕГИСТРАЦИИ =====
+  if (registerForm) {
+    registerForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+
+      const formData = new FormData(registerForm);
+      const name = formData.get("name")?.toString().trim();
+      const company = formData.get("company")?.toString().trim();
+      const email = formData.get("email")?.toString().trim();
+      const password = formData.get("password")?.toString().trim();
+
+      if (!name || !company || !email || !password) {
+        alert("Заполните все поля");
+        return;
+      }
+
+      const passwordInput = registerForm.querySelector('input[name="password"]');
+      if (passwordInput && !passwordInput.checkValidity()) {
+        alert("Минимум 8 символов, хотя бы одна буква и одна цифра");
+        return;
+      }
+
+      const submitBtn = registerForm.querySelector('button[type="submit"]');
+      submitBtn.disabled = true;
+      submitBtn.textContent = "Создаём аккаунт…";
+
+      try {
+        const data = await apiRegisterHR({ name, company, email, password });
+
+        localStorage.setItem("qa_is_logged_in", "1");
+        localStorage.setItem("qa_company_id", data.company_id);
+        localStorage.setItem("qa_company_name", data.company_name || company);
+        if (data.company_token) {
+          localStorage.setItem("qa_company_token", data.company_token);
+        }
+        if (data.access_token) {
+          localStorage.setItem("qa_access_token", data.access_token);
+        }
+
+        closeAuthModal();
+        window.location.href = "/hr-dashboard/";
+      } catch (err) {
+        console.error(err);
+        const msg =
+          (err.backendPayload && err.backendPayload.detail) ||
+          err.message ||
+          "Ошибка регистрации";
+        alert(msg);
+        submitBtn.disabled = false;
+        submitBtn.textContent = "Создать аккаунт";
+      }
+    });
+  }
 });

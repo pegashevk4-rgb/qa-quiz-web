@@ -337,7 +337,9 @@
           type="password"
           name="password"
           required
-          minlength="6"
+          minlength="8"
+          pattern="^(?=.*[A-Za-z])(?=.*\d).{8,}$"
+          title="Минимум 8 символов, хотя бы одна буква и одна цифра"
         />
       </label>
       <button type="submit" class="modal-submit">
@@ -382,7 +384,9 @@
           type="password"
           name="password"
           required
-          minlength="6"
+          minlength="8"
+          pattern="^(?=.*[A-Za-z])(?=.*\d).{8,}$"
+          title="Минимум 8 символов, хотя бы одна буква и одна цифра"
         />
       </label>
       <button type="submit" class="modal-submit">
