@@ -210,28 +210,31 @@
 
 
           <div class="filter-block">
-            <!-- верхний ряд -->
-            <div class="filter-row">
+            <!-- Вердикты -->
+            <div class="filter-group filter-group--verdicts">
               <button class="filter-btn active" data-value="All">Все</button>
               <button class="filter-btn" data-value="Passed">Прошли</button>
               <button class="filter-btn" data-value="On the edge">На грани</button>
               <button class="filter-btn" data-value="Failed">Провалили</button>
-
-              <button class="date-filter-btn active" data-range="all">За всё время</button>
-              <button class="date-filter-btn" data-range="today">Сегодня</button>
             </div>
 
-            <!-- нижний ряд -->
-            <div class="filter-row">
+            <!-- Даты -->
+            <div class="filter-group filter-group--dates">
+              <button class="date-filter-btn active" data-range="all">За всё время</button>
+              <button class="date-filter-btn" data-range="today">Сегодня</button>
+              <button class="date-filter-btn" data-range="week">Неделя</button>
+              <button class="date-filter-btn" data-range="month">Месяц</button>
+            </div>
+
+            <!-- Тесты -->
+            <div class="filter-group filter-group--tests">
               <button class="test-filter-btn active" data-test="All">Все тесты</button>
               <button class="test-filter-btn" data-test="Junior QA">Junior</button>
               <button class="test-filter-btn" data-test="Middle QA">Middle</button>
               <button class="test-filter-btn" data-test="Senior QA">Senior</button>
-
-              <button class="date-filter-btn" data-range="week">Неделя</button>
-              <button class="date-filter-btn" data-range="month">Месяц</button>
             </div>
           </div>
+
 
           <button
             type="button"
