@@ -27,22 +27,25 @@
  
   <!-- БОКОВОЕ МЕНЮ -->
   <aside class="sidebar">
-    <div class="sidebar-logo">
-      <span class="logo-mark">QA</span>
-      <span class="logo-text">QA Hiring Assistant</span>
-    </div>
-   
-    <nav class="sidebar-nav">
-      <a href="/hr-dashboard" class="nav-item active">
-        <span>●</span> Дашборд
-      </a>
-      <a href="/pricing" class="nav-item">
-        <span>●</span> Тарифы
-      </a>
-      <a href="/" class="nav-item">
-        <span>●</span> Главная
-      </a>
+  <div class="sidebar-logo">
+    <span class="logo-mark">QA</span>
+    <span class="logo-text">QA Hiring Assistant</span>
+  </div>
 
+  <nav class="sidebar-nav">
+    <a href="/hr-dashboard" class="nav-item active">
+      <span>●</span> Дашборд
+    </a>
+    <a href="/pricing" class="nav-item">
+      <span>●</span> Тарифы
+    </a>
+    <a href="/" class="nav-item">
+      <span>●</span> Главная
+    </a>
+  </nav>
+</aside>
+
+<div class="sidebar-backdrop" id="sidebarBackdrop"></div>
 
     </nav>
   </aside>
@@ -53,13 +56,19 @@
     <!-- ХЕДЕР -->
     <header class="top-header">
       <div class="header-left">
-        <h1>HR-дашборд</h1>
-        <p class="header-subtitle">Оценка и аналитика QA-кандидатов</p>
+        <button class="burger-btn" id="burgerBtn" aria-label="Открыть меню">
+          ☰
+        </button>
+
+        <div>
+          <h1>HR-дашборд</h1>
+          <p class="header-subtitle">Оценка и аналитика QA-кандидатов</p>
+        </div>
       </div>
-     
+
       <div class="header-right">
         <span class="company-pill" id="companyPill">Компания: Demo Company</span>
-       
+
         <button
           id="themeToggle"
           class="theme-toggle"
@@ -68,12 +77,13 @@
         >
           <span id="themeIcon">☀</span>
         </button>
-       
+
         <button class="logout-btn" id="logoutBtn" type="button">
           Выйти
         </button>
       </div>
     </header>
+
 
 
     <!-- ОСНОВНОЙ КОНТЕНТ -->
