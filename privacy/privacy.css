@@ -140,6 +140,13 @@ html[data-theme="light"] .privacy-card.card {
 .privacy-hero {
   max-width: 760px;
   margin-bottom: 42px;
+  margin-left: auto;
+  margin-right: auto;
+
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start; /* всё выравниваем по левому краю */
+  gap: 8px;               /* расстояние между Privacy и "К тарифам" */
 }
 
 .privacy-badge {

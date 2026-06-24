@@ -25,18 +25,17 @@
           QA Hiring Assistant
         </a>
 
-        <div class="privacy-header-actions">
-          <a href="/" class="privacy-back" id="privacy-back">
-            ← На главную
-          </a>
-
-          <button id="theme-toggle" class="theme-toggle">
-            Светлая / тёмная тема
+          <button id="theme-toggle" class="theme-toggle" aria-label="Переключить тему">
+            ☀
           </button>
         </div>
       </header>
 
       <section class="privacy-hero">
+        <a href="/pricing" class="privacy-back" id="privacy-back">
+          ← К тарифам
+        </a>
+
         <span class="privacy-badge">Privacy</span>
 
         <h1 class="section-title">
@@ -123,28 +122,36 @@
 
   <script>
     (function () {
-      // --- Переключатель темы ---
       const root = document.documentElement;
       const themeToggle = document.getElementById('theme-toggle');
+      const THEME_KEY = 'qa_theme';
 
-      // восстановить тему из localStorage
-      const savedTheme = localStorage.getItem('theme');
-      if (savedTheme === 'light') {
-        root.setAttribute('data-theme', 'light');
-      } else {
-        root.setAttribute('data-theme', 'dark');
+      function applyTheme(theme) {
+        root.setAttribute('data-theme', theme);
+        if (themeToggle) {
+          themeToggle.textContent = theme === 'dark' ? '🌙' : '☀';
+        }
       }
+
+      // восстановить тему из localStorage (как на других страницах)
+      const savedTheme = localStorage.getItem(THEME_KEY);
+      const prefersDark =
+        window.matchMedia &&
+        window.matchMedia('(prefers-color-scheme: dark)').matches;
+
+      const initial = savedTheme || (prefersDark ? 'dark' : 'light');
+      applyTheme(initial);
 
       if (themeToggle) {
         themeToggle.addEventListener('click', () => {
           const current = root.getAttribute('data-theme') || 'dark';
           const next = current === 'dark' ? 'light' : 'dark';
-          root.setAttribute('data-theme', next);
-          localStorage.setItem('theme', next);
+          applyTheme(next);
+          localStorage.setItem(THEME_KEY, next);
         });
       }
 
-      // --- Логика кнопки "назад" ---
+      // --- Логика кнопки "назад" (можешь оставить как есть) ---
       const backLink = document.getElementById('privacy-back');
       if (!backLink || !document.referrer) return;
 
@@ -164,7 +171,7 @@
           backLink.textContent = '← На главную';
         }
       } catch (e) {
-        // если с referrer что-то не так — оставляем переход на главную
+        // fallback: оставляем "← На главную"
       }
     })();
   </script>
