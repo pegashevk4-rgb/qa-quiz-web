@@ -272,9 +272,6 @@ function handleNext() {
     // Сразу сохранить новое currentIndex
     if (typeof saveQuizState === 'function') {
       saveQuizState();
-
-      // Жёстко убедиться, что localStorage успел записаться
-      localStorage.setItem('quiz_last_save', 'saved_' + Date.now());
     }
 
     // Заблокировать F5 на 500ms после перехода
@@ -307,7 +304,7 @@ function showForm() {
   state.phase = 'form';
   if (typeof saveQuizState === 'function') saveQuizState();
 
-  // останавливаем таймер, если есть
+  // Останавливаем таймер при переходе к форме
   if (window.timerInterval) {
     clearInterval(window.timerInterval);
   }
@@ -429,6 +426,9 @@ function renderResult() {
 
   state.phase = 'result';
   if (typeof saveQuizState === 'function') saveQuizState();
+
+  // Очищаем таймер — тест завершён
+  localStorage.removeItem('quiz_end_time_' + TEST_ID);
 
   const percent = state.percentFromServer ?? 0;
   const verdict = state.verdictFromServer || "On the edge";
