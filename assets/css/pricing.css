@@ -485,8 +485,11 @@ body[data-theme="light"] header {
   border: 1px solid var(--border);
   border-radius: var(--radius);
   box-shadow: var(--shadow);
-  padding: 24px 22px; /* было 32px 28px */
+  padding: 24px 22px;
   transition: border-color var(--transition), transform var(--transition), box-shadow var(--transition);
+
+  display: flex;
+  flex-direction: column;
 }
 
 .pricing-card:hover {
@@ -515,7 +518,7 @@ body[data-theme="light"] header {
 }
 
 .plan-price {
-  font-size: 2.4rem; /* было 3rem */
+  font-size: 2.4rem;
   font-weight: 800;
   letter-spacing: -0.04em;
   margin-bottom: 24px;
@@ -552,6 +555,12 @@ body[data-theme="light"] header {
 
   color: var(--accent);
   font-weight: 700;
+}
+
+/* Кнопка в карточке — прижата к низу */
+.pricing-card > .btn {
+  margin-top: auto;
+  width: 100%;
 }
 
 /* EXPORT */
@@ -880,17 +889,28 @@ footer {
 
 /* MOBILE */
 
-@media (max-width: 980px) {
+/* Планшеты: 2 колонки */
+@media (max-width: 980px) and (min-width: 641px) {
   .pricing-grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
   }
 
-  .export-card {
-    flex-direction: column;
-    align-items: flex-start;
+  .pricing-card {
+    padding: 22px 20px;
+  }
+
+  .plan-desc {
+    min-height: 48px;
+    margin-bottom: 22px;
+  }
+
+  .plan-features {
+    margin-bottom: 28px;
   }
 }
 
+/* Маленькие экраны: 1 колонка */
 @media (max-width: 760px) {
   .nav-links {
     display: none;
@@ -908,8 +928,37 @@ footer {
     font-size: 2rem;
   }
 
+  .pricing-grid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+
+  .pricing-card {
+    padding: 20px;
+  }
+
+  .plan-name {
+    font-size: 1.3rem;
+  }
+
+  .plan-desc {
+    min-height: auto;
+    margin-bottom: 18px;
+    font-size: 0.9rem;
+  }
+
   .plan-price {
-    font-size: 2.4rem;
+    font-size: 2rem;
+    margin-bottom: 18px;
+  }
+
+  .plan-features {
+    gap: 10px;
+    margin-bottom: 22px;
+  }
+
+  .plan-features li {
+    font-size: 0.9rem;
   }
 
   .export-card {
