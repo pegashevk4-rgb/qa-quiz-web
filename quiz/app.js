@@ -183,14 +183,14 @@ function showQuestion() {
       ? "Тип вопроса: выберите один или несколько вариантов ответа."
       : "Тип вопроса: выберите один вариант ответа.";
 
+  // отрисовываем варианты
   renderOptions(question);
 
-  console.log('DEBUG question:', question);
-  const qType = question.question_type || question.type || "single";
-  console.log('DEBUG qType:', qType);
-
-
+  // отладка без повторного объявления
+  console.log("DEBUG question:", question);
+  console.log("DEBUG qType:", qType);
 }
+
 
 function renderOptions(question) {
   elements.optionsContainer.innerHTML = "";
