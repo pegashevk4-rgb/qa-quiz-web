@@ -506,6 +506,7 @@ function openCandidateModal(candidate) {
 
   overlay.classList.add("active");
   modal.classList.add("active");
+  document.body.classList.add("modal-open");
 }
 
 function closeModal() {
@@ -513,6 +514,7 @@ function closeModal() {
   const overlay = document.getElementById("modalOverlay");
   overlay.classList.remove("active");
   modal.classList.remove("active");
+  document.body.classList.remove("modal-open");
 }
 
 function exportCurrentCandidateToCsv() {
