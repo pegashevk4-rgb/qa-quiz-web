@@ -76,6 +76,10 @@ body {
   font-family: var(--font-body);
   font-size: 16px;
   line-height: 1.6;
+
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
 }
 
 /* Noise на фоне, как в hr.css */
@@ -586,23 +590,29 @@ body[data-theme="light"] header {
 
 .export-badges {
   display: flex;
+  justify-content: center;
   gap: 14px;
   flex-wrap: wrap;
 }
 
 .export-badge {
-  padding: 18px 24px;
-
-  border-radius: 16px;
-
+  padding: 14px 28px;
+  border-radius: 12px;
   background: var(--surface-2);
-
   border: 1px solid var(--border);
-
   font-weight: 700;
-
+  font-size: 0.95rem;
   min-width: 100px;
   text-align: center;
+  flex: 0 1 auto;
+  transition: border-color var(--transition), box-shadow var(--transition);
+  cursor: default;          /* вот это добавь */
+  pointer-events: none;     
+}
+
+.export-badge:hover {
+  border-color: var(--accent);
+  box-shadow: 0 0 16px rgba(79, 255, 176, 0.15);
 }
 
 /* FAQ */
@@ -639,32 +649,34 @@ body[data-theme="light"] header {
 /* FOOTER */
 
 footer {
-  border-top: 1px solid rgba(255, 255, 255, 0.05);
-
-  padding: 34px 0;
+  border-top: 1px solid var(--border);
+  padding: 28px 0;
+  margin-top: auto;
 }
 
 .footer-inner {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: 20px;
-
+  justify-content: center;
   flex-wrap: wrap;
-}
-
-.footer-links {
-  display: flex;
-  align-items: center;
-  gap: 22px;
-}
-
-.footer-links a {
+  gap: 8px 6px;
+  font-size: 0.85rem;
   color: var(--muted);
 }
 
-.footer-links a:hover {
-  color: white;
+.footer-inner span {
+  color: var(--muted);
+  opacity: 0.6;
+}
+
+.footer-link {
+  color: var(--muted);
+  text-decoration: none;
+  transition: color var(--transition);
+}
+
+.footer-link:hover {
+  color: var(--accent);
 }
 
 /* AUTH / GENERIC MODAL – как на hr */
@@ -906,5 +918,28 @@ footer {
 
   .export-card h2 {
     font-size: 1.6rem;
+  }
+
+  .export-badges {
+    justify-content: center;
+    gap: 10px;
+  }
+
+  .export-badge {
+    padding: 12px 22px;
+    font-size: 0.85rem;
+    min-width: 80px;
+  }
+
+  .footer-inner {
+    flex-direction: column;
+    gap: 8px;
+    text-align: center;
+  }
+
+  .footer-inner > span {
+    display: block;
+    width: 100%;
+    margin-bottom: 4px;
   }
 }
