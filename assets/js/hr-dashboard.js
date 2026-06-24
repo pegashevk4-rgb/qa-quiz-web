@@ -805,15 +805,13 @@ scoreSort.addEventListener("click", () => {
 
 document
   .getElementById("closeModalBtn")
-  .addEventListener("click", closeModal);
-
+  ?.addEventListener("click", closeModal);
 
 document
   .getElementById("closeFooterBtn")
-  .addEventListener("click", closeModal);
+  ?.addEventListener("click", closeModal);
 
-
-overlay.addEventListener("click", closeModal);
+overlay?.addEventListener("click", closeModal);
 
 
 // --- Переключатель темы ---
@@ -869,7 +867,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
   if (companyPill && companyName) {
-    const cleanName = companyName.replace(/\\_/g, "_").replace(/\\(.)/g, "$1");
+    const cleanName = companyName.replace(/\\(.)/g, "$1");
     companyPill.textContent = `Компания: ${cleanName}`;
   }
 
