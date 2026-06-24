@@ -155,11 +155,6 @@ h1 {
   font-weight: 500;
 }
 
-#options input[type="radio"],
-#options input[type="checkbox"] {
-  accent-color: #2563eb;
-}
-
 /* Кнопка "Далее" */
 #next-btn {
   width: 100%;
