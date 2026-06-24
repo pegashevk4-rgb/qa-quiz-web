@@ -981,15 +981,12 @@ AUTH / GENERIC MODAL
 .modal-inner {
   position: relative;
   width: 100%;
-  max-width: 420px;
-  padding: 24px 24px 20px;
-
+  max-width: 380px;        
+  padding: 20px 20px 18px; 
   border-radius: var(--radius);
   border: 1px solid var(--border);
-
   background: var(--card);
   box-shadow: 0 22px 60px rgba(0, 0, 0, 0.6);
-
   text-align: center;
 }
 
@@ -1406,6 +1403,17 @@ RESPONSIVE
     height: 28px;
     min-width: 28px;
     font-size: 14px;
+  }
+
+  /* НОВОЕ: чуть компактнее заголовок на мобиле */
+  h1 {
+    font-size: clamp(2.1rem, 8vw, 2.6rem);
+    line-height: 1.1;
+  }
+
+  /* НОВОЕ: меньшие боковые отступы контейнера */
+  .inner {
+    padding: 0 16px;
   }
 
   #hero {
