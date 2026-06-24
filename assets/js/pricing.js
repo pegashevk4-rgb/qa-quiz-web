@@ -74,11 +74,23 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // "Начать бесплатно" → просто открывает модалку (можно сразу на регистрацию)
   if (freeBtn) {
+  if (isLoggedIn()) {
+    // Пользователь уже авторизован
+    freeBtn.textContent = "Перейти в дашборд";
+    freeBtn.addEventListener("click", (e) => {
+      e.preventDefault();
+      window.location.href = "/hr-dashboard/";
+    });
+  } else {
+    // Не авторизован — как и было раньше
+    freeBtn.textContent = "Начать бесплатно";
     freeBtn.addEventListener("click", (e) => {
       e.preventDefault();
       openAuthModal("register");
     });
   }
+}
+
 
   // "Войти" в хедере → открывает модалку
   if (openAuthBtn) {
