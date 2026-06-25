@@ -169,6 +169,9 @@ def create_company(payload: schemas.CompanyCreate, db: Session = Depends(get_db)
     company = models.Company(
         name=payload.name,
         public_token=public_token,
+        is_paid=False,
+        trial_tests_limit=10,
+        trial_tests_used=0,
     )
     db.add(company)
     db.commit()
