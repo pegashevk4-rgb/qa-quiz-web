@@ -1,8 +1,12 @@
 from collections import defaultdict
+import traceback
+import logging
 
-from fastapi import FastAPI, Depends, HTTPException, status, Path
+from fastapi import FastAPI, Depends, HTTPException, status, Path, Request
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
 from sqlalchemy.orm import Session
+from sqlalchemy import text
 
 from .database import Base, engine, SessionLocal
 from . import models, schemas
@@ -16,9 +20,22 @@ import string
 import json
 from pathlib import Path as FilePath
 
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+
 Base.metadata.create_all(bind=engine)
 
 app = FastAPI()
+
+# Temporary debug handler — shows traceback in response
+@app.exception_handler(Exception)
+async def debug_exception_handler(request: Request, exc: Exception):
+    tb = traceback.format_exception(type(exc), exc, exc.__tb__)
+    logger.error("Unhandled exception: %s", "".join(tb))
+    return JSONResponse(
+        status_code=500,
+        content={"detail": str(exc), "type": type(exc).__name__, "trace": "".join(tb[-5:])},
+    )
 
 # Разрешённые источники (origin'ы) для разработки
 origins = [
@@ -34,6 +51,21 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+
+@app.on_event("startup")
+def check_db_tables():
+    with engine.connect() as conn:
+        result = conn.execute(text(
+            "SELECT table_name FROM information_schema.tables "
+            "WHERE table_schema = 'public'"
+        ))
+        tables = [row[0] for row in result]
+        logger.info("Database tables: %s", tables)
+        required = ["companies", "company_hr_users", "users", "results", "detailed_results", "quiz_questions"]
+        missing = [t for t in required if t not in tables]
+        if missing:
+            logger.warning("MISSING TABLES: %s", missing)
 
 
 def generate_public_token(length: int = 32) -> str:
