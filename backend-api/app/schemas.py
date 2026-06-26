@@ -96,6 +96,7 @@ class QuestionPublic(BaseModel):
     text: str
     options: List[str]
     type: str = "single"
+    category: str = "Общее"
 
     class Config:
         from_attributes = True

@@ -1,4 +1,5 @@
 from collections import defaultdict
+import random
 import traceback
 import logging
 
@@ -445,14 +446,138 @@ def get_test_public(
     test_id: str,
     db: Session = Depends(get_db),
 ):
+    
+    # Целевые размеры тестов
+    TARGET_TOTAL_BY_TEST = {
+        "qa_junior_web": 35,
+        "qa_middle_web": 32,
+        "qa_senior_web": 36,
+    }
+    TARGET_TOTAL = TARGET_TOTAL_BY_TEST.get(test_id, 35)
+
+    # ----- Планы по категориям -----
+
+    JUNIOR_CATEGORY_PLAN: dict[str, tuple[int, int]] = {
+        "Принципы тестирования": (2, 3),
+        "Виды тестирования": (2, 3),
+        "Уровни тестирования": (1, 2),
+        "Документация": (2, 3),
+        "Баг-репорт / Severity / Priority": (2, 3),
+        "Smoke / Sanity / Регрессия": (1, 2),
+        "Жизненный цикл разработки": (1, 2),
+        "Техники тест-дизайна": (2, 3),
+        "API-тестирование": (2, 3),
+        "SQL / Базы данных": (1, 2),
+        "Жизненный цикл дефекта": (1, 2),
+        "Браузеры и Web": (1, 2),
+        "Клиент-сервер": (1, 1),
+        "DevTools": (1, 2),
+        "Основы мобильного тестирования": (1, 1),
+        "DevTools / Практика": (1, 2),
+        "HTTP Status Codes": (1, 2),
+    }
+
+    MIDDLE_CATEGORY_PLAN: dict[str, tuple[int, int]] = {
+        "API-тестирование": (4, 6),
+        "Автоматизация тестирования": (4, 6),
+        "SQL / Базы данных": (3, 5),
+        "Жизненный цикл разработки": (3, 5),
+        "Баг-репорт / Severity / Priority": (3, 5),
+        "Smoke / Sanity / Регрессия": (3, 5),
+    }
+
+    SENIOR_CATEGORY_PLAN: dict[str, tuple[int, int]] = {
+        "Тест-стратегия и тест-планирование": (3, 3),
+        "Risk-based testing и приоритизация": (3, 3),
+        "Flaky-тесты и стабильность автотестов": (3, 3),
+        "CI/CD и релизы": (3, 3),
+        "Архитектура автоматизации и пирамида тестирования": (3, 3),
+        "API-тестирование и микросервисы": (3, 3),
+        "Анализ инцидентов и постмортемы": (3, 3),
+        "Анализ требований и роль QA": (3, 3),
+        "SQL и работа с данными": (3, 3),
+        "Приоритизация багов и регрессии": (3, 3),
+        "Observability и мониторинг": (3, 3),
+        "Automation architecture": (3, 3),
+    }
+
+    if test_id == "qa_junior_web":
+        CATEGORY_PLAN = JUNIOR_CATEGORY_PLAN
+    elif test_id == "qa_middle_web":
+        CATEGORY_PLAN = MIDDLE_CATEGORY_PLAN
+    elif test_id == "qa_senior_web":
+        CATEGORY_PLAN = SENIOR_CATEGORY_PLAN
+    else:
+        CATEGORY_PLAN = {}
+
     questions = (
         db.query(models.QuizQuestion)
         .filter(models.QuizQuestion.test_id == test_id)
-        .order_by(models.QuizQuestion.order.asc(), models.QuizQuestion.id.asc())
         .all()
     )
     if not questions:
         raise HTTPException(status_code=404, detail="Test not found")
+
+    by_category: dict[str, list[models.QuizQuestion]] = defaultdict(list)
+    for q in questions:
+        cat = q.category or "Общее"
+        by_category[cat].append(q)
+
+    selected: list[models.QuizQuestion] = []
+
+    # минимум по плану
+    for cat, cat_questions in by_category.items():
+        plan = CATEGORY_PLAN.get(cat)
+        if plan:
+            min_q, max_q = plan
+        else:
+            min_q, max_q = 0, min(2, len(cat_questions))
+
+        if min_q <= 0:
+            continue
+
+        k = min(min_q, len(cat_questions))
+        if k > 0:
+            selected.extend(random.sample(cat_questions, k))
+
+    # добор до TARGET_TOTAL
+    if len(selected) < TARGET_TOTAL:
+        remaining_needed = TARGET_TOTAL - len(selected)
+
+        pool: list[models.QuizQuestion] = []
+        already_ids = {q.id for q in selected}
+
+        for cat, cat_questions in by_category.items():
+            plan = CATEGORY_PLAN.get(cat)
+            if plan:
+                min_q, max_q = plan
+            else:
+                min_q, max_q = 0, min(2, len(cat_questions))
+
+            already_in_cat = sum(
+                1 for q in selected if (q.category or "Общее") == cat
+            )
+            can_take_from_cat = max(
+                0,
+                min(max_q - already_in_cat, len(cat_questions))
+            )
+            if can_take_from_cat <= 0:
+                continue
+
+            remaining_cat_q = [
+                q for q in cat_questions if q.id not in already_ids
+            ]
+            random.shuffle(remaining_cat_q)
+            pool.extend(remaining_cat_q[:can_take_from_cat])
+
+        if pool:
+            extra = random.sample(pool, min(remaining_needed, len(pool)))
+            selected.extend(extra)
+
+    if len(selected) > TARGET_TOTAL:
+        selected = random.sample(selected, TARGET_TOTAL)
+
+    random.shuffle(selected)
 
     return schemas.TestPublic(
         test_id=test_id,
@@ -463,8 +588,9 @@ def get_test_public(
                 text=q.text,
                 options=q.options,
                 type=q.question_type or "single",
+                category=q.category or "Общее",
             )
-            for q in questions
+            for q in selected
         ],
     )
 
@@ -527,7 +653,7 @@ def submit_test(
 
     q_by_id: dict[int, models.QuizQuestion] = {q.id: q for q in db_questions}
 
-    total = len(db_questions)
+    total = len(payload.answers)
     correct = 0
 
     # агрегат по категориям

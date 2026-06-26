@@ -80,13 +80,7 @@ async function loadQuestions() {
       return;
     }
 
-    questions = questions
-      .map(q => ({ q, sort: Math.random() }))
-      .sort((a, b) => a.sort - b.sort)
-      .map(({ q }) => q);
-
-    const MAX_QUESTIONS = 30;
-    state.questions = questions.slice(0, MAX_QUESTIONS);
+    state.questions = questions;
 
     if (elements.testTitle) {
       elements.testTitle.textContent = data.title || "QA Quiz";
@@ -173,7 +167,7 @@ function showQuestion() {
   elements.progress.textContent =
     `Вопрос ${state.currentIndex + 1} из ${state.questions.length}`;
 
-  elements.categoryText.textContent = "";
+  elements.categoryText.textContent = question.category || "";
   elements.questionText.textContent = question.text;
 
   const qType = question.question_type || question.type || "single";
