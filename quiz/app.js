@@ -180,9 +180,6 @@ function showQuestion() {
   // отрисовываем варианты
   renderOptions(question);
 
-  // отладка без повторного объявления
-  console.log("DEBUG question:", question);
-  console.log("DEBUG qType:", qType);
 }
 
 
