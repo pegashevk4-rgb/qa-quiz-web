@@ -3,12 +3,6 @@ const API_BASE_URL = "https://api.qa-quiz-test.ru";
 
 // --- Проверка авторизации перед показом дашборда ---
 (function guardDashboard() {
-  const DEV_BYPASS_AUTH = false; // на проде обязательно false
-
-  if (DEV_BYPASS_AUTH) {
-    return;
-  }
-
   const isLoggedIn = localStorage.getItem("qa_is_logged_in") === "1";
   const companyId = localStorage.getItem("qa_company_id");
 

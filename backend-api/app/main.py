@@ -21,6 +21,9 @@ import string
 import json
 from pathlib import Path as FilePath
 
+VERDICT_PASSED_THRESHOLD = 80
+VERDICT_EDGE_THRESHOLD = 50
+
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
@@ -28,14 +31,14 @@ Base.metadata.create_all(bind=engine)
 
 app = FastAPI()
 
-# Temporary debug handler — shows traceback in response
+# Global exception handler: логируем и отдаём обобщённую ошибку
 @app.exception_handler(Exception)
-async def debug_exception_handler(request: Request, exc: Exception):
+async def production_exception_handler(request: Request, exc: Exception):
     tb = traceback.format_exception(type(exc), exc, exc.__traceback__)
     logger.error("Unhandled exception: %s", "".join(tb))
     return JSONResponse(
         status_code=500,
-        content={"detail": str(exc), "type": type(exc).__name__, "trace": "".join(tb[-5:])},
+        content={"detail": "Internal Server Error"},
     )
 
 # Разрешённые источники (origin'ы) для разработки
@@ -694,9 +697,9 @@ def submit_test(
 
     percent = int(round(correct * 100 / total)) if total else 0
 
-    if percent >= 80:
+    if percent >= VERDICT_PASSED_THRESHOLD:
         verdict = "Passed"
-    elif percent >= 50:
+    elif percent >= VERDICT_EDGE_THRESHOLD:
         verdict = "On the edge"
     else:
         verdict = "Failed"
@@ -760,8 +763,8 @@ def submit_test(
             result_id=result.id,
             category=cat_name,
             percent=cat_percent,
-            is_strong=cat_percent >= 80,
-            is_weak=cat_percent < 50,
+            is_strong=cat_percent >= VERDICT_PASSED_THRESHOLD,
+            is_weak=cat_percent < VERDICT_EDGE_THRESHOLD,
         )
         db.add(detailed)
 
@@ -774,9 +777,9 @@ def submit_test(
             )
         )
 
-        if cat_percent >= 80:
+        if cat_percent >= VERDICT_PASSED_THRESHOLD:
             strong_areas.append(schemas.AreaItem(category=cat_name))
-        elif cat_percent < 50:
+        elif cat_percent < VERDICT_EDGE_THRESHOLD:
             weak_areas.append(schemas.AreaItem(category=cat_name))
 
     # общий "Overall" как и раньше
@@ -784,8 +787,8 @@ def submit_test(
         result_id=result.id,
         category="Overall",
         percent=percent,
-        is_strong=percent >= 80,
-        is_weak=percent < 50,
+        is_strong=percent >= VERDICT_PASSED_THRESHOLD,
+        is_weak=percent < VERDICT_EDGE_THRESHOLD,
     )
     db.add(overall_detail)
 
@@ -799,196 +802,3 @@ def submit_test(
         weak_areas=weak_areas,
         categories=detailed_rows,
     )
-
-
-def seed_questions():
-    db = SessionLocal()
-    try:
-        existing = db.query(models.QuizQuestion).first()
-        if existing:
-            print("Questions already seeded")
-            return
-
-        q1 = models.QuizQuestion(
-            test_id="qa_junior_web",
-            text="Что такое тест-кейс?",
-            options=[
-                "Описание набора действий для проверки функционала",
-                "Описание архитектуры системы",
-                "Описание багов",
-                "Описание требований к системе",
-            ],
-            correct_index=0,
-            order=1,
-        )
-
-        q2 = models.QuizQuestion(
-            test_id="qa_junior_web",
-            text="Что такое баг-репорт?",
-            options=[
-                "Документ, описывающий найденный дефект",
-                "Документ с требованиями",
-                "План тестирования",
-                "Список тест-кейсов",
-            ],
-            correct_index=0,
-            order=2,
-        )
-
-        db.add_all([q1, q2])
-        db.commit()
-        print("Seed done")
-    finally:
-        db.close()
-
-def import_junior_questions_from_json(json_path: str):
-    db = SessionLocal()
-    try:
-        path = FilePath(json_path)
-        if not path.exists():
-            print(f"JSON file not found: {path}")
-            return
-
-        with path.open("r", encoding="utf-8") as f:
-            data = json.load(f)
-
-        # Очищаем старые junior-вопросы (если нужно)
-        db.query(models.QuizQuestion).filter(
-            models.QuizQuestion.test_id == "qa_junior_web"
-        ).delete()
-        db.commit()
-
-        questions: list[models.QuizQuestion] = []
-
-        order_counter = 1
-        for item in data:
-            # Пропускаем не junior-уровень на всякий случай
-            if item.get("level") != "junior":
-                continue
-
-            # Берём первую правильную опцию (для type=multiple берём просто первый индекс)
-            correct_indexes = item.get("correct_indexes") or []
-            if not correct_indexes:
-                continue
-
-            correct_index = correct_indexes[0]
-
-            q = models.QuizQuestion(
-                test_id="qa_junior_web",
-                text=item["question"],
-                options=item["options"],
-                correct_index=correct_index,
-                correct_indexes=correct_indexes,
-                question_type=item.get("type") or "single",
-                order=order_counter,
-                category=item.get("category") or "Общее",
-            )
-            questions.append(q)
-            order_counter += 1
-
-        db.add_all(questions)
-        db.commit()
-        print(f"Imported {len(questions)} junior questions from {path}")
-    finally:
-        db.close()
-
-def import_middle_questions_from_json(json_path: str):
-    db = SessionLocal()
-    try:
-        path = FilePath(json_path)
-        if not path.exists():
-            print(f"JSON file not found: {path}")
-            return
-
-        with path.open("r", encoding="utf-8") as f:
-            data = json.load(f)
-
-        db.query(models.QuizQuestion).filter(
-            models.QuizQuestion.test_id == "qa_middle_web"
-        ).delete()
-        db.commit()
-
-        questions: list[models.QuizQuestion] = []
-        order_counter = 1
-
-        for item in data:
-            if item.get("level") != "middle":
-                continue
-
-            correct_indexes = item.get("correct_indexes") or []
-            if not correct_indexes:
-                continue
-
-            correct_index = correct_indexes[0]
-
-            q = models.QuizQuestion(
-                test_id="qa_middle_web",
-                text=item["question"],
-                options=item["options"],
-                correct_index=correct_index,
-                correct_indexes=correct_indexes,
-                question_type=item.get("type") or "single",
-                order=order_counter,
-                category=item.get("category") or "Общее",
-            )
-            questions.append(q)
-            order_counter += 1
-
-        db.add_all(questions)
-        db.commit()
-        print(f"Imported {len(questions)} middle questions from {path}")
-    finally:
-        db.close()
-
-def import_senior_questions_from_json(json_path: str):
-    db = SessionLocal()
-    try:
-        path = FilePath(json_path)
-        if not path.exists():
-            print(f"JSON file not found: {path}")
-            return
-
-        with path.open("r", encoding="utf-8") as f:
-            data = json.load(f)
-
-        db.query(models.QuizQuestion).filter(
-            models.QuizQuestion.test_id == "qa_senior_web"
-        ).delete()
-        db.commit()
-
-        questions: list[models.QuizQuestion] = []
-        order_counter = 1
-
-        for item in data:
-            if item.get("level") != "senior":
-                continue
-
-            correct_indexes = item.get("correct_indexes") or []
-            if not correct_indexes:
-                continue
-
-            correct_index = correct_indexes[0]
-
-            q = models.QuizQuestion(
-                test_id="qa_senior_web",
-                text=item["question"],
-                options=item["options"],
-                correct_index=correct_index,
-                correct_indexes=correct_indexes,
-                question_type=item.get("type") or "single",
-                order=order_counter,
-                category=item.get("category") or "Общее",
-            )
-            questions.append(q)
-            order_counter += 1
-
-        db.add_all(questions)
-        db.commit()
-        print(f"Imported {len(questions)} senior questions from {path}")
-    finally:
-        db.close()
-
-#if __name__ == "__main__":
-    #import_junior_questions_from_json("app/data/questions_junior.json")
-    #import_middle_questions_from_json("app/data/questions_middle.json")
-    #import_senior_questions_from_json("app/data/questions_senior.json")

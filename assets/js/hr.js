@@ -258,6 +258,9 @@ document.addEventListener("DOMContentLoaded", () => {
   const candTopicsBody = document.getElementById("cand-topics-body");
   const tableBody = document.getElementById("results-table-body");
 
+
+// Демонстрационные темы по кандидатам только для лендинга.
+// В реальном HR-кабинете breakdown берётся из API.
   const candidateTopicsByEmail = {
   "a.smirnova@mail.ru": [
     { name: "Принципы тестирования", percent: 80, correct: 7, total: 9 },
