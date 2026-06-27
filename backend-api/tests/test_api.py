@@ -165,6 +165,50 @@ class TestCandidates:
         assert response.json() == []
 
 
+class TestPublicQuiz:
+    def test_get_public_test_returns_limited_questions(self, client, db):
+        from app.models import QuizQuestion
+
+        categories = [f"Category-{i}" for i in range(20)]
+        questions = []
+        for i in range(50):
+            questions.append(
+                QuizQuestion(
+                    test_id="qa_junior_web",
+                    text=f"Question {i}",
+                    options=["A", "B", "C", "D"],
+                    correct_index=0,
+                    order=i + 1,
+                    category=categories[i % len(categories)],
+                )
+            )
+        db.add_all(questions)
+        db.commit()
+
+        response = client.get("/public/tests/qa_junior_web")
+        assert response.status_code == 200
+        data = response.json()
+        assert data["test_id"] == "qa_junior_web"
+        assert len(data["questions"]) <= 35
+
+    def test_get_public_test_returns_404_for_unknown(self, client):
+        response = client.get("/public/tests/qa_nonexistent_test")
+        assert response.status_code == 404
+
+    def test_get_public_test_correct_structure(self, client, sample_questions):
+        response = client.get("/public/tests/qa_junior_web")
+        assert response.status_code == 200
+        data = response.json()
+        assert "test_id" in data
+        assert "title" in data
+        assert "questions" in data
+        assert len(data["questions"]) > 0
+        q = data["questions"][0]
+        assert "id" in q
+        assert "text" in q
+        assert "options" in q
+
+
 class TestPublicSubmit:
     @pytest.mark.parametrize(
         "answers,expected_percent,expected_verdict",
