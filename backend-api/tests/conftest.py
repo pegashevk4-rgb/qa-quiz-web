@@ -12,6 +12,8 @@ from app.main import app, get_db
 from app.auth import get_current_company
 from app import models
 
+TEST_COMPANY_TOKEN = "test_token_abc123"
+
 test_engine = create_engine(
     "sqlite://",
     connect_args={"check_same_thread": False},
@@ -36,12 +38,7 @@ database_module.SessionLocal = TestSessionLocal
 main_module.engine = test_engine
 main_module.SessionLocal = TestSessionLocal
 
-
-@pytest.fixture(scope="session", autouse=True)
-def create_tables():
-    Base.metadata.create_all(bind=test_engine)
-    yield
-    Base.metadata.drop_all(bind=test_engine)
+Base.metadata.create_all(bind=test_engine)
 
 
 @pytest.fixture(autouse=True)
@@ -51,31 +48,6 @@ def setup_db():
         for table in reversed(Base.metadata.sorted_tables):
             conn.execute(table.delete())
         conn.commit()
-
-
-def override_get_db():
-    db = TestSessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
-
-
-app.dependency_overrides[get_db] = override_get_db
-
-
-def override_get_current_company():
-    db = TestSessionLocal()
-    try:
-        company = db.query(models.Company).first()
-        if company is None:
-            raise Exception("No company found for test")
-        return company
-    finally:
-        db.close()
-
-
-app.dependency_overrides[get_current_company] = override_get_current_company
 
 
 @pytest.fixture()
@@ -88,9 +60,29 @@ def db():
 
 
 @pytest.fixture()
-def client():
+def client(db):
     from fastapi.testclient import TestClient
-    return TestClient(app)
+
+    def override_get_db():
+        try:
+            yield db
+        finally:
+            pass
+
+    def override_get_current_company():
+        company = db.query(models.Company).first()
+        if company is None:
+            raise Exception("No company found for test")
+        return company
+
+    app.dependency_overrides[get_db] = override_get_db
+    app.dependency_overrides[get_current_company] = override_get_current_company
+
+    with TestClient(app) as c:
+        yield c
+
+    app.dependency_overrides.pop(get_db, None)
+    app.dependency_overrides.pop(get_current_company, None)
 
 
 @pytest.fixture()
@@ -98,7 +90,7 @@ def sample_company(db):
     from app.models import Company
     company = Company(
         name="TestCorp",
-        public_token="test_token_abc123",
+        public_token=TEST_COMPANY_TOKEN,
         is_paid=False,
         trial_tests_limit=10,
         trial_tests_used=0,

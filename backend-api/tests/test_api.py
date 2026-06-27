@@ -1,4 +1,7 @@
+import pytest
+
 from app.models import Company, User, Result, DetailedResult, CompanyHRUser
+from tests.conftest import TEST_COMPANY_TOKEN
 
 
 class TestHealth:
@@ -25,7 +28,7 @@ class TestAuth:
         assert data["email"] == "hr@testcorp.com"
         assert data["name"] == "HR Manager"
         assert data["company_id"] == sample_company.id
-        assert data["company_token"] == "test_token_abc123"
+        assert data["company_token"] == sample_company.public_token
         assert "id" in data
 
     def test_register_duplicate_email(self, client, sample_company):
@@ -56,10 +59,20 @@ class TestAuth:
         assert response.status_code == 200
         data = response.json()
         assert data["company_id"] == sample_company.id
-        assert data["company_token"] == "test_token_abc123"
+        assert data["company_token"] == sample_company.public_token
         assert "access_token" in data
 
-    def test_login_wrong_password(self, client, sample_company):
+    @pytest.mark.parametrize(
+        "email,password,expected_status",
+        [
+            ("hr@testcorp.com", "wrongpassword", 401),
+            ("nobody@testcorp.com", "secret123", 401),
+        ],
+        ids=["wrong_password", "nonexistent_user"],
+    )
+    def test_login_invalid_credentials(
+        self, client, sample_company, email, password, expected_status
+    ):
         client.post(
             "/auth/register",
             json={
@@ -71,16 +84,9 @@ class TestAuth:
         )
         response = client.post(
             "/auth/login",
-            json={"email": "hr@testcorp.com", "password": "wrongpassword"},
+            json={"email": email, "password": password},
         )
-        assert response.status_code == 401
-
-    def test_login_nonexistent_user(self, client):
-        response = client.post(
-            "/auth/login",
-            json={"email": "nobody@testcorp.com", "password": "secret123"},
-        )
-        assert response.status_code == 401
+        assert response.status_code == expected_status
 
 
 class TestCandidates:
@@ -117,13 +123,103 @@ class TestCandidates:
         assert response.status_code == 200
         assert response.json()["first_name"] == "Иван"
 
-    def test_get_nonexistent_candidate(self, client, sample_company):
-        response = client.get("/candidates/99999")
+    def test_get_nonexistent_candidate(self, client, sample_company, db):
+        create_resp = client.post(
+            "/candidates",
+            json={
+                "first_name": "Temp",
+                "last_name": "User",
+                "email": "temp@example.com",
+                "company_id": sample_company.id,
+            },
+        )
+        candidate_id = create_resp.json()["id"]
+
+        db.query(User).filter(User.id == candidate_id).delete()
+        db.commit()
+
+        response = client.get(f"/candidates/{candidate_id}")
         assert response.status_code == 404
+
+    def test_list_candidates(self, client, sample_company):
+        for name, email in [("Иван", "ivan@example.com"), ("Мария", "maria@example.com")]:
+            client.post(
+                "/candidates",
+                json={
+                    "first_name": name,
+                    "last_name": "Тест",
+                    "email": email,
+                    "company_id": sample_company.id,
+                },
+            )
+
+        response = client.get("/candidates")
+        assert response.status_code == 200
+        data = response.json()
+        assert len(data) == 2
+        assert {c["email"] for c in data} == {"ivan@example.com", "maria@example.com"}
+
+    def test_list_candidates_empty(self, client, sample_company):
+        response = client.get("/candidates")
+        assert response.status_code == 200
+        assert response.json() == []
 
 
 class TestPublicSubmit:
-    def test_submit_test(self, client, sample_company, sample_questions):
+    @pytest.mark.parametrize(
+        "answers,expected_percent,expected_verdict",
+        [
+            (
+                [
+                    {"question_index": 0, "selected_index": 0},
+                    {"question_index": 1, "selected_index": 0},
+                    {"question_index": 2, "selected_index": 0},
+                ],
+                100,
+                "Passed",
+            ),
+            (
+                [
+                    {"question_index": 0, "selected_index": 0},
+                    {"question_index": 1, "selected_index": 1},
+                    {"question_index": 2, "selected_index": 1},
+                ],
+                33,
+                "Failed",
+            ),
+        ],
+        ids=["all_correct", "partial_correct"],
+    )
+    def test_submit_scoring(
+        self,
+        client,
+        sample_company,
+        sample_questions,
+        answers,
+        expected_percent,
+        expected_verdict,
+    ):
+        real_answers = [
+            {
+                "question_id": sample_questions[a["question_index"]].id,
+                "selected_index": a["selected_index"],
+            }
+            for a in answers
+        ]
+        response = client.post(
+            f"/public/tests/qa_junior_web/submit?company_token={sample_company.public_token}",
+            json={
+                "test_id": "qa_junior_web",
+                "answers": real_answers,
+                "candidate": {"first_name": "Test", "last_name": "User"},
+            },
+        )
+        assert response.status_code == 201
+        data = response.json()
+        assert data["percent"] == expected_percent
+        assert data["verdict"] == expected_verdict
+
+    def test_submit_test_all_correct_categories(self, client, sample_company, sample_questions):
         response = client.post(
             f"/public/tests/qa_junior_web/submit?company_token={sample_company.public_token}",
             json={
@@ -142,31 +238,8 @@ class TestPublicSubmit:
         )
         assert response.status_code == 201
         data = response.json()
-        assert data["percent"] == 100
-        assert data["verdict"] == "Passed"
         assert len(data["categories"]) == 2
         assert len(data["strong_areas"]) >= 1
-
-    def test_submit_test_partial_correct(self, client, sample_company, sample_questions):
-        response = client.post(
-            f"/public/tests/qa_junior_web/submit?company_token={sample_company.public_token}",
-            json={
-                "test_id": "qa_junior_web",
-                "answers": [
-                    {"question_id": sample_questions[0].id, "selected_index": 0},
-                    {"question_id": sample_questions[1].id, "selected_index": 1},
-                    {"question_id": sample_questions[2].id, "selected_index": 1},
-                ],
-                "candidate": {
-                    "first_name": "Мария",
-                    "last_name": "Сидорова",
-                },
-            },
-        )
-        assert response.status_code == 201
-        data = response.json()
-        assert data["percent"] == 33
-        assert data["verdict"] == "Failed"
 
     def test_submit_test_bad_token(self, client, sample_questions):
         response = client.post(

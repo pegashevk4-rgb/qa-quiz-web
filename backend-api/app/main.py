@@ -31,7 +31,7 @@ app = FastAPI()
 # Temporary debug handler — shows traceback in response
 @app.exception_handler(Exception)
 async def debug_exception_handler(request: Request, exc: Exception):
-    tb = traceback.format_exception(type(exc), exc, exc.__tb__)
+    tb = traceback.format_exception(type(exc), exc, exc.__traceback__)
     logger.error("Unhandled exception: %s", "".join(tb))
     return JSONResponse(
         status_code=500,
@@ -56,17 +56,20 @@ app.add_middleware(
 
 @app.on_event("startup")
 def check_db_tables():
-    with engine.connect() as conn:
-        result = conn.execute(text(
-            "SELECT table_name FROM information_schema.tables "
-            "WHERE table_schema = 'public'"
-        ))
-        tables = [row[0] for row in result]
-        logger.info("Database tables: %s", tables)
-        required = ["companies", "company_hr_users", "users", "results", "detailed_results", "quiz_questions"]
-        missing = [t for t in required if t not in tables]
-        if missing:
-            logger.warning("MISSING TABLES: %s", missing)
+    try:
+        with engine.connect() as conn:
+            result = conn.execute(text(
+                "SELECT table_name FROM information_schema.tables "
+                "WHERE table_schema = 'public'"
+            ))
+            tables = [row[0] for row in result]
+            logger.info("Database tables: %s", tables)
+            required = ["companies", "company_hr_users", "users", "results", "detailed_results", "quiz_questions"]
+            missing = [t for t in required if t not in tables]
+            if missing:
+                logger.warning("MISSING TABLES: %s", missing)
+    except Exception as e:
+        logger.info("Skipping table check (non-PostgreSQL DB): %s", e)
 
 
 def generate_public_token(length: int = 32) -> str:
@@ -317,6 +320,18 @@ def create_candidate(
     db.commit()
     db.refresh(candidate)
     return candidate
+
+
+@app.get("/candidates", response_model=list[schemas.CandidatePublic])
+def list_candidates(
+    current_company: models.Company = Depends(get_current_company),
+    db: Session = Depends(get_db),
+):
+    return (
+        db.query(models.User)
+        .filter(models.User.company_id == current_company.id)
+        .all()
+    )
 
 
 @app.get("/candidates/{candidate_id}", response_model=schemas.CandidatePublic)
